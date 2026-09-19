@@ -34,7 +34,7 @@ Claude 主写实现，用户做设计决策。
 
 按实验而异：Go（06、13、16、17 方向）、C++（15 方向）。
 
-tx 服务器适合跑这条线（Go 1.27、cmake、Docker 齐全，且常开）。**注意那台机器的 `ubuntu` 用户不在 docker 组，docker 命令要带 `sudo`**；内存只有 7.5G，多个服务同时跑之前先看 `free -h`。
+tx 服务器适合跑这条线（Go 1.27、cmake、Docker 齐全，且常开，`ubuntu` 已在 docker 组所以不用 `sudo`）。内存只有 7.5G，多个服务同时跑之前先看 `free -h`。
 
 ## 所有项目共同的约束
 
@@ -67,7 +67,7 @@ tx 服务器适合跑这条线（Go 1.27、cmake、Docker 齐全，且常开）�
 
 确有必要在本地跑时，**必须先征得用户同意**，不要自行决定。
 
-tx 上 `ubuntu` 用户不在 `docker` 组，所有 docker 命令要带 `sudo`（免密 sudo 可用）。该机内存只有 7.5G，多个服务同时跑之前先看 `free -h`。
+tx 上 `ubuntu` **已加入 `docker` 组**（2026-09-19），docker 命令不需要 `sudo`，Testcontainers 也可直接用。该机内存只有 7.5G，多个服务同时跑之前先看 `free -h`。
 
 ### 在 tx 上跑 Docker／测试前，必须先同步代码
 
