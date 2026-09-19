@@ -69,6 +69,19 @@ tx 服务器适合跑这条线（Go 1.27、cmake、Docker 齐全，且常开）�
 
 tx 上 `ubuntu` 用户不在 `docker` 组，所有 docker 命令要带 `sudo`（免密 sudo 可用）。该机内存只有 7.5G，多个服务同时跑之前先看 `free -h`。
 
+### 在 tx 上跑 Docker／测试前，必须先同步代码
+
+本地改完直接去 tx 跑，而 tx 上还是旧代码 —— 结果是「测试通过」测的其实是旧版本，**这种假通过比失败更危险**。
+
+用 `workplan-docs/scripts/run-on-tx.sh` 代替手工 ssh，它强制执行正确顺序：
+
+```bash
+bash workplan-docs/scripts/run-on-tx.sh agent-memory 'uv run pytest -q'
+bash workplan-docs/scripts/run-on-tx.sh agent-memory 'docker compose up -d postgres'
+```
+
+它会：本地有未提交改动就拒绝 → push → tx pull → **校验两边哈希一致** → 才执行。哈希比对是最终判据，不是「命令有没有报错」。脚本还顺带剥掉了腾讯云登录横幅。
+
 ## 记录规范：新内容写到哪儿
 
 **本仓库的正文只维护 `AGENTS.md` 一份**，`CLAUDE.md` 永远只是几行指路。两份都写正文必然漂移，**不要往 `CLAUDE.md` 里加任何内容**。
