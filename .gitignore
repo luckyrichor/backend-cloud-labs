@@ -1,0 +1,19 @@
+.DS_Store
+.local/
+# Go
+bin/
+vendor/
+# C++
+build/
+cmake-build-*/
+compile_commands.json
+*.o
+*.a
+*.so
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
