@@ -1,12 +1,14 @@
 # AGENTS.md
 
+最后更新：2026-10-01（北京时间）
+
 本文件为在本仓库工作的编码 agent 提供指引（Claude Code 读 `CLAUDE.md`、Codex 读 `AGENTS.md`，两者都指向这里）。
 
 ## 这是什么
 
 后端服务与云原生方向的实验集合。三个月求职计划六项目之一（原编号 ⑥），对应岗位 **06、13、15、16、17**。总计划见 [workplan-docs](https://github.com/luckyrichor/workplan-docs)。
 
-**当前状态：E1 骨架就位（Item 模型 + 内存 store，`-race` 通过），正题未开始；E2～E5 未开工。**（2026-09-20）
+**当前状态：E1 本地自动验收通过（2026-10-01），缓存竞态/修复/降级/HTTP 已验证；source 仍为内存 store；E2～E5 未开工。**
 
 权威口径是各实验目录的 README 与 `docs/progress.md`，不要在别处另写一份状态。
 
