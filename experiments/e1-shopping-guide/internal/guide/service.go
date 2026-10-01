@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/catalog"
+	"sort"
 )
 
 var ErrCacheMiss = errors.New("cache miss")
@@ -48,7 +49,12 @@ func (s Service) Put(ctx context.Context, item catalog.Item) (Result, error) {
 }
 func (s Service) Recommend(ctx context.Context, ids []string, budgetCent int64) ([]Result, error) {
 	results := make([]Result, 0)
+	seen := make(map[string]bool)
 	for _, id := range ids {
+		if seen[id] {
+			continue
+		}
+		seen[id] = true
 		result, err := s.Get(ctx, id)
 		if errors.Is(err, catalog.ErrNotFound) {
 			continue
@@ -60,5 +66,11 @@ func (s Service) Recommend(ctx context.Context, ids []string, budgetCent int64) 
 			results = append(results, result)
 		}
 	}
+	sort.Slice(results, func(i, j int) bool {
+		if results[i].Item.PriceCent == results[j].Item.PriceCent {
+			return results[i].Item.ID < results[j].Item.ID
+		}
+		return results[i].Item.PriceCent < results[j].Item.PriceCent
+	})
 	return results, nil
 }

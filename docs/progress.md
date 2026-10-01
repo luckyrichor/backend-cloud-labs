@@ -48,3 +48,8 @@
 HTTP 服务实跑 127.0.0.1:8086：初始 kettle v1/4990；停 Redis 后 PUT 改为 v2/3990，HTTP 200/degraded=true；缓存停止期间 GET 得 v2/degraded=true；启动 Redis 后 GET 得 v2/source=store/degraded=false，下一次 source=cache_validated；POST recommendations/budget=4500 返回该商品。源是内存 store，不称作已验证持久数据库/生产导购；所有读严格验证源版本，未声称缓存减轻 DB 读。服务与临时容器验证后清理，不动常驻 memory Postgres。
 
 未提交/推送，无实际工时声明。E2～E5 未实现。
+# 2026-10-02 W5–W7（Codex）
+
+来源 backend-cloud-labs@8519ae7 + 本轮工作树修改。W5 独立维护：E1 推荐去重、按价格/ID 排序，增加回归。W6 E2：独立 module，TCP JSON 长连接、权威帧循环、同帧广播、随机恢复凭据、重连恢复、输入去重。W7 独立维护：旧连接输入失效、非法握手拒绝、慢队列隔离和关闭时回收 worker 的验证。
+
+`sg docker -c 'bash scripts/bootstrap.sh'`：E1 **11 tests**（实际临时 Redis，无 skip）、E2 **3 tests**，全部 go test -race -count=1 通过，go vet 通过；gofmt 已执行。Redis 临时容器自动清理，未动常驻服务。E2 默认50ms帧，本次测试用2ms/1ms有界驱动，无生产容量声明。E1源/房间状态仍在内存；E3–E5未开工。E2接口/边界见实验README。无实际工时声明，以下为历史记录。

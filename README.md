@@ -2,12 +2,13 @@
 
 后端服务与云原生方向的实验集合。**刻意拆成多个各自独立、各自完整的小实验**，而不是一个什么都沾一点的大项目——后者的结果是五个岗位方向哪个都覆盖不了。
 
-**状态：E1 骨架就位，其余四个实验未开工**（2026-09-20）
+**状态：E1/E2 本地自动验收通过；E3–E5 未开工**（2026-10-02）
 
 | 实验 | 目录 | 状态 |
 |---|---|---|
-| E1 导购服务 + 缓存一致性 | [`experiments/e1-shopping-guide`](experiments/e1-shopping-guide) | 骨架就位（Item 模型 + 内存 store），正题未开始，W3 主力 |
-| E2 ～ E5 | — | 未开工 |
+| E1 导购服务 + 缓存一致性 | [`experiments/e1-shopping-guide`](experiments/e1-shopping-guide) | 真实 Redis 竞态/降级/恢复；W5 推荐去重排序维护完成 |
+| E2 房间状态同步 | [`experiments/e2-room-sync`](experiments/e2-room-sync) | W6 TCP/帧/重连；W7 连接隔离维护完成 |
+| E3 ～ E5 | — | 未开工 |
 
 ## 对应岗位与实验拆分
 

@@ -73,3 +73,21 @@ func TestCacheOutageAndStaleCacheAfterRecovery(t *testing.T) {
 		t.Fatal(results, err)
 	}
 }
+
+func TestRecommendationsDeduplicateAndSortDeterministically(t *testing.T) {
+	ctx := context.Background()
+	service := guide.Service{Store: catalog.NewMemoryStore(), Cache: cache.NewMemory(time.Minute)}
+	for _, item := range []catalog.Item{
+		{ID: "b", PriceCent: 100, Stock: 1}, {ID: "a", PriceCent: 100, Stock: 1},
+		{ID: "cheap", PriceCent: 50, Stock: 1}, {ID: "sold", PriceCent: 1, Stock: 0},
+	} {
+		if _, err := service.Put(ctx, item); err != nil {
+			t.Fatal(err)
+		}
+	}
+	result, err := service.Recommend(ctx, []string{"b", "a", "b", "cheap", "missing", "sold"}, 100)
+	if err != nil || len(result) != 3 || result[0].Item.ID != "cheap" ||
+		result[1].Item.ID != "a" || result[2].Item.ID != "b" {
+		t.Fatal(result, err)
+	}
+}
