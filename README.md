@@ -2,13 +2,15 @@
 
 后端服务与云原生方向的实验集合。**刻意拆成多个各自独立、各自完整的小实验**，而不是一个什么都沾一点的大项目——后者的结果是五个岗位方向哪个都覆盖不了。
 
-**状态：E1/E2 本地自动验收通过；E3–E5 未开工**（2026-10-02）
+**状态：E1–E4本地自动验收通过；E5未开工**（2026-10-07，Codex本次更新）
 
 | 实验 | 目录 | 状态 |
 |---|---|---|
 | E1 导购服务 + 缓存一致性 | [`experiments/e1-shopping-guide`](experiments/e1-shopping-guide) | 真实 Redis 竞态/降级/恢复；W5 推荐去重排序维护完成 |
 | E2 房间状态同步 | [`experiments/e2-room-sync`](experiments/e2-room-sync) | W6 TCP/帧/重连；W7 连接隔离维护完成 |
-| E3 ～ E5 | — | 未开工 |
+| E3 表达式引擎 | [experiments/e3-rule-engine](experiments/e3-rule-engine) | W8实现、W9边界维护，AST/benchmark初验通过 |
+| E4 调度器 | [experiments/e4-scheduler](experiments/e4-scheduler) | W10打分/装箱/抢占对比与race/vet通过 |
+| E5 CMDB | — | 未开工 |
 
 ## 对应岗位与实验拆分
 

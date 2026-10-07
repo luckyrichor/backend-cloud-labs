@@ -1,0 +1,36 @@
+{
+  "assistant": "Codex",
+  "generated_at_beijing": "2026-10-07T21:06:44.721871+08:00",
+  "baseline_commit": "68f0767f0981338e8ebf4b0a254d8b713b1cd7a1",
+  "source_state": "baseline plus uncommitted W8-W10 changes at measurement time",
+  "source_sha256": {
+    "experiments/e1-shopping-guide/cmd/guide/main.go": "9f9d79ea067d0cb3f45ded61eb34b9c8245602d8bbbd648cbd5ada4b6347f6c5",
+    "experiments/e1-shopping-guide/internal/cache/cache.go": "4e9d13f8424fbb9396fb588a3f210b561083d3601e7fec693baf92bf9caacdc6",
+    "experiments/e1-shopping-guide/internal/cache/redis.go": "fe3e5f9865e96dfc78ade1e2f248483ddf6a9aff575ca25579d630fa890abee1",
+    "experiments/e1-shopping-guide/internal/cache/redis_test.go": "74b1d64300d37a8c02c0109eecf26c7c6230acaa1aba4b9d7738eefd5c32db1e",
+    "experiments/e1-shopping-guide/internal/catalog/catalog.go": "8506777da01e51fadc66671cef6d5d22ee1325449a5e80c4b016f58273e0600e",
+    "experiments/e1-shopping-guide/internal/catalog/catalog_test.go": "60a9061c2b1f7933db5863d84f06a3550e1ad3da786a0e601a1197f593bb0ca4",
+    "experiments/e1-shopping-guide/internal/guide/service.go": "d7d1b65b340a5977d24124a32a689a2dd206ee3d45897992950cbb8f9cd66182",
+    "experiments/e1-shopping-guide/internal/guide/service_test.go": "c29de0d7196eec3a662007bdb1fe5aa579f3b16810bce098a3ca12afa092e2cc",
+    "experiments/e1-shopping-guide/internal/httpapi/handler.go": "6c6846726beae33af802bed842fd97cd5f6fe59074176faccaa53f580a032e0c",
+    "experiments/e1-shopping-guide/internal/httpapi/handler_test.go": "3dca6868752f51d5592f88e6d4a960e8d6bf3eb198764066fe4ca34d914e42c2",
+    "experiments/e2-room-sync/cmd/room/main.go": "c8976016efbf490c9ac8dabeae01a3a1335e1fda0a657446edad211263d7f787",
+    "experiments/e2-room-sync/room/server.go": "8e43c4b38738b08d4173e3c9a08edc7aa0ed77b7dd9481aaedda4888e842cc0d",
+    "experiments/e2-room-sync/room/server_test.go": "8a76767488c1bae8158e6a7283b7a0359162912276a184ade32c4b054f2a0a28",
+    "experiments/e3-rule-engine/CMakeLists.txt": "3a44eb6255136677cbb67972e5f92348051263d24024ad0f5de0c9ed5266c75e",
+    "experiments/e3-rule-engine/benchmark.cpp": "0dc379ac30820122b8197b9c0857676d4877189864ffc0381d5cc9cc9946d27b",
+    "experiments/e3-rule-engine/expression.hpp": "e556ab619b669ece2e43c7b796aeb1360a061503950a841d7bffc15f4f9d0647",
+    "experiments/e3-rule-engine/tests.cpp": "c455ab45d9be26b01c126f592d1a8e926de2066e597070e5b3bda10fae2f6148",
+    "experiments/e4-scheduler/cmd/compare/main.go": "f95305754a8db599b2eaf1fb43e48931d858819f74420fbe82ad244958d9833c",
+    "experiments/e4-scheduler/resources_test.go": "343c438235b2b485ae933924361cc65e92c50440eafd00e755a1b866bb79978d",
+    "experiments/e4-scheduler/scheduler.go": "9d271d5f64b9f2f4736178085ffcf0c7dc98ec32508e39bc1b274147cc3d738f",
+    "experiments/e4-scheduler/scheduler_test.go": "2cf8df6bbe993f44081e5796457fb4e3143b1c3f2fa37ceace83980e2194522e",
+    "scripts/bootstrap.sh": "1f800687a2e06da90c58185b4fdc1265c2b365a607d27e369591c9925f8cf7bd",
+    "scripts/check.sh": "dca4090c8ec48445ee1a249d3ddb5ebe0b8960543cc9676c80c45b837ebdaa83"
+  },
+  "environment": "TX Ubuntu 24.04, AMD EPYC 7K62 virtual 4CPU, 7.5GiB, gcc13.3, CMake3.28, Go1.27.1, uv Python3.12",
+  "artifact_sha256": {
+    "docs/measurements/w8-expression.csv": "644b307da8e50661d44d5901ca37be99c3937e2f0b00a9dbc93f76b6dd21cc39",
+    "docs/measurements/w10-scheduler.csv": "dd73364c4fa229011f328934d4c92e6c0666ea1d2c28ccab4343b4274408d9a2"
+  }
+}

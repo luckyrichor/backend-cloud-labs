@@ -53,3 +53,10 @@ HTTP 服务实跑 127.0.0.1:8086：初始 kettle v1/4990；停 Redis 后 PUT 改
 来源 backend-cloud-labs@8519ae7 + 本轮工作树修改。W5 独立维护：E1 推荐去重、按价格/ID 排序，增加回归。W6 E2：独立 module，TCP JSON 长连接、权威帧循环、同帧广播、随机恢复凭据、重连恢复、输入去重。W7 独立维护：旧连接输入失效、非法握手拒绝、慢队列隔离和关闭时回收 worker 的验证。
 
 `sg docker -c 'bash scripts/bootstrap.sh'`：E1 **11 tests**（实际临时 Redis，无 skip）、E2 **3 tests**，全部 go test -race -count=1 通过，go vet 通过；gofmt 已执行。Redis 临时容器自动清理，未动常驻服务。E2 默认50ms帧，本次测试用2ms/1ms有界驱动，无生产容量声明。E1源/房间状态仍在内存；E3–E5未开工。E2接口/边界见实验README。无实际工时声明，此前章节为历史记录。
+
+
+## 2026-10-07 Codex：W8–W10实际执行
+
+W8 E3完成独立C++ AST解析/求值与缓存/重解析对比：222条检查通过，20轮×100000操作checksum60012一致。W9维护完成短路与输入/节点/深度限制、异常和非有限数验证。W10 E4完成独立Go调度器：spread/binpack/preempt，CPU和内存约束、严格优先级抢占、失败抢占不修改既有任务；4个Go测试、race/vet通过。固定到达序列中spread拒绝大紧急任务，binpack接纳，preempt驱逐1项后接纳；不声称全局最优或Kubernetes部署。
+
+全项目scripts/check.sh实际临时Redis验收E1/E2/E4并构建CTest E3通过；新增E4 CPU/内存专项测试单独race/vet通过。各实验README及CSV记录设备/方法/边界。来源backend-cloud-labs@68f0767 + 本轮工作树，SHA256见测量元数据。E5后续未做。
