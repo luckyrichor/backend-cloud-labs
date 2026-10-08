@@ -94,7 +94,25 @@ func Schedule(nodes []Node, jobs []Job, strategy Strategy) (Result, error) {
 						victims = append(victims, p)
 					}
 				}
-				sort.SliceStable(victims, func(a, b int) bool { return victims[a].Job.Priority < victims[b].Job.Priority })
+				// Keep lower priority first, then prefer resources useful to this deficit.
+				// Stable arrival order resolves ties; this greedy heuristic is not an optimum.
+				deficit := Resource{job.Need.CPU - (n.Capacity.CPU - u.CPU), job.Need.Memory - (n.Capacity.Memory - u.Memory)}
+				relief := func(v Placement) float64 {
+					score := 0.0
+					if deficit.CPU > 0 {
+						score += min(float64(v.Job.Need.CPU)/float64(deficit.CPU), 1)
+					}
+					if deficit.Memory > 0 {
+						score += min(float64(v.Job.Need.Memory)/float64(deficit.Memory), 1)
+					}
+					return score
+				}
+				sort.SliceStable(victims, func(a, b int) bool {
+					if victims[a].Job.Priority != victims[b].Job.Priority {
+						return victims[a].Job.Priority < victims[b].Job.Priority
+					}
+					return relief(victims[a]) > relief(victims[b])
+				})
 				removed := []Placement{}
 				for _, v := range victims {
 					u.CPU -= v.Job.Need.CPU

@@ -129,10 +129,10 @@ func TestTakeoverFencesOldConnectionAndSlowQueueDoesNotBlockFrames(t *testing.T)
 	current, other := net.Pipe()
 	defer current.Close()
 	defer other.Close()
-	peer := &session{connection: current, out: make(chan Message, 1)}
+	peer := &session{connection: current, out: make(chan Message, 1), commands: make(chan input, 64)}
 	server.sessions["player"] = peer
-	server.commands <- input{"player", old, 99, 1, 1}
-	server.commands <- input{"player", current, 1, 1, 0}
+	peer.commands <- input{"player", old, 99, 1, 1}
+	peer.commands <- input{"player", current, 1, 1, 0}
 	ctx, cancel := context.WithCancel(context.Background())
 	done := make(chan struct{})
 	go func() { server.frames(ctx); close(done) }()
@@ -156,5 +156,84 @@ func TestTakeoverFencesOldConnectionAndSlowQueueDoesNotBlockFrames(t *testing.T)
 	defer server.mu.Unlock()
 	if server.frame < 2 {
 		t.Fatal("frame loop blocked by consumer")
+	}
+}
+
+func TestPerConnectionQueueBudgetProtectsHealthyPlayer(t *testing.T) {
+	s := New(time.Hour)
+	flood, remote := net.Pipe()
+	defer flood.Close()
+	defer remote.Close()
+	healthy, other := net.Pipe()
+	defer healthy.Close()
+	defer other.Close()
+	a := &session{connection: flood, commands: make(chan input, 64), out: make(chan Message, 4)}
+	b := &session{connection: healthy, commands: make(chan input, 64), out: make(chan Message, 4)}
+	s.sessions["flood"], s.sessions["healthy"] = a, b
+	for i := 1; i <= 64; i++ {
+		a.commands <- input{"flood", flood, uint64(i), 1, 0}
+	}
+	b.commands <- input{"healthy", healthy, 1, 0, 1}
+	s.interval = time.Millisecond
+	ctx, cancel := context.WithCancel(context.Background())
+	done := make(chan struct{})
+	go func() { s.frames(ctx); close(done) }()
+	select {
+	case m := <-b.out:
+		if m.Players["healthy"].Seq != 1 || m.Players["flood"].Seq != 32 {
+			t.Fatalf("unfair frame: %+v", m)
+		}
+	case <-time.After(time.Second):
+		t.Error("frame blocked")
+	}
+	cancel()
+	<-done
+}
+
+func TestDisconnectedIdentitiesExpireButLiveAndRetainedSessionsSurvive(t *testing.T) {
+	s := NewWithRetention(time.Millisecond, time.Second)
+	now := time.Now()
+	for i := 0; i < 128; i++ {
+		s.sessions[string(rune(i))] = &session{disconnectedAt: now.Add(-time.Second)}
+	}
+	s.mu.Lock()
+	s.expireLocked(now)
+	s.mu.Unlock()
+	if len(s.sessions) != 0 {
+		t.Fatal("expired identities still consume capacity")
+	}
+	live, remote := net.Pipe()
+	defer live.Close()
+	defer remote.Close()
+	s.sessions["live"] = &session{connection: live, disconnectedAt: now.Add(-time.Hour)}
+	s.sessions["retained"] = &session{disconnectedAt: now.Add(-500 * time.Millisecond)}
+	s.expireLocked(now)
+	if len(s.sessions) != 2 {
+		t.Fatal("live or resumable player prematurely removed")
+	}
+	s.expireLocked(now.Add(time.Second))
+	if len(s.sessions) != 1 || s.sessions["live"] == nil {
+		t.Fatal("retention deadline not enforced")
+	}
+}
+
+func TestExpiredRoomCapacityReclaimedAndOldTokenRejected(t *testing.T) {
+	address, s := launch(t)
+	s.mu.Lock()
+	for i := 0; i < 128; i++ {
+		s.sessions[string(rune(i))] = &session{token: "expired-token", disconnectedAt: time.Now().Add(-time.Minute)}
+	}
+	s.mu.Unlock()
+	fresh := connect(t, address, "", "")
+	snapshot(t, fresh, func(m Message) bool { return len(m.Players) == 1 })
+	conn, err := net.DialTimeout("tcp", address, time.Second)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer conn.Close()
+	_ = json.NewEncoder(conn).Encode(Message{Type: "join", ID: string(rune(1)), Token: "expired-token"})
+	_ = conn.SetReadDeadline(time.Now().Add(time.Second))
+	if err := json.NewDecoder(conn).Decode(new(Message)); err == nil {
+		t.Fatal("expired token resumed")
 	}
 }

@@ -1,4 +1,4 @@
-// Package guide demonstrates revision-validated cache reads with monotonic fills.
+// Package guide compares strict and cache-first reads with monotonic fills.
 package guide
 
 import (
@@ -19,12 +19,38 @@ type Result struct {
 	Source   string       `json:"source"`
 	Degraded bool         `json:"degraded"`
 }
+type ReadMode string
+
+const (
+	Strict     ReadMode = "strict"
+	CacheFirst ReadMode = "cache-first"
+)
+
+// Empty mode preserves strict behavior. CacheFirst trades freshness for source load.
+func ValidReadMode(mode ReadMode) bool { return mode == "" || mode == Strict || mode == CacheFirst }
+
 type Service struct {
+	Mode  ReadMode
 	Store catalog.Store
 	Cache Cache
 }
 
 func (s Service) Get(ctx context.Context, id string) (Result, error) {
+	if !ValidReadMode(s.Mode) {
+		return Result{}, errors.New("invalid cache read mode")
+	}
+	if s.Mode == CacheFirst {
+		cached, err := s.Cache.Get(ctx, id)
+		if err == nil {
+			return Result{cached, "cache_unvalidated", false}, nil
+		}
+		authoritative, sourceErr := s.Store.Get(ctx, id)
+		if sourceErr != nil {
+			return Result{}, sourceErr
+		}
+		_, fillErr := s.Cache.PutIfNewer(ctx, authoritative)
+		return Result{authoritative, "store", !errors.Is(err, ErrCacheMiss) || fillErr != nil}, nil
+	}
 	// Strict mode validates source revision even on hits, trading DB load for correctness.
 	authoritative, err := s.Store.Get(ctx, id)
 	if err != nil {

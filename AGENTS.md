@@ -8,7 +8,7 @@
 
 后端服务与云原生方向的实验集合。三个月求职计划六项目之一（原编号 ⑥），对应岗位 **06、13、15、16、17**。总计划见 [workplan-docs](https://github.com/luckyrichor/workplan-docs)。
 
-**当前状态：E1–E4本地自动验收通过；E3安全边界、枚举求值与批量过滤扩展完成；E4被驱逐重排、preempt-binpack与增量资源账本通过。各实验仍是独立小实验，E5未做；证据见docs/progress.md。**
+**当前状态：E1–E4本地自动验收通过；E3安全边界、枚举求值与批量过滤扩展完成；E4被驱逐重排、preempt-binpack与增量资源账本通过。E1支持strict/cache-first对照，E2独立输入队列与断线身份回收，E4同优先级缺口贡献排序；各实验仍是独立小实验，E5未做；证据见docs/progress.md。**
 
 权威口径是各实验目录的 README 与 `docs/progress.md`，不要在别处另写一份状态。
 

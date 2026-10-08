@@ -23,7 +23,11 @@ func main() {
 		defer client.Close()
 		cached = &cache.Redis{Client: client, Prefix: "guide:", TTL: time.Minute}
 	}
-	server := &http.Server{Addr: "127.0.0.1:8086", Handler: httpapi.Handler(guide.Service{Store: store, Cache: cached}),
+	mode := guide.ReadMode(os.Getenv("CACHE_READ_MODE"))
+	if !guide.ValidReadMode(mode) {
+		log.Fatal("CACHE_READ_MODE must be strict or cache-first")
+	}
+	server := &http.Server{Addr: "127.0.0.1:8086", Handler: httpapi.Handler(guide.Service{Store: store, Cache: cached, Mode: mode}),
 		ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 5 * time.Second, WriteTimeout: 5 * time.Second}
 	log.Fatal(server.ListenAndServe())
 }

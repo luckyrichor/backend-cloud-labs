@@ -1,0 +1,92 @@
+{
+  "assistant": "Codex",
+  "date_beijing": "2026-10-08",
+  "base_commit": "97eb85c6028ec59b45bf69bc80cc0649b3a51f4a",
+  "source_state": "base commit plus tested working tree; hashes identify final source, subsequently committed",
+  "historical_hash_verification": [
+    {
+      "report": "w8-w10-source.json",
+      "commit": "6d1e487",
+      "matched_files": 23
+    },
+    {
+      "report": "2026-10-08-e3-batch.json",
+      "commit": "9fcc76c",
+      "matched_files": 7
+    },
+    {
+      "report": "2026-10-08-e4-requeue.json",
+      "commit": "97eb85c",
+      "matched_files": 5
+    }
+  ],
+  "tests": {
+    "command": "bash scripts/check.sh",
+    "go_race": "passed; E1=13 E2=6 E4=8 top-level tests with subtests",
+    "go_vet": "all three modules passed",
+    "redis": "real ephemeral Redis, no skipped Redis integration test",
+    "release_ctest": "2/2; 222 original + 19568 differential/batch checks"
+  },
+  "before_fix": {
+    "E4_same_priority_size": "capacity 10, jobs 2+8, incoming 8: two evictions; regression failed"
+  },
+  "after_fix": {
+    "E4_same_priority_size": "one eviction; greedy deficit heuristic, not optimal",
+    "E2": "independent 64 queues, 32 commands per player per frame, 30s disconnect retention, live identities preserved; real TCP capacity/token checks",
+    "E1": "strict returns v2 with one source read, cache-first returns stale v1 with zero source reads after cache update outage; expiration and outage fallback verified"
+  },
+  "benchmark": {
+    "command": "go test ./internal/guide -run '^$' -bench BenchmarkReadModes -benchmem -count=5",
+    "raw": "2026-10-08-e1-read-modes.txt",
+    "rounds": 5,
+    "median_ns_op": {
+      "strict": 179.6,
+      "cache-first": 135.2
+    },
+    "source_reads_per_op": {
+      "strict": 1,
+      "cache-first": 0
+    },
+    "go_version": "go version go1.27.1 linux/amd64",
+    "limits": "warm in-memory source/cache, no HTTP Redis database latency; sequential modes, shared VM, not production speedup"
+  },
+  "limits": [
+    "E3 sequential batch enum AST; no indexes parallelism columnar layout sharding or 10-billion-DOC proof",
+    "E4 victim heuristic and pending scans remain nonoptimal; offline scheduler only",
+    "E2 per-connection fairness, not authenticated per-user quota; disconnected resume expires",
+    "E1 cache-first does not guarantee freshness; TTL is not a strict freshness SLA"
+  ],
+  "source_sha256": {
+    "experiments/e1-shopping-guide/cmd/guide/main.go": "3fc0b984eba84ae27d10fdeb1f80f3083e4e72c12da584966032f89367c7b56b",
+    "experiments/e1-shopping-guide/go.mod": "0815b22215e7a3ea4f51cd816a84e996a7ddffd4c132d6ab50b898e4edee80bd",
+    "experiments/e1-shopping-guide/go.sum": "b13f2dcb93bf7f314eb4aacf2d73a7bccd17c9c974ce4a805ba3352fac3e6e0f",
+    "experiments/e1-shopping-guide/internal/cache/cache.go": "4e9d13f8424fbb9396fb588a3f210b561083d3601e7fec693baf92bf9caacdc6",
+    "experiments/e1-shopping-guide/internal/cache/redis.go": "fe3e5f9865e96dfc78ade1e2f248483ddf6a9aff575ca25579d630fa890abee1",
+    "experiments/e1-shopping-guide/internal/cache/redis_test.go": "74b1d64300d37a8c02c0109eecf26c7c6230acaa1aba4b9d7738eefd5c32db1e",
+    "experiments/e1-shopping-guide/internal/catalog/catalog.go": "8506777da01e51fadc66671cef6d5d22ee1325449a5e80c4b016f58273e0600e",
+    "experiments/e1-shopping-guide/internal/catalog/catalog_test.go": "60a9061c2b1f7933db5863d84f06a3550e1ad3da786a0e601a1197f593bb0ca4",
+    "experiments/e1-shopping-guide/internal/guide/modes_test.go": "4f58bbd5a86c063acd0708d02a3873dde59c24e9b4ddf9902c23943da12c9163",
+    "experiments/e1-shopping-guide/internal/guide/service.go": "b59a4e7c46ae028066278a80f075bad953a8de347aee4b81743e84d318425d64",
+    "experiments/e1-shopping-guide/internal/guide/service_test.go": "c29de0d7196eec3a662007bdb1fe5aa579f3b16810bce098a3ca12afa092e2cc",
+    "experiments/e1-shopping-guide/internal/httpapi/handler.go": "6c6846726beae33af802bed842fd97cd5f6fe59074176faccaa53f580a032e0c",
+    "experiments/e1-shopping-guide/internal/httpapi/handler_test.go": "3dca6868752f51d5592f88e6d4a960e8d6bf3eb198764066fe4ca34d914e42c2",
+    "experiments/e2-room-sync/cmd/room/main.go": "c8976016efbf490c9ac8dabeae01a3a1335e1fda0a657446edad211263d7f787",
+    "experiments/e2-room-sync/go.mod": "d7de50e8a71162f8a593ad588417cfca1ed9f3c88724f8eb3feabed2e2a10795",
+    "experiments/e2-room-sync/room/server.go": "3d9f9bd52f31c8e3ba53675294fd6b98183cf907c5aec3ee42173c00f9f4f61d",
+    "experiments/e2-room-sync/room/server_test.go": "3bb2615c99a37d03ac2147bf694da9a347b9df48b2b3bb2bfdd4c32d9fdfca86",
+    "experiments/e3-rule-engine/batch_tests.cpp": "d8fa7d75e885ed1721859718d4c59b99e4502209d5003ee0e0d2fab363977b3e",
+    "experiments/e3-rule-engine/benchmark.cpp": "51b003988819ebaef1825aff3e35b3c13d03e84f88773fe4cc7a1a43003e9b0f",
+    "experiments/e3-rule-engine/expression.hpp": "3087dbd81680cfa45d3100dd5039768b5c5d5ad93ec1d69bfcb52fb17264ae4f",
+    "experiments/e3-rule-engine/scripts/summarize.py": "cb6f304e2109ddbc0e5b4899fe9fc34e47da601620185a0c08b67f9a904bfd83",
+    "experiments/e3-rule-engine/string_baseline.hpp": "b415d6d1c61d546a8f9c4f4e344543e13a248ac4b0c0f8341c2e5ae9faf4cd1a",
+    "experiments/e3-rule-engine/tests.cpp": "c455ab45d9be26b01c126f592d1a8e926de2066e597070e5b3bda10fae2f6148",
+    "experiments/e4-scheduler/cmd/compare/main.go": "5e8fcf15a04f97c306205c29604f4af235ea21a2b100c5bd5a9ab2be79c6dc12",
+    "experiments/e4-scheduler/go.mod": "1cdfa5d9f45710732501ff169bc910de2542624d4dae10855c362923b4669984",
+    "experiments/e4-scheduler/requeue_test.go": "6731a6ef0de9f1e647d66848376af89ae002b9f87115151650f486392ecdbf4a",
+    "experiments/e4-scheduler/resources_test.go": "8d6174d39bc8fb9b0031965f55acc16b7d389514b20dd7677f8a1f65ad6dcd06",
+    "experiments/e4-scheduler/scheduler.go": "bb43eac208d8c1a9d0a8083eb08f995bfa77bb0258315683f306980182415dfa",
+    "experiments/e4-scheduler/scheduler_test.go": "90896f467ad015aa541e8d4e8e5d2bb8124ec30df908fb9ecee1098b839c1141",
+    "experiments/e4-scheduler/victim_size_test.go": "4381ee1439318fc3a570c51c536a55836299cb3a793b15aa6762b8fde418f3c8"
+  },
+  "check_log_sha256": "3249d28a9d7d7c1158a6e23466e174c19fe12493abac3fa7a4426b011e92a1ce"
+}

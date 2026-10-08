@@ -33,10 +33,12 @@ type Message struct {
 	DY      float64           `json:"dy,omitempty"`
 }
 type session struct {
-	token      string
-	player     Player
-	connection net.Conn
-	out        chan Message
+	token          string
+	player         Player
+	connection     net.Conn
+	out            chan Message
+	commands       chan input
+	disconnectedAt time.Time
 }
 type input struct {
 	id         string
@@ -48,18 +50,21 @@ type Server struct {
 	mu          sync.Mutex
 	sessions    map[string]*session
 	connections map[net.Conn]bool
-	commands    chan input
+	retention   time.Duration
 	frame       uint64
 	interval    time.Duration
 	wg          sync.WaitGroup
 }
 
-func New(interval time.Duration) *Server {
-	if interval <= 0 {
-		panic("frame interval must be positive")
+func New(interval time.Duration) *Server { return NewWithRetention(interval, 30*time.Second) }
+
+// Retention bounds reconnect identities; expiration invalidates resume credentials.
+func NewWithRetention(interval, retention time.Duration) *Server {
+	if interval <= 0 || retention <= 0 {
+		panic("frame interval and retention must be positive")
 	}
 	return &Server{sessions: make(map[string]*session), connections: make(map[net.Conn]bool),
-		commands: make(chan input, 256), interval: interval}
+		retention: retention, interval: interval}
 }
 func randomToken() string {
 	var b [16]byte
@@ -130,6 +135,7 @@ func (s *Server) handle(ctx context.Context, c net.Conn) {
 		return
 	}
 	s.mu.Lock()
+	s.expireLocked(time.Now())
 	id := hello.ID
 	peer := s.sessions[id]
 	if id != "" {
@@ -144,13 +150,16 @@ func (s *Server) handle(ctx context.Context, c net.Conn) {
 		if len(s.sessions) >= 128 {
 			s.mu.Unlock()
 			return
-		} // Demo retains at most 128 identities.
+		} // Connected plus unexpired disconnected identities are bounded.
 		id = randomToken()
 		peer = &session{token: randomToken()}
 		s.sessions[id] = peer
 	}
 	out := make(chan Message, 4)
 	peer.connection, peer.out = c, out
+	peer.commands = make(chan input, 64)
+	peer.disconnectedAt = time.Time{}
+	commands := peer.commands
 	out <- Message{Type: "welcome", ID: id, Token: peer.token}
 	out <- s.snapshotLocked()
 	s.mu.Unlock()
@@ -177,6 +186,8 @@ func (s *Server) handle(ctx context.Context, c net.Conn) {
 		if peer.connection == c {
 			peer.connection = nil
 			peer.out = nil
+			peer.commands = nil
+			peer.disconnectedAt = time.Now()
 		}
 		s.mu.Unlock()
 		// Writer sees closure on next frame at worst; force wakeup without touching other sessions.
@@ -198,7 +209,7 @@ func (s *Server) handle(ctx context.Context, c net.Conn) {
 			return
 		}
 		select {
-		case s.commands <- input{id, c, command.Seq, command.DX, command.DY}:
+		case commands <- input{id, c, command.Seq, command.DX, command.DY}:
 		case <-ctx.Done():
 			return
 		default:
@@ -223,18 +234,21 @@ func (s *Server) frames(ctx context.Context) {
 			return
 		case <-ticker.C:
 			s.mu.Lock()
-			// Bounded work per frame; all recipients see the same immutable snapshot.
-			for count := 0; count < 256; count++ {
-				select {
-				case cmd := <-s.commands:
-					peer := s.sessions[cmd.id]
-					if peer != nil && peer.connection == cmd.connection && cmd.seq > peer.player.Seq {
-						peer.player.X += cmd.dx
-						peer.player.Y += cmd.dy
-						peer.player.Seq = cmd.seq
+			s.expireLocked(time.Now())
+			// Each connection gets its own bounded queue and frame budget.
+			// A flood cannot consume another player's admission slots.
+			for _, peer := range s.sessions {
+				for count := 0; count < 32; count++ {
+					select {
+					case cmd := <-peer.commands:
+						if peer.connection == cmd.connection && cmd.seq > peer.player.Seq {
+							peer.player.X += cmd.dx
+							peer.player.Y += cmd.dy
+							peer.player.Seq = cmd.seq
+						}
+					default:
+						count = 32
 					}
-				default:
-					count = 256
 				}
 			}
 			s.frame++
@@ -250,6 +264,15 @@ func (s *Server) frames(ctx context.Context) {
 				}
 			}
 			s.mu.Unlock()
+		}
+	}
+}
+
+// Caller holds mu. Live connections are never expired.
+func (s *Server) expireLocked(now time.Time) {
+	for id, peer := range s.sessions {
+		if peer.connection == nil && !peer.disconnectedAt.IsZero() && now.Sub(peer.disconnectedAt) >= s.retention {
+			delete(s.sessions, id)
 		}
 	}
 }
