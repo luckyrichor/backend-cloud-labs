@@ -1,0 +1,242 @@
+{
+  "generated_at": "2026-10-08T07:06:44.308043+00:00",
+  "base_commit": "6d1e487e1ffe77599c58d7eede6453d5b3b032d6",
+  "source_dirty": true,
+  "system": "Linux-6.8.0-139-generic-x86_64-with-glibc2.39",
+  "compiler": "c++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "cmake": "cmake version 3.28.3",
+  "cpu": "Architecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           48 bits physical, 48 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  4\nOn-line CPU(s) list:                     0-3\nVendor ID:                               AuthenticAMD\nModel name:                              AMD EPYC 7K62 48-Core Processor\nCPU family:                              23\nModel:                                   49\nThread(s) per core:                      1\nCore(s) per socket:                      4\nSocket(s):                               1\nStepping:                                0\nBogoMIPS:                                5190.24\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm rep_good nopl cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext ibpb vmmcall fsgsbase bmi1 avx2 smep bmi2 rdseed adx smap clflushopt sha_ni xsaveopt xsavec xgetbv1 arat\nHypervisor vendor:                       KVM\nVirtualization type:                     full\nL1d cache:                               128 KiB (4 instances)\nL1i cache:                               128 KiB (4 instances)\nL2 cache:                                16 MiB (4 instances)\nL3 cache:                                16 MiB (1 instance)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-3\nVulnerability Gather data sampling:      Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Mitigation; untrained return thunk; SMT disabled\nVulnerability Spec rstack overflow:      Vulnerable\nVulnerability Spec store bypass:         Vulnerable\nVulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; Retpolines; IBPB conditional; STIBP disabled; RSB filling; PBRSB-eIBRS Not affected; BHI Not affected\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Not affected\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Not affected\n",
+  "build_type": "Release",
+  "timing": "steady_clock; ns/document; median of ten round averages, not request p95",
+  "interference": "sanitizer build/tests overlapped initial measurement; shared VM, no CPU isolation",
+  "release_ctest": "2/2 passed; original 222 plus 19568 differential/batch checks",
+  "sanitizer_ctest": "ASan/UBSan Debug 2/2 passed; detect_leaks=0",
+  "source_sha256": {
+    "/home/ubuntu/project/WorkPlan/backend-cloud-labs/experiments/e3-rule-engine/scripts/summarize.py": "cb6f304e2109ddbc0e5b4899fe9fc34e47da601620185a0c08b67f9a904bfd83",
+    "experiments/e3-rule-engine/CMakeLists.txt": "7124bd006ecc5ab98b195f36b55b21db81a3769fe197b257c9144f6348eebde8",
+    "experiments/e3-rule-engine/batch_tests.cpp": "d8fa7d75e885ed1721859718d4c59b99e4502209d5003ee0e0d2fab363977b3e",
+    "experiments/e3-rule-engine/benchmark.cpp": "51b003988819ebaef1825aff3e35b3c13d03e84f88773fe4cc7a1a43003e9b0f",
+    "experiments/e3-rule-engine/expression.hpp": "3087dbd81680cfa45d3100dd5039768b5c5d5ad93ec1d69bfcb52fb17264ae4f",
+    "experiments/e3-rule-engine/string_baseline.hpp": "b415d6d1c61d546a8f9c4f4e344543e13a248ac4b0c0f8341c2e5ae9faf4cd1a",
+    "experiments/e3-rule-engine/tests.cpp": "c455ab45d9be26b01c126f592d1a8e926de2066e597070e5b3bda10fae2f6148"
+  },
+  "csv_sha256": "4566e9951468eccae84654696358a1dc46984fd0cc674bdf977fa23858d727d8",
+  "summary": [
+    {
+      "scenario": "early_short_circuit",
+      "documents": 1000,
+      "mode": "enum_batch",
+      "median_ns_per_document": 24.34915,
+      "min_ns_per_document": 22.6948,
+      "max_ns_per_document": 28.3255,
+      "speedup_vs_string": 2.864596916114115
+    },
+    {
+      "scenario": "early_short_circuit",
+      "documents": 1000,
+      "mode": "enum_scalar",
+      "median_ns_per_document": 28.249699999999997,
+      "min_ns_per_document": 27.0481,
+      "max_ns_per_document": 29.996,
+      "speedup_vs_string": 2.46907046800497
+    },
+    {
+      "scenario": "early_short_circuit",
+      "documents": 1000,
+      "mode": "parse_enum_scalar",
+      "median_ns_per_document": 1165.125,
+      "min_ns_per_document": 1112.03,
+      "max_ns_per_document": 1253.9,
+      "speedup_vs_string": 0.059865250509601974
+    },
+    {
+      "scenario": "early_short_circuit",
+      "documents": 1000,
+      "mode": "string_scalar",
+      "median_ns_per_document": 69.7505,
+      "min_ns_per_document": 68.0773,
+      "max_ns_per_document": 74.0842,
+      "speedup_vs_string": 1.0
+    },
+    {
+      "scenario": "early_short_circuit",
+      "documents": 10000,
+      "mode": "enum_batch",
+      "median_ns_per_document": 25.56965,
+      "min_ns_per_document": 23.7663,
+      "max_ns_per_document": 27.6683,
+      "speedup_vs_string": 2.8336015549684883
+    },
+    {
+      "scenario": "early_short_circuit",
+      "documents": 10000,
+      "mode": "enum_scalar",
+      "median_ns_per_document": 29.0113,
+      "min_ns_per_document": 27.4966,
+      "max_ns_per_document": 31.6281,
+      "speedup_vs_string": 2.4974475463009242
+    },
+    {
+      "scenario": "early_short_circuit",
+      "documents": 10000,
+      "mode": "parse_enum_scalar",
+      "median_ns_per_document": 1177.875,
+      "min_ns_per_document": 1131.89,
+      "max_ns_per_document": 1246.43,
+      "speedup_vs_string": 0.06151263928685132
+    },
+    {
+      "scenario": "early_short_circuit",
+      "documents": 10000,
+      "mode": "string_scalar",
+      "median_ns_per_document": 72.4542,
+      "min_ns_per_document": 68.2678,
+      "max_ns_per_document": 78.7003,
+      "speedup_vs_string": 1.0
+    },
+    {
+      "scenario": "early_short_circuit",
+      "documents": 100000,
+      "mode": "enum_batch",
+      "median_ns_per_document": 28.208750000000002,
+      "min_ns_per_document": 27.6624,
+      "max_ns_per_document": 34.2004,
+      "speedup_vs_string": 2.7641777817166657
+    },
+    {
+      "scenario": "early_short_circuit",
+      "documents": 100000,
+      "mode": "enum_scalar",
+      "median_ns_per_document": 34.00265,
+      "min_ns_per_document": 32.8266,
+      "max_ns_per_document": 40.2713,
+      "speedup_vs_string": 2.2931742084808096
+    },
+    {
+      "scenario": "early_short_circuit",
+      "documents": 100000,
+      "mode": "parse_enum_scalar",
+      "median_ns_per_document": 1163.695,
+      "min_ns_per_document": 1119.24,
+      "max_ns_per_document": 1269.64,
+      "speedup_vs_string": 0.06700552979947495
+    },
+    {
+      "scenario": "early_short_circuit",
+      "documents": 100000,
+      "mode": "string_scalar",
+      "median_ns_per_document": 77.974,
+      "min_ns_per_document": 74.8433,
+      "max_ns_per_document": 86.082,
+      "speedup_vs_string": 1.0
+    },
+    {
+      "scenario": "full_rhs",
+      "documents": 1000,
+      "mode": "enum_batch",
+      "median_ns_per_document": 39.95355,
+      "min_ns_per_document": 38.342,
+      "max_ns_per_document": 44.4224,
+      "speedup_vs_string": 3.4289193325749525
+    },
+    {
+      "scenario": "full_rhs",
+      "documents": 1000,
+      "mode": "enum_scalar",
+      "median_ns_per_document": 44.824349999999995,
+      "min_ns_per_document": 44.17,
+      "max_ns_per_document": 48.1061,
+      "speedup_vs_string": 3.0563187196244903
+    },
+    {
+      "scenario": "full_rhs",
+      "documents": 1000,
+      "mode": "parse_enum_scalar",
+      "median_ns_per_document": 1195.98,
+      "min_ns_per_document": 1147.64,
+      "max_ns_per_document": 1313.48,
+      "speedup_vs_string": 0.11454832020602351
+    },
+    {
+      "scenario": "full_rhs",
+      "documents": 1000,
+      "mode": "string_scalar",
+      "median_ns_per_document": 136.9975,
+      "min_ns_per_document": 133.09,
+      "max_ns_per_document": 144.361,
+      "speedup_vs_string": 1.0
+    },
+    {
+      "scenario": "full_rhs",
+      "documents": 10000,
+      "mode": "enum_batch",
+      "median_ns_per_document": 40.9144,
+      "min_ns_per_document": 38.6334,
+      "max_ns_per_document": 43.5483,
+      "speedup_vs_string": 3.370964745908531
+    },
+    {
+      "scenario": "full_rhs",
+      "documents": 10000,
+      "mode": "enum_scalar",
+      "median_ns_per_document": 46.03445,
+      "min_ns_per_document": 44.2908,
+      "max_ns_per_document": 47.6435,
+      "speedup_vs_string": 2.996038836132505
+    },
+    {
+      "scenario": "full_rhs",
+      "documents": 10000,
+      "mode": "parse_enum_scalar",
+      "median_ns_per_document": 1227.71,
+      "min_ns_per_document": 1146.17,
+      "max_ns_per_document": 1308.18,
+      "speedup_vs_string": 0.11234004773114172
+    },
+    {
+      "scenario": "full_rhs",
+      "documents": 10000,
+      "mode": "string_scalar",
+      "median_ns_per_document": 137.921,
+      "min_ns_per_document": 134.849,
+      "max_ns_per_document": 149.561,
+      "speedup_vs_string": 1.0
+    },
+    {
+      "scenario": "full_rhs",
+      "documents": 100000,
+      "mode": "enum_batch",
+      "median_ns_per_document": 47.4905,
+      "min_ns_per_document": 42.5895,
+      "max_ns_per_document": 52.2613,
+      "speedup_vs_string": 2.9539276276307898
+    },
+    {
+      "scenario": "full_rhs",
+      "documents": 100000,
+      "mode": "enum_scalar",
+      "median_ns_per_document": 51.2819,
+      "min_ns_per_document": 47.9078,
+      "max_ns_per_document": 56.4288,
+      "speedup_vs_string": 2.7355363198321436
+    },
+    {
+      "scenario": "full_rhs",
+      "documents": 100000,
+      "mode": "parse_enum_scalar",
+      "median_ns_per_document": 1184.19,
+      "min_ns_per_document": 1142.26,
+      "max_ns_per_document": 1237.32,
+      "speedup_vs_string": 0.11846367559259915
+    },
+    {
+      "scenario": "full_rhs",
+      "documents": 100000,
+      "mode": "string_scalar",
+      "median_ns_per_document": 140.2835,
+      "min_ns_per_document": 137.049,
+      "max_ns_per_document": 156.698,
+      "speedup_vs_string": 1.0
+    }
+  ]
+}

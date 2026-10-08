@@ -8,7 +8,7 @@
 |---|---|---|
 | E1 导购服务 + 缓存一致性 | [`experiments/e1-shopping-guide`](experiments/e1-shopping-guide) | 真实 Redis 竞态/降级/恢复；W5 推荐去重排序维护完成 |
 | E2 房间状态同步 | [`experiments/e2-room-sync`](experiments/e2-room-sync) | W6 TCP/帧/重连；W7 连接隔离维护完成 |
-| E3 表达式引擎 | [experiments/e3-rule-engine](experiments/e3-rule-engine) | W8实现、W9边界维护，AST/benchmark初验通过 |
+| E3 表达式引擎 | [experiments/e3-rule-engine](experiments/e3-rule-engine) | AST/枚举求值与批量过滤通过；千至十万文档对照测量 |
 | E4 调度器 | [experiments/e4-scheduler](experiments/e4-scheduler) | W10打分/装箱/抢占对比与race/vet通过 |
 | E5 CMDB | — | 未开工 |
 

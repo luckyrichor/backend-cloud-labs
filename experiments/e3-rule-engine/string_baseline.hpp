@@ -1,3 +1,5 @@
+// Frozen backend-cloud-labs@6d1e487 expression.hpp (namespace renamed).
+// For benchmark/differential tests only; not a production execution path.
 #pragma once
 #include <cmath>
 #include <cctype>
@@ -9,80 +11,40 @@
 #include <string_view>
 #include <unordered_map>
 #include <vector>
-#include <span>
 
-namespace rules {
+namespace string_baseline {
 using Variables = std::unordered_map<std::string, double>;
-enum class Op { Number, Variable, Negate, Not, Add, Subtract, Multiply, Divide,
-                Less, LessEqual, Greater, GreaterEqual, Equal, NotEqual, And, Or };
-inline Op parse_op(std::string_view token) {
-  static constexpr std::pair<std::string_view, Op> mapping[] = {
-    {"number",Op::Number},{"variable",Op::Variable},{"neg",Op::Negate},{"!",Op::Not},
-    {"+",Op::Add},{"-",Op::Subtract},{"*",Op::Multiply},{"/",Op::Divide},
-    {"<",Op::Less},{"<=",Op::LessEqual},{">",Op::Greater},{">=",Op::GreaterEqual},
-    {"==",Op::Equal},{"!=",Op::NotEqual},{"&&",Op::And},{"||",Op::Or}};
-  for (auto [text, op] : mapping) if (text == token) return op;
-  throw std::runtime_error("invalid operator");
-}
 struct Node {
-  Op op{Op::Number};
+  std::string op;
   double number{};
   std::unique_ptr<Node> left, right;
   double evaluate(const Variables& vars) const {
-    if (op == Op::Number) return number;
-    if (op == Op::Variable) {
+    if (op == "number") return number;
+    if (op == "variable") {
       auto found = vars.find(name);
       if (found == vars.end() || !std::isfinite(found->second)) throw std::runtime_error("invalid variable");
       return found->second;
     }
     double a = left->evaluate(vars);
-    if (op == Op::Negate) return -a;
-    if (op == Op::Not) return a == 0;
-    if (op == Op::And && a == 0) return 0;
-    if (op == Op::Or && a != 0) return 1;
+    if (op == "neg") return -a;
+    if (op == "!") return a == 0;
+    if (op == "&&" && a == 0) return 0;
+    if (op == "||" && a != 0) return 1;
     double b = right->evaluate(vars), result{};
-    switch (op) {
-      case Op::Add: result = a+b; break;
-      case Op::Subtract: result = a-b; break;
-      case Op::Multiply: result = a*b; break;
-      case Op::Divide:
-        if (b == 0) throw std::runtime_error("division by zero");
-        result = a/b; break;
-      case Op::Less: result = a<b; break;
-      case Op::LessEqual: result = a<=b; break;
-      case Op::Greater: result = a>b; break;
-      case Op::GreaterEqual: result = a>=b; break;
-      case Op::Equal: result = a==b; break;
-      case Op::NotEqual: result = a!=b; break;
-      case Op::And: case Op::Or: result = b != 0; break;
-      default: throw std::runtime_error("invalid operator");
-    }
+    if (op == "+") result = a+b;
+    else if (op == "-") result = a-b;
+    else if (op == "*") result = a*b;
+    else if (op == "/") { if (b == 0) throw std::runtime_error("division by zero"); result = a/b; }
+    else if (op == "<") result = a<b;
+    else if (op == "<=") result = a<=b;
+    else if (op == ">") result = a>b;
+    else if (op == ">=") result = a>=b;
+    else if (op == "==") result = a==b;
+    else if (op == "!=") result = a!=b;
+    else if (op == "&&" || op == "||") result = b != 0;
+    else throw std::runtime_error("invalid operator");
     if (!std::isfinite(result)) throw std::runtime_error("nonfinite result");
     return result;
-  }
-  // Sequential batch APIs reuse this immutable compiled expression. Error policy:
-  // fail fast with the row index; no partial result is returned, input is untouched.
-  std::vector<double> evaluate_batch(std::span<const Variables> documents) const {
-    std::vector<double> results;
-    results.reserve(documents.size());
-    for (std::size_t i=0; i<documents.size(); ++i) {
-      try { results.push_back(evaluate(documents[i])); }
-      catch (const std::runtime_error& e) {
-        throw std::runtime_error("document " + std::to_string(i) + ": " + e.what());
-      }
-    }
-    return results;
-  }
-  std::vector<std::size_t> filter_batch(std::span<const Variables> documents) const {
-    std::vector<std::size_t> matches;
-    matches.reserve(documents.size());
-    for (std::size_t i=0; i<documents.size(); ++i) {
-      try { if (evaluate(documents[i]) != 0) matches.push_back(i); }
-      catch (const std::runtime_error& e) {
-        throw std::runtime_error("document " + std::to_string(i) + ": " + e.what());
-      }
-    }
-    return matches;
   }
   std::string name;
 };
@@ -93,7 +55,7 @@ class Parser {
   bool eat(std::string_view token) { space(); if(text.compare(pos, token.size(), token)==0) { pos+=token.size(); return true; } return false; }
   std::unique_ptr<Node> node(std::string op, std::unique_ptr<Node> a={}, std::unique_ptr<Node> b={}) {
     if (++count > 256) throw std::runtime_error("node limit");
-    auto n=std::make_unique<Node>(); n->op=parse_op(op); n->left=std::move(a); n->right=std::move(b); return n;
+    auto n=std::make_unique<Node>(); n->op=std::move(op); n->left=std::move(a); n->right=std::move(b); return n;
   }
   std::unique_ptr<Node> expression(int level, int depth) {
     if(depth > 64) throw std::runtime_error("depth limit");
