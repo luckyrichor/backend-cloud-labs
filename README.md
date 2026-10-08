@@ -2,12 +2,12 @@
 
 后端服务与云原生方向的实验集合。**刻意拆成多个各自独立、各自完整的小实验**，而不是一个什么都沾一点的大项目——后者的结果是五个岗位方向哪个都覆盖不了。
 
-**状态：E1–E4本地自动验收通过；E5未开工**（2026-10-07，Codex本次更新）
+**状态：E1–E4本地自动验收通过；E5未开工**（2026-10-08，Codex本次更新）
 
 | 实验 | 目录 | 状态 |
 |---|---|---|
-| E1 导购服务 + 缓存一致性 | [`experiments/e1-shopping-guide`](experiments/e1-shopping-guide) | 真实 Redis 竞态/降级/恢复；W5 推荐去重排序维护完成 |
-| E2 房间状态同步 | [`experiments/e2-room-sync`](experiments/e2-room-sync) | W6 TCP/帧/重连；W7 连接隔离维护完成 |
+| E1 导购服务 + 缓存一致性 | [`experiments/e1-shopping-guide`](experiments/e1-shopping-guide) | 真实 Redis 竞态/降级/恢复；推荐去重排序；strict/cache-first 对照完成 |
+| E2 房间状态同步 | [`experiments/e2-room-sync`](experiments/e2-room-sync) | TCP/帧/重连；每连接输入队列与断线身份过期回收 |
 | E3 表达式引擎 | [experiments/e3-rule-engine](experiments/e3-rule-engine) | AST/枚举求值与批量过滤通过；千至十万文档对照测量 |
 | E4 调度器 | [experiments/e4-scheduler](experiments/e4-scheduler) | W10打分/装箱/抢占对比与race/vet通过 |
 | E5 CMDB | — | 未开工 |
@@ -29,3 +29,6 @@
 ## 技术栈
 
 按实验而异：Go（06、13、16、17 方向）、C++（15 方向）。具体选型在各实验目录内说明。
+
+
+第二轮评审代码与测试已提交 [2e69dbe](https://github.com/luckyrichor/backend-cloud-labs/commit/2e69dbe435b2daaf9ecac47627e3cf8870bea295)，对应 [来源与验证记录](docs/measurements/2026-10-08-review-followup.json)。历史报告的工作树描述保留测量时状态，已逐项核对其后对应的Git提交；不代表当前代码未提交。
