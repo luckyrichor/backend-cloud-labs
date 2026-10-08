@@ -22,34 +22,28 @@ type Placement struct {
 type Result struct {
 	Placements          []Placement
 	Rejected, Preempted []Job
+	Pending             []Job               // Evicted jobs still waiting after retry; Preempted is history.
+	Usage               map[string]Resource // Final incremental resource ledger.
 }
 type Strategy string
 
 const (
-	Spread  Strategy = "spread"
-	BinPack Strategy = "binpack"
-	Preempt Strategy = "preempt"
+	Spread         Strategy = "spread"
+	BinPack        Strategy = "binpack"
+	Preempt        Strategy = "preempt" // Compatibility: spread placement plus preemption.
+	PreemptBinPack Strategy = "preempt-binpack"
 )
 
 func fits(used, need, capacity Resource) bool {
 	return need.CPU <= capacity.CPU-used.CPU && need.Memory <= capacity.Memory-used.Memory
 }
 func add(a, b Resource) Resource { return Resource{a.CPU + b.CPU, a.Memory + b.Memory} }
-func usage(node Node, placements []Placement) Resource {
-	var used Resource
-	for _, p := range placements {
-		if p.NodeID == node.ID {
-			used = add(used, p.Job.Need)
-		}
-	}
-	return used
-}
 
 // Schedule models arrivals in input order. Preemption considers strictly lower
 // priority residents; a failed attempt never removes any existing placement.
 func Schedule(nodes []Node, jobs []Job, strategy Strategy) (Result, error) {
 	var result Result
-	if strategy != Spread && strategy != BinPack && strategy != Preempt {
+	if strategy != Spread && strategy != BinPack && strategy != Preempt && strategy != PreemptBinPack {
 		return result, fmt.Errorf("unknown strategy")
 	}
 	ids := map[string]bool{}
@@ -66,24 +60,34 @@ func Schedule(nodes []Node, jobs []Job, strategy Strategy) (Result, error) {
 		}
 		ids[j.ID] = true
 	}
-	for _, job := range jobs {
+	used := make([]Resource, len(nodes))
+	pack := strategy == BinPack || strategy == PreemptBinPack
+	canPreempt := strategy == Preempt || strategy == PreemptBinPack
+	choose := func(job Job) int {
 		chosen := -1
 		score := 0.0
 		for i, n := range nodes {
-			u := usage(n, result.Placements)
+			u := used[i]
 			if !fits(u, job.Need, n.Capacity) {
 				continue
 			}
 			s := float64(u.CPU)/float64(n.Capacity.CPU) + float64(u.Memory)/float64(n.Capacity.Memory)
-			if chosen < 0 || (strategy != BinPack && s < score) || (strategy == BinPack && s > score) {
-				chosen = i
-				score = s
+			if chosen < 0 || (!pack && s < score) || (pack && s > score) {
+				chosen, score = i, s
 			}
 		}
-		if chosen < 0 && strategy == Preempt {
+		return chosen
+	}
+	place := func(job Job, chosen int) {
+		used[chosen] = add(used[chosen], job.Need)
+		result.Placements = append(result.Placements, Placement{job, nodes[chosen].ID})
+	}
+	for _, job := range jobs {
+		chosen := choose(job)
+		if chosen < 0 && canPreempt {
 			var best []Placement
 			for i, n := range nodes {
-				u := usage(n, result.Placements)
+				u := used[i]
 				victims := []Placement{}
 				for _, p := range result.Placements {
 					if p.NodeID == n.ID && p.Job.Priority < job.Priority {
@@ -110,6 +114,9 @@ func Schedule(nodes []Node, jobs []Job, strategy Strategy) (Result, error) {
 				for _, v := range best {
 					victimIDs[v.Job.ID] = true
 					result.Preempted = append(result.Preempted, v.Job)
+					result.Pending = append(result.Pending, v.Job)
+					used[chosen].CPU -= v.Job.Need.CPU
+					used[chosen].Memory -= v.Job.Need.Memory
 				}
 				kept := []Placement{}
 				for _, p := range result.Placements {
@@ -123,8 +130,24 @@ func Schedule(nodes []Node, jobs []Job, strategy Strategy) (Result, error) {
 		if chosen < 0 {
 			result.Rejected = append(result.Rejected, job)
 		} else {
-			result.Placements = append(result.Placements, Placement{job, nodes[chosen].ID})
+			place(job, chosen)
 		}
+		// Retry waiting evictions after each arrival, without further eviction:
+		// no recursive preemption/oscillation, priority then stable queue order.
+		sort.SliceStable(result.Pending, func(i, j int) bool { return result.Pending[i].Priority > result.Pending[j].Priority })
+		waiting := make([]Job, 0, len(result.Pending))
+		for _, retry := range result.Pending {
+			if target := choose(retry); target >= 0 {
+				place(retry, target)
+			} else {
+				waiting = append(waiting, retry)
+			}
+		}
+		result.Pending = waiting
+	}
+	result.Usage = make(map[string]Resource, len(nodes))
+	for i, n := range nodes {
+		result.Usage[n.ID] = used[i]
 	}
 	return result, nil
 }

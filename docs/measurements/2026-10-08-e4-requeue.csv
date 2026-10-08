@@ -1,0 +1,5 @@
+strategy,resident,rejected,preempted,pending,urgent_admitted,nodes_used
+spread,2,1,0,0,false,2
+binpack,3,0,0,0,true,2
+preempt,3,0,1,0,true,2
+preempt-binpack,3,0,0,0,true,2

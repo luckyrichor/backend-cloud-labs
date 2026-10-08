@@ -1,0 +1,12 @@
+goos: linux
+goarch: amd64
+pkg: github.com/luckyrichor/backend-cloud-labs/e4-scheduler
+cpu: AMD EPYC 7K62 48-Core Processor
+BenchmarkIncrementalPlacement/1000-4         	    3691	    337261 ns/op	  261554 B/op	    1042 allocs/op
+BenchmarkIncrementalPlacement/1000-4         	    3427	    336897 ns/op	  261552 B/op	    1042 allocs/op
+BenchmarkIncrementalPlacement/1000-4         	    3330	    343909 ns/op	  261552 B/op	    1042 allocs/op
+BenchmarkIncrementalPlacement/10000-4        	     297	   3931946 ns/op	 3773401 B/op	   10109 allocs/op
+BenchmarkIncrementalPlacement/10000-4        	     290	   4037316 ns/op	 3773404 B/op	   10109 allocs/op
+BenchmarkIncrementalPlacement/10000-4        	     295	   4035146 ns/op	 3773405 B/op	   10109 allocs/op
+PASS
+ok  	github.com/luckyrichor/backend-cloud-labs/e4-scheduler	8.439s

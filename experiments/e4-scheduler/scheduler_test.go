@@ -5,7 +5,7 @@ import "testing"
 func TestPolicies(t *testing.T) {
 	nodes := []Node{{"a", Resource{8, 8}}, {"b", Resource{8, 8}}}
 	jobs := []Job{{"one", Resource{4, 4}, 1}, {"two", Resource{4, 4}, 1}, {"urgent", Resource{8, 8}, 10}}
-	expected := map[Strategy][3]int{Spread: {2, 1, 0}, BinPack: {3, 0, 0}, Preempt: {2, 0, 1}}
+	expected := map[Strategy][3]int{Spread: {2, 1, 0}, BinPack: {3, 0, 0}, Preempt: {3, 0, 1}, PreemptBinPack: {3, 0, 0}}
 	for s, want := range expected {
 		r, err := Schedule(nodes, jobs, s)
 		if err != nil || len(r.Placements) != want[0] || len(r.Rejected) != want[1] || len(r.Preempted) != want[2] {

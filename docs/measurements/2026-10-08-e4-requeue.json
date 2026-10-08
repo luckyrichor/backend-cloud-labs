@@ -1,0 +1,19 @@
+{
+  "generated_at": "2026-10-08T07:32:13.631504+00:00",
+  "base_commit": "9fcc76ce12ef34f9a6dc46762689a2f30edbf146",
+  "source_dirty": true,
+  "go_version": "go version go1.27.1 linux/amd64",
+  "source_sha256": {
+    "experiments/e4-scheduler/cmd/compare/main.go": "5e8fcf15a04f97c306205c29604f4af235ea21a2b100c5bd5a9ab2be79c6dc12",
+    "experiments/e4-scheduler/requeue_test.go": "6731a6ef0de9f1e647d66848376af89ae002b9f87115151650f486392ecdbf4a",
+    "experiments/e4-scheduler/resources_test.go": "8d6174d39bc8fb9b0031965f55acc16b7d389514b20dd7677f8a1f65ad6dcd06",
+    "experiments/e4-scheduler/scheduler.go": "4efeb1e59e5b5211aacf9657c1911860e8a5d17e8f0862684ff294be9e461193",
+    "experiments/e4-scheduler/scheduler_test.go": "90896f467ad015aa541e8d4e8e5d2bb8124ec30df908fb9ecee1098b839c1141"
+  },
+  "tests": "7 tests, go test -race -count=1 passed; go vet passed",
+  "benchmark": "32 nodes binpack, 1000/10000 jobs, 3 repeats, whole Schedule calls including validation/allocation; not single-job p95 or old/new speedup",
+  "result_sha256": {
+    "docs/measurements/2026-10-08-e4-incremental.txt": "f62e0fe519a47b344527baf2923c52759af2d86018f5c872661d47d1a6c85b62",
+    "docs/measurements/2026-10-08-e4-requeue.csv": "616fc31687a4d6805269ab0b2a22920a2e9227c7d021e7673671b5aec5490bd2"
+  }
+}
