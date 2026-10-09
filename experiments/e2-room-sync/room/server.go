@@ -18,9 +18,10 @@ import (
 )
 
 type Player struct {
-	X   float64 `json:"x"`
-	Y   float64 `json:"y"`
-	Seq uint64  `json:"seq"`
+	X         float64 `json:"x"`
+	Y         float64 `json:"y"`
+	Seq       uint64  `json:"seq"`
+	Connected bool    `json:"connected"`
 }
 type Message struct {
 	Type    string            `json:"type"`
@@ -34,6 +35,7 @@ type Message struct {
 }
 type session struct {
 	token          string
+	originHost     string
 	player         Player
 	connection     net.Conn
 	out            chan Message
@@ -47,24 +49,31 @@ type input struct {
 	dx, dy     float64
 }
 type Server struct {
-	mu          sync.Mutex
-	sessions    map[string]*session
-	connections map[net.Conn]bool
-	retention   time.Duration
-	frame       uint64
-	interval    time.Duration
-	wg          sync.WaitGroup
+	mu                    sync.Mutex
+	sessions              map[string]*session
+	connections           map[net.Conn]bool
+	retention             time.Duration
+	perIP, maxConnections int
+	ipCounts              map[string]int
+	frame                 uint64
+	interval              time.Duration
+	wg                    sync.WaitGroup
 }
 
 func New(interval time.Duration) *Server { return NewWithRetention(interval, 30*time.Second) }
 
 // Retention bounds reconnect identities; expiration invalidates resume credentials.
 func NewWithRetention(interval, retention time.Duration) *Server {
-	if interval <= 0 || retention <= 0 {
+	return NewWithLimits(interval, retention, 16, 256)
+}
+
+// Per-IP limits mitigate one-host floods, not distributed or authenticated abuse.
+func NewWithLimits(interval, retention time.Duration, perIP, maxConnections int) *Server {
+	if interval <= 0 || retention <= 0 || perIP <= 0 || maxConnections <= 0 {
 		panic("frame interval and retention must be positive")
 	}
 	return &Server{sessions: make(map[string]*session), connections: make(map[net.Conn]bool),
-		retention: retention, interval: interval}
+		retention: retention, interval: interval, perIP: perIP, maxConnections: maxConnections, ipCounts: map[string]int{}}
 }
 func randomToken() string {
 	var b [16]byte
@@ -100,7 +109,14 @@ func (s *Server) Serve(ctx context.Context, listener net.Listener) error {
 			return err
 		}
 		s.mu.Lock()
+		host := remoteHost(c)
+		if len(s.connections) >= s.maxConnections || s.ipCounts[host] >= s.perIP {
+			s.mu.Unlock()
+			_ = c.Close()
+			continue
+		}
 		s.connections[c] = true
+		s.ipCounts[host]++
 		s.mu.Unlock()
 		s.wg.Add(1)
 		go func() { defer s.wg.Done(); s.handle(ctx, c) }()
@@ -127,7 +143,17 @@ func read(scanner *bufio.Scanner) (Message, error) {
 }
 
 func (s *Server) handle(ctx context.Context, c net.Conn) {
-	defer func() { _ = c.Close(); s.mu.Lock(); delete(s.connections, c); s.mu.Unlock() }()
+	defer func() {
+		_ = c.Close()
+		s.mu.Lock()
+		delete(s.connections, c)
+		host := remoteHost(c)
+		s.ipCounts[host]--
+		if s.ipCounts[host] <= 0 {
+			delete(s.ipCounts, host)
+		}
+		s.mu.Unlock()
+	}()
 	_ = c.SetReadDeadline(time.Now().Add(5 * time.Second))
 	scanner := bufio.NewScanner(c) // 64 KiB maximum record; no unbounded input allocation.
 	hello, err := read(scanner)
@@ -147,12 +173,18 @@ func (s *Server) handle(ctx context.Context, c net.Conn) {
 			_ = peer.connection.Close()
 		}
 	} else {
-		if len(s.sessions) >= 128 {
+		identities := 0
+		for _, existing := range s.sessions {
+			if existing.originHost == remoteHost(c) {
+				identities++
+			}
+		}
+		if len(s.sessions) >= 128 || identities >= s.perIP {
 			s.mu.Unlock()
 			return
 		} // Connected plus unexpired disconnected identities are bounded.
 		id = randomToken()
-		peer = &session{token: randomToken()}
+		peer = &session{token: randomToken(), originHost: remoteHost(c)}
 		s.sessions[id] = peer
 	}
 	out := make(chan Message, 4)
@@ -221,7 +253,9 @@ func (s *Server) handle(ctx context.Context, c net.Conn) {
 func (s *Server) snapshotLocked() Message {
 	players := make(map[string]Player, len(s.sessions))
 	for id, peer := range s.sessions {
-		players[id] = peer.player
+		player := peer.player
+		player.Connected = peer.connection != nil
+		players[id] = player
 	}
 	return Message{Type: "snapshot", Frame: s.frame, Players: players}
 }
@@ -275,4 +309,12 @@ func (s *Server) expireLocked(now time.Time) {
 			delete(s.sessions, id)
 		}
 	}
+}
+
+func remoteHost(c net.Conn) string {
+	host, _, err := net.SplitHostPort(c.RemoteAddr().String())
+	if err != nil {
+		return c.RemoteAddr().String()
+	}
+	return host
 }

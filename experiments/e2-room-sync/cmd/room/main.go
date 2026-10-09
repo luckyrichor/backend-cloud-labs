@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"github.com/luckyrichor/backend-cloud-labs/e2-room-sync/room"
+	"github.com/luckyrichor/backend-cloud-labs/experiments/e2-room-sync/room"
 	"log"
 	"net"
 	"os"

@@ -1,6 +1,6 @@
 # AGENTS.md
 
-最后更新：2026-10-08（北京时间）
+最后更新：2026-10-09（北京时间）
 
 本文件为在本仓库工作的编码 agent 提供指引（Claude Code 读 `CLAUDE.md`、Codex 读 `AGENTS.md`，两者都指向这里）。
 
@@ -102,3 +102,8 @@ bash workplan-docs/scripts/run-on-tx.sh agent-memory 'docker compose up -d postg
 | 岗位要求本身 | `workplan-docs/岗位要求原文.md`（唯一事实来源，不要在别处改写） |
 
 写进「环境与踩坑记录」时，用 **［实测］**／**［预警］** 标注区分「已验证的事实」和「未触发的已知风险」，不要把推断写成结论。
+
+
+## 2026-10-09 当前约束
+
+E1 Item已统一snake_case，Redis v2键隔离旧JSON；NewService/HTTP Handler启用1024容量本地失败修复队列，溢出保守回源，不宣称持久补偿。E2/E4统一experiments module路径，E2默认每IP16连接/16保留身份、全局256TCP及128身份，快照带connected；非账号认证。E3可预绑定变量slot，保留哈希接口，绑定前完成schema验证，不与求值并发重绑；测量区分预布局和运行期转换。E4三个对照场景同时报告接纳/驱逐/占用，不宣称组合总是更优。最新验收35个Go测试与CTest3/3，见docs/progress.md。

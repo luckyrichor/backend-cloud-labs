@@ -2,7 +2,7 @@
 
 后端服务与云原生方向的实验集合。**刻意拆成多个各自独立、各自完整的小实验**，而不是一个什么都沾一点的大项目——后者的结果是五个岗位方向哪个都覆盖不了。
 
-**状态：E1–E4本地自动验收通过；E5未开工**（2026-10-08，Codex本次更新）
+**状态：E1–E4本地自动验收通过；E5未开工**（2026-10-09，Codex本次更新）
 
 | 实验 | 目录 | 状态 |
 |---|---|---|
@@ -32,3 +32,6 @@
 
 
 第二轮评审代码与测试已提交 [2e69dbe](https://github.com/luckyrichor/backend-cloud-labs/commit/2e69dbe435b2daaf9ecac47627e3cf8870bea295)，对应 [来源与验证记录](docs/measurements/2026-10-08-review-followup.json)。历史报告的工作树描述保留测量时状态，已逐项核对其后对应的Git提交；不代表当前代码未提交。
+
+
+2026-10-09第三轮：E1统一snake_case、注入时钟与本地缓存失败补偿；E2加IP准入和connected快照；E3加schema绑定数组slot及转换成本测量；E4加三场景对照。35个Go测试race与vet、真实Redis通过，Release/ASan/UBSan CTest3/3。边界与实际源码摘要见 [第三轮证据](docs/measurements/2026-10-09-third-review.json)，不得沿用旧报告为新接口/性能背书。

@@ -1,0 +1,12 @@
+goos: linux
+goarch: amd64
+pkg: github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/guide
+cpu: AMD EPYC 7K62 48-Core Processor
+BenchmarkReadModes/strict-4         	 5937160	       207.3 ns/op	         1.000 source-reads/op	       0 B/op	       0 allocs/op
+BenchmarkReadModes/strict-4         	 5758240	       207.0 ns/op	         1.000 source-reads/op	       0 B/op	       0 allocs/op
+BenchmarkReadModes/strict-4         	 5823714	       209.7 ns/op	         1.000 source-reads/op	       0 B/op	       0 allocs/op
+BenchmarkReadModes/cache-first-4    	 7355217	       173.4 ns/op	         0 source-reads/op	       0 B/op	       0 allocs/op
+BenchmarkReadModes/cache-first-4    	 7438107	       158.9 ns/op	         0 source-reads/op	       0 B/op	       0 allocs/op
+BenchmarkReadModes/cache-first-4    	 7586942	       156.2 ns/op	         0 source-reads/op	       0 B/op	       0 allocs/op
+PASS
+ok  	github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/guide	8.417s

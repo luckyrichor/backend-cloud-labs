@@ -51,3 +51,14 @@ go test -run '^$' -bench BenchmarkIncrementalPlacement -benchmem -count=3
 现在保留低优先级先驱逐；同优先级按对本次CPU/内存缺口的有效贡献降序，贡献各维最多1，平局稳定沿用到达顺序。该用例只驱逐大任务（1次）。不把不同资源维度直接按裸数相加，也不越过优先级约束。8项测试race通过，包括独立账本/任务守恒oracle。
 
 这是固定初始缺口评分的贪心启发式，不保证最少受害者或最小浪费；多资源组合仍可能次优。候选扫描、排序和Pending重试仍存在，增量账本只消除了普通放置的占用重算，没有消除所有规模瓶颈。
+
+
+## 三场景对照（2026-10-09）
+
+compare现输出scenario列及cpu_used；保留packing旧场景，并增加full_nodes与packing_and_preemption。原CSV保留旧来源；新结果见 ../../docs/measurements/2026-10-09-e4-scenarios.csv。
+
+- packing：binpack可直接接纳，无需驱逐；说明装箱收益。
+- full_nodes：低优先任务占满两节点；binpack拒绝紧急任务，两种preempt接纳且驱逐1个；说明驱逐收益，不作为组合独有收益。
+- packing_and_preemption：2/6/2/6单位低优先任务后到8单位紧急任务。binpack使用16资源但拒绝紧急；preempt接纳后使用12资源、驱逐1个；preempt-binpack接纳后使用16资源、驱逐2个，Pending有2个。这说明本到达序列中组合可保留更多驻留资源，代价是更多驱逐，并非所有指标都更优。
+
+9项顶层测试race通过，组合场景回归同时核对接纳、占用和驱逐。module路径同步experiments，抢占仍为贪心离线实验。

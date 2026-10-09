@@ -237,3 +237,79 @@ func TestExpiredRoomCapacityReclaimedAndOldTokenRejected(t *testing.T) {
 		t.Fatal("expired token resumed")
 	}
 }
+
+func TestPerIPQuotaClosesFloodAndReleasesDisconnectedSlots(t *testing.T) {
+	address, s := launch(t)
+	s.mu.Lock()
+	s.perIP = 2
+	s.mu.Unlock()
+	a := connect(t, address, "", "")
+	_ = connect(t, address, "", "")
+	denied, err := net.DialTimeout("tcp", address, time.Second)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer denied.Close()
+	_ = denied.SetReadDeadline(time.Now().Add(time.Second))
+	if err = json.NewDecoder(denied).Decode(new(Message)); err == nil {
+		t.Fatal("IP quota bypassed")
+	}
+	_ = a.conn.Close()
+	deadline := time.Now().Add(time.Second)
+	for {
+		s.mu.Lock()
+		count := s.ipCounts["127.0.0.1"]
+		s.mu.Unlock()
+		if count == 1 {
+			break
+		}
+		if time.Now().After(deadline) {
+			t.Fatal("connection slot leaked")
+		}
+		time.Sleep(time.Millisecond)
+	}
+	// A fresh identity cannot bypass the quota by rapidly closing connections.
+	extra, err := net.DialTimeout("tcp", address, time.Second)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_ = json.NewEncoder(extra).Encode(Message{Type: "join"})
+	_ = extra.SetReadDeadline(time.Now().Add(time.Second))
+	if err = json.NewDecoder(extra).Decode(new(Message)); err == nil {
+		t.Fatal("retained identity quota bypassed")
+	}
+	_ = extra.Close()
+	deadline = time.Now().Add(time.Second)
+	for {
+		s.mu.Lock()
+		count := s.ipCounts["127.0.0.1"]
+		s.mu.Unlock()
+		if count == 1 {
+			break
+		}
+		if time.Now().After(deadline) {
+			t.Fatal("slot leaked")
+		}
+		time.Sleep(time.Millisecond)
+	}
+	// The owner can still resume the retained identity without claiming a new one.
+	_ = connect(t, address, a.welcome.ID, a.welcome.Token)
+}
+
+func TestSnapshotExplicitlyMarksRetainedDisconnectAndExpiry(t *testing.T) {
+	s := NewWithRetention(time.Millisecond, time.Second)
+	now := time.Now()
+	live, other := net.Pipe()
+	defer live.Close()
+	defer other.Close()
+	s.sessions["live"] = &session{connection: live}
+	s.sessions["gone"] = &session{disconnectedAt: now}
+	first := s.snapshotLocked()
+	if !first.Players["live"].Connected || first.Players["gone"].Connected {
+		t.Fatal(first)
+	}
+	s.expireLocked(now.Add(time.Second))
+	if _, exists := s.snapshotLocked().Players["gone"]; exists {
+		t.Fatal("expired player retained")
+	}
+}

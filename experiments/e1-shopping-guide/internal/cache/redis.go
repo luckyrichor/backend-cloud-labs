@@ -27,7 +27,7 @@ return 1
 `)
 
 func (c *Redis) Get(ctx context.Context, id string) (catalog.Item, error) {
-	raw, err := c.Client.HGet(ctx, c.Prefix+id, "item").Result()
+	raw, err := c.Client.HGet(ctx, c.Prefix+"v2:"+id, "item").Result()
 	if errors.Is(err, redis.Nil) {
 		return catalog.Item{}, guide.ErrCacheMiss
 	}
@@ -43,7 +43,7 @@ func (c *Redis) PutIfNewer(ctx context.Context, item catalog.Item) (bool, error)
 	if err != nil {
 		return false, err
 	}
-	result, err := fill.Run(ctx, c.Client, []string{c.Prefix + item.ID}, item.Version,
+	result, err := fill.Run(ctx, c.Client, []string{c.Prefix + "v2:" + item.ID}, item.Version,
 		string(raw), c.TTL.Milliseconds()).Int()
 	return result == 1, err
 }

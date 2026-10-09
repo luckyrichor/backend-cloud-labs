@@ -1,6 +1,6 @@
 # E1 导购服务 + 缓存一致性
 
-最后更新：2026-10-08；Codex；原创建来源 backend-cloud-labs@1770378；第二轮修订基线 97eb85c + 工作树。
+最后更新：2026-10-09；Codex；原创建来源 backend-cloud-labs@1770378；第二轮修订基线 97eb85c + 工作树。
 
 W3 E1 自动验收已通过：可运行 HTTP 导购最小服务、确定性旧读者缓存回填竞态复现、单调版本填充修复、缓存 outage/read/write/recovery 降级。本实验保留 W1 Item+Store 骨架，并增加独立缓存层。
 
@@ -35,3 +35,10 @@ go test ./internal/guide -run '^$' -bench BenchmarkReadModes -benchmem -count=5
 ```
 
 TX 5轮内存源+内存缓存热命中微测：strict 中位179.6 ns/op，cache-first 135.2 ns/op；源读取分别1/0次每请求，均0 B/op。包含 Go 锁与时间检查，没有真实数据库/Redis/HTTP延迟，不能推算生产吞吐收益。原始值见 ../../docs/measurements/2026-10-08-e1-read-modes.txt。
+
+
+## 第三轮修订（2026-10-09）
+
+Item显式JSON标签与响应契约测试已完成；go-redis为直接依赖，go mod tidy整理锁定校验；内存缓存新增NewMemoryWithClock，过期测试用受控时钟、不依赖sleep。缓存写失败补偿使用共享Repairs版本队列：NewService和HTTP Handler默认启用，队列上限1024、溢出回源；成功修复后恢复热命中。补偿是本地读触发，不跨重启/实例，不是持久队列。历史双模式测试仍展示未被同一队列观测的更新所导致的陈旧风险。新源码复测数据见 ../../docs/measurements/2026-10-09-e1-read-modes.txt，旧测速属于旧提交，不能混用。完整新契约见docs/api.md。
+
+当前启用修复队列的内存热命中3轮复测：strict207.3 ns/op，cache-first158.9 ns/op，源读取1/0每请求；增加队列检查后不沿用旧性能数字。本次不同代码/不同轮数，不把与旧值的差异全部归因于修复队列。

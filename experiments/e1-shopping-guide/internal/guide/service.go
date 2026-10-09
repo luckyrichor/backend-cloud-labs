@@ -30,16 +30,22 @@ const (
 func ValidReadMode(mode ReadMode) bool { return mode == "" || mode == Strict || mode == CacheFirst }
 
 type Service struct {
-	Mode  ReadMode
-	Store catalog.Store
-	Cache Cache
+	Mode    ReadMode
+	Store   catalog.Store
+	Cache   Cache
+	Repairs *RepairQueue
+}
+
+// NewService enables bounded local read-repair; share this value across requests.
+func NewService(store catalog.Store, cache Cache, mode ReadMode) Service {
+	return Service{Store: store, Cache: cache, Mode: mode, Repairs: NewRepairQueue(1024)}
 }
 
 func (s Service) Get(ctx context.Context, id string) (Result, error) {
 	if !ValidReadMode(s.Mode) {
 		return Result{}, errors.New("invalid cache read mode")
 	}
-	if s.Mode == CacheFirst {
+	if s.Mode == CacheFirst && !s.Repairs.pending(id) {
 		cached, err := s.Cache.Get(ctx, id)
 		if err == nil {
 			return Result{cached, "cache_unvalidated", false}, nil
@@ -58,9 +64,13 @@ func (s Service) Get(ctx context.Context, id string) (Result, error) {
 	}
 	cached, cacheErr := s.Cache.Get(ctx, id)
 	if cacheErr == nil && cached.Version == authoritative.Version {
+		s.Repairs.clear(id, authoritative.Version)
 		return Result{cached, "cache_validated", false}, nil
 	}
 	_, fillErr := s.Cache.PutIfNewer(ctx, authoritative)
+	if fillErr == nil {
+		s.Repairs.clear(id, authoritative.Version)
+	}
 	degraded := (cacheErr != nil && !errors.Is(cacheErr, ErrCacheMiss)) || fillErr != nil
 	return Result{authoritative, "store", degraded}, nil
 }
@@ -70,6 +80,11 @@ func (s Service) Put(ctx context.Context, item catalog.Item) (Result, error) {
 		return Result{}, err
 	}
 	_, err = s.Cache.PutIfNewer(ctx, authoritative)
+	if err != nil {
+		s.Repairs.mark(authoritative.ID, authoritative.Version)
+	} else {
+		s.Repairs.clear(authoritative.ID, authoritative.Version)
+	}
 	// Cache errors never disguise an already-committed source write as a failed write.
 	return Result{authoritative, "store", err != nil}, nil
 }

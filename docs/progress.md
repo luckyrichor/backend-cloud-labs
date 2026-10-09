@@ -1,6 +1,6 @@
 # 进度记录
 
-最后更新：2026-10-08（北京时间）
+最后更新：2026-10-09（北京时间）
 
 本文件是 `backend-cloud-labs` 的进度事实源，汇总到 `workplan-docs/进度总览.md`。
 
@@ -96,3 +96,12 @@ E1内存热命中5轮中位179.6/135.2 ns/op，源读取1/0每请求；不是生
 ## 2026-10-08：接口文档与统计勘误（Codex）
 
 按实现7277e74核对E1接口说明，补cache_unvalidated、strict/cache-first新鲜度差别及推荐去重排序；源失败503仅适用于实际访问源的路径。复算5轮原始strict值184.5、179.6、181.4、178.9、177.7，中位179.6 ns/op；修正上轮progress误写180.4，原始数据未修改。这是文档修订，没有修改运行代码或沿用旧测试冒充新功能验收。
+
+
+## 2026-10-09：第三轮七项建议落地（Codex）
+
+基线544bf3a + 本轮修改：JSON标签/响应契约测试、Redis v2缓存隔离、直接依赖整理、注入时钟、E2/E4 module路径统一、本地缓存失败版本补偿、IP连接和身份准入及快照connected、E4三场景对比、E3绑定slot与含转换成本测量。首轮compare用外部包无字段名结构字面量导致go vet拒绝，改带字段名/构造助手后通过。
+
+最终scripts/check.sh通过：E1 18/E2 8/E4 9项Go顶层测试（共35，含子测试）race、vet均通过；真实临时Redis两项用例无skip。E3 Release CTest3/3（旧222+19568、新1500差分及边界）通过；ASan/UBSan Debug CTest3/3，detect_leaks=0。E3十轮哈希/slot/转换slot中位47.6856/14.51135/34.85875 ns/doc，结果checksum一致。E4组合用例binpack拒绝urgent，preempt接纳且占用12，preempt-binpack接纳且占用16、驱逐2次；不声称全面优于其他策略。
+
+新证据见 measurements/2026-10-09-third-review.json 与各CSV；历史报告保留原源码。无新常驻部署。补偿不跨重启/实例，IP限额不替代认证，slot优化不是百亿检索验收；所有这些边界同步各README。

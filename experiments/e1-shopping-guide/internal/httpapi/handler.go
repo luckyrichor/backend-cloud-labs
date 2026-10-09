@@ -10,6 +10,9 @@ import (
 )
 
 func Handler(service guide.Service) http.Handler {
+	if service.Repairs == nil {
+		service.Repairs = guide.NewRepairQueue(1024)
+	}
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /items/{id}", func(w http.ResponseWriter, r *http.Request) {
 		result, err := service.Get(r.Context(), r.PathValue("id"))

@@ -21,12 +21,12 @@ var ErrNotFound = errors.New("catalog: item not found")
 // Version is what makes stale reads detectable: a cached copy carrying a lower
 // version than the store's is stale by definition, with no clock involved.
 type Item struct {
-	ID        string
-	Title     string
-	PriceCent int64
-	Stock     int
-	Version   int64
-	UpdatedAt time.Time
+	ID        string    `json:"id"`
+	Title     string    `json:"title"`
+	PriceCent int64     `json:"price_cent"`
+	Stock     int       `json:"stock"`
+	Version   int64     `json:"version"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 // Store is the source of truth. Implementations must be safe for concurrent use.

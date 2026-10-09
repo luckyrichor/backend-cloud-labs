@@ -16,9 +16,18 @@ type Memory struct {
 	mu      sync.Mutex
 	entries map[string]entry
 	TTL     time.Duration
+	now     func() time.Time
 }
 
-func NewMemory(ttl time.Duration) *Memory { return &Memory{entries: map[string]entry{}, TTL: ttl} }
+func NewMemory(ttl time.Duration) *Memory { return NewMemoryWithClock(ttl, time.Now) }
+
+// Clock is immutable after construction; tests advance a controlled clock.
+func NewMemoryWithClock(ttl time.Duration, now func() time.Time) *Memory {
+	if now == nil {
+		panic("clock is required")
+	}
+	return &Memory{entries: map[string]entry{}, TTL: ttl, now: now}
+}
 func (c *Memory) Get(ctx context.Context, id string) (catalog.Item, error) {
 	if err := ctx.Err(); err != nil {
 		return catalog.Item{}, err
@@ -26,7 +35,7 @@ func (c *Memory) Get(ctx context.Context, id string) (catalog.Item, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	e, ok := c.entries[id]
-	if !ok || time.Now().After(e.expires) {
+	if !ok || c.now().After(e.expires) {
 		return catalog.Item{}, guide.ErrCacheMiss
 	}
 	return e.item, nil
@@ -38,9 +47,9 @@ func (c *Memory) PutIfNewer(ctx context.Context, item catalog.Item) (bool, error
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	e, ok := c.entries[item.ID]
-	if ok && time.Now().Before(e.expires) && e.item.Version > item.Version {
+	if ok && c.now().Before(e.expires) && e.item.Version > item.Version {
 		return false, nil
 	}
-	c.entries[item.ID] = entry{item, time.Now().Add(c.TTL)}
+	c.entries[item.ID] = entry{item, c.now().Add(c.TTL)}
 	return true, nil
 }

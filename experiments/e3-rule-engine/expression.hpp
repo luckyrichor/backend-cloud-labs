@@ -28,19 +28,16 @@ struct Node {
   Op op{Op::Number};
   double number{};
   std::unique_ptr<Node> left, right;
-  double evaluate(const Variables& vars) const {
+  std::size_t slot{static_cast<std::size_t>(-1)};
+  template<class Load> double evaluate_by(const Load& load) const {
     if (op == Op::Number) return number;
-    if (op == Op::Variable) {
-      auto found = vars.find(name);
-      if (found == vars.end() || !std::isfinite(found->second)) throw std::runtime_error("invalid variable");
-      return found->second;
-    }
-    double a = left->evaluate(vars);
+    if (op == Op::Variable) return load(*this);
+    double a = left->evaluate_by(load);
     if (op == Op::Negate) return -a;
     if (op == Op::Not) return a == 0;
     if (op == Op::And && a == 0) return 0;
     if (op == Op::Or && a != 0) return 1;
-    double b = right->evaluate(vars), result{};
+    double b = right->evaluate_by(load), result{};
     switch (op) {
       case Op::Add: result = a+b; break;
       case Op::Subtract: result = a-b; break;
@@ -59,6 +56,37 @@ struct Node {
     }
     if (!std::isfinite(result)) throw std::runtime_error("nonfinite result");
     return result;
+  }
+  double evaluate(const Variables& vars) const {
+    return evaluate_by([&](const Node& n) {
+      auto it=vars.find(n.name);
+      if(it==vars.end() || !std::isfinite(it->second)) throw std::runtime_error("invalid variable");
+      return it->second;
+    });
+  }
+  // Bind once before sharing the AST. Evaluation afterwards is immutable.
+  void bind_variables(std::span<const std::string> schema) {
+    if(schema.size()>256) throw std::runtime_error("schema limit");
+    std::unordered_map<std::string,std::size_t> indices;
+    for(std::size_t i=0;i<schema.size();++i)
+      if(schema[i].empty() || !indices.emplace(schema[i],i).second) throw std::runtime_error("invalid schema");
+    std::vector<std::pair<Node*,std::size_t>> assignments;
+    std::function<void(Node&)> collect=[&](Node& n) {
+      if(n.op==Op::Variable) {
+        auto it=indices.find(n.name);if(it==indices.end()) throw std::runtime_error("missing schema variable");
+        assignments.emplace_back(&n,it->second);
+      }
+      if(n.left) collect(*n.left);
+      if(n.right) collect(*n.right);
+    };
+    collect(*this); // Validation completes before mutating any binding.
+    for(auto [node,index]:assignments) node->slot=index;
+  }
+  double evaluate(std::span<const double> values) const {
+    return evaluate_by([&](const Node& n) {
+      if(n.slot>=values.size() || !std::isfinite(values[n.slot])) throw std::runtime_error("invalid variable slot");
+      return values[n.slot];
+    });
   }
   // Sequential batch APIs reuse this immutable compiled expression. Error policy:
   // fail fast with the row index; no partial result is returned, input is untouched.

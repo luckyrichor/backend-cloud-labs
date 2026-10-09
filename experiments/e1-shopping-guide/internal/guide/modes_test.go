@@ -73,7 +73,7 @@ func BenchmarkReadModes(b *testing.B) {
 		b.Run(fmt.Sprint(mode), func(b *testing.B) {
 			ctx := context.Background()
 			store := &countingStore{Store: catalog.NewMemoryStore()}
-			s := guide.Service{Store: store, Cache: cache.NewMemory(time.Hour), Mode: mode}
+			s := guide.NewService(store, cache.NewMemory(time.Hour), mode)
 			_, _ = s.Put(ctx, catalog.Item{ID: "sku", PriceCent: 100, Stock: 1})
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
