@@ -106,4 +106,6 @@ bash workplan-docs/scripts/run-on-tx.sh agent-memory 'docker compose up -d postg
 
 ## 2026-10-09 当前约束
 
-E1 Item已统一snake_case，Redis v2键隔离旧JSON；NewService/HTTP Handler启用1024容量本地失败修复队列，溢出保守回源，不宣称持久补偿。E2/E4统一experiments module路径，E2默认每IP16连接/16保留身份、全局256TCP及128身份，快照带connected；非账号认证。E3可预绑定变量slot，保留哈希接口，绑定前完成schema验证，不与求值并发重绑；测量区分预布局和运行期转换。E4三个对照场景同时报告接纳/驱逐/占用，不宣称组合总是更优。最新验收35个Go测试与CTest3/3，见docs/progress.md。
+E1 Item已统一snake_case，Redis v2键隔离旧JSON；NewService/HTTP Handler启用1024容量本地失败修复队列，溢出保守回源，不宣称持久补偿。E2/E4统一experiments module路径，E2默认每IP16连接/16保留身份、全局256TCP及128身份，快照带connected；非账号认证。E3可预绑定变量slot，保留哈希接口，bind返回独立私有只读Bound；不原地重绑；测量区分预布局和运行期转换。E4三个对照场景同时报告接纳/驱逐/占用，不宣称组合总是更优。最新验收39个Go测试与CTest3/3，见docs/progress.md。
+
+第四轮E1空队列atomic快路径、cache-first缺队列显式错误；标记/overflow因寿命协议未定义仍保守不回收。E2 IPv6按/64聚合，IPv4按地址。E4另报打断CPU/内存事件总量。当前证据统一见docs/measurements/2026-10-09-fourth-review.json；历史测量不改写来源。

@@ -1,0 +1,69 @@
+goos: linux
+goarch: amd64
+pkg: github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/guide
+cpu: AMD EPYC 7K62 48-Core Processor
+BenchmarkRepairReadParallel/locked-empty           	33191007	        11.15 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRepairReadParallel/locked-empty           	32330419	        11.14 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRepairReadParallel/locked-empty           	32608234	        11.35 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRepairReadParallel/locked-empty-4         	22366230	        22.54 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRepairReadParallel/locked-empty-4         	16151330	        22.91 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRepairReadParallel/locked-empty-4         	14098257	        23.61 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRepairReadParallel/locked-empty-8         	13122248	        30.30 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRepairReadParallel/locked-empty-8         	12453138	        30.16 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRepairReadParallel/locked-empty-8         	11646922	        29.53 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRepairReadParallel/atomic-empty           	99406542	         3.577 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRepairReadParallel/atomic-empty           	99777550	         3.714 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRepairReadParallel/atomic-empty           	100000000	         3.935 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRepairReadParallel/atomic-empty-4         	270154567	         1.266 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRepairReadParallel/atomic-empty-4         	328721852	         1.088 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRepairReadParallel/atomic-empty-4         	323233492	         1.151 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRepairReadParallel/atomic-empty-8         	332840697	         1.084 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRepairReadParallel/atomic-empty-8         	341714264	         1.247 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRepairReadParallel/atomic-empty-8         	300964621	         1.255 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRepairReadParallel/atomic-marked          	14870677	        20.54 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRepairReadParallel/atomic-marked          	17924414	        20.57 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRepairReadParallel/atomic-marked          	16711284	        20.93 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRepairReadParallel/atomic-marked-4        	 8426876	        43.16 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRepairReadParallel/atomic-marked-4        	 8494677	        44.98 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRepairReadParallel/atomic-marked-4        	 8727440	        44.28 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRepairReadParallel/atomic-marked-8        	 7366563	        47.28 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRepairReadParallel/atomic-marked-8        	 7395411	        48.86 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRepairReadParallel/atomic-marked-8        	 7913551	        48.51 ns/op	       0 B/op	       0 allocs/op
+BenchmarkReadModes/strict                          	 1923460	       193.6 ns/op	         1.000 source-reads/op	       0 B/op	       0 allocs/op
+BenchmarkReadModes/strict                          	 1884410	       183.9 ns/op	         1.000 source-reads/op	       0 B/op	       0 allocs/op
+BenchmarkReadModes/strict                          	 1964724	       185.7 ns/op	         1.000 source-reads/op	       0 B/op	       0 allocs/op
+BenchmarkReadModes/strict-4                        	 1865516	       189.9 ns/op	         1.000 source-reads/op	       0 B/op	       0 allocs/op
+BenchmarkReadModes/strict-4                        	 1948560	       189.0 ns/op	         1.000 source-reads/op	       0 B/op	       0 allocs/op
+BenchmarkReadModes/strict-4                        	 1966680	       192.9 ns/op	         1.000 source-reads/op	       0 B/op	       0 allocs/op
+BenchmarkReadModes/strict-8                        	 1873916	       191.5 ns/op	         1.000 source-reads/op	       0 B/op	       0 allocs/op
+BenchmarkReadModes/strict-8                        	 1948436	       190.6 ns/op	         1.000 source-reads/op	       0 B/op	       0 allocs/op
+BenchmarkReadModes/strict-8                        	 1929447	       196.0 ns/op	         1.000 source-reads/op	       0 B/op	       0 allocs/op
+BenchmarkReadModes/cache-first                     	 2468659	       148.0 ns/op	         0 source-reads/op	       0 B/op	       0 allocs/op
+BenchmarkReadModes/cache-first                     	 2456596	       144.9 ns/op	         0 source-reads/op	       0 B/op	       0 allocs/op
+BenchmarkReadModes/cache-first                     	 2418028	       150.4 ns/op	         0 source-reads/op	       0 B/op	       0 allocs/op
+BenchmarkReadModes/cache-first-4                   	 2554252	       144.2 ns/op	         0 source-reads/op	       0 B/op	       0 allocs/op
+BenchmarkReadModes/cache-first-4                   	 2473759	       146.7 ns/op	         0 source-reads/op	       0 B/op	       0 allocs/op
+BenchmarkReadModes/cache-first-4                   	 2549317	       147.7 ns/op	         0 source-reads/op	       0 B/op	       0 allocs/op
+BenchmarkReadModes/cache-first-8                   	 2417068	       147.8 ns/op	         0 source-reads/op	       0 B/op	       0 allocs/op
+BenchmarkReadModes/cache-first-8                   	 2514620	       144.5 ns/op	         0 source-reads/op	       0 B/op	       0 allocs/op
+BenchmarkReadModes/cache-first-8                   	 2463908	       149.8 ns/op	         0 source-reads/op	       0 B/op	       0 allocs/op
+BenchmarkServiceReadParallel/strict                	 2063047	       172.2 ns/op	       0 B/op	       0 allocs/op
+BenchmarkServiceReadParallel/strict                	 2016298	       180.6 ns/op	       0 B/op	       0 allocs/op
+BenchmarkServiceReadParallel/strict                	 2022027	       174.2 ns/op	       0 B/op	       0 allocs/op
+BenchmarkServiceReadParallel/strict-4              	 1690923	       216.4 ns/op	       0 B/op	       0 allocs/op
+BenchmarkServiceReadParallel/strict-4              	 1716388	       217.4 ns/op	       0 B/op	       0 allocs/op
+BenchmarkServiceReadParallel/strict-4              	 1671510	       213.7 ns/op	       0 B/op	       0 allocs/op
+BenchmarkServiceReadParallel/strict-8              	 1630435	       222.1 ns/op	       0 B/op	       0 allocs/op
+BenchmarkServiceReadParallel/strict-8              	 1601332	       220.0 ns/op	       0 B/op	       0 allocs/op
+BenchmarkServiceReadParallel/strict-8              	 1592384	       224.6 ns/op	       0 B/op	       0 allocs/op
+BenchmarkServiceReadParallel/cache-first           	 2609289	       140.9 ns/op	       0 B/op	       0 allocs/op
+BenchmarkServiceReadParallel/cache-first           	 2671020	       143.9 ns/op	       0 B/op	       0 allocs/op
+BenchmarkServiceReadParallel/cache-first           	 2541015	       143.5 ns/op	       0 B/op	       0 allocs/op
+BenchmarkServiceReadParallel/cache-first-4         	 1994306	       182.9 ns/op	       0 B/op	       0 allocs/op
+BenchmarkServiceReadParallel/cache-first-4         	 2058196	       176.1 ns/op	       0 B/op	       0 allocs/op
+BenchmarkServiceReadParallel/cache-first-4         	 1955023	       180.6 ns/op	       0 B/op	       0 allocs/op
+BenchmarkServiceReadParallel/cache-first-8         	 1886822	       188.5 ns/op	       0 B/op	       0 allocs/op
+BenchmarkServiceReadParallel/cache-first-8         	 1825462	       191.3 ns/op	       0 B/op	       0 allocs/op
+BenchmarkServiceReadParallel/cache-first-8         	 1897986	       191.7 ns/op	       0 B/op	       0 allocs/op
+PASS
+ok  	github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/guide	30.932s

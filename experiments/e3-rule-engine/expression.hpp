@@ -64,30 +64,9 @@ struct Node {
       return it->second;
     });
   }
-  // Bind once before sharing the AST. Evaluation afterwards is immutable.
-  void bind_variables(std::span<const std::string> schema) {
-    if(schema.size()>256) throw std::runtime_error("schema limit");
-    std::unordered_map<std::string,std::size_t> indices;
-    for(std::size_t i=0;i<schema.size();++i)
-      if(schema[i].empty() || !indices.emplace(schema[i],i).second) throw std::runtime_error("invalid schema");
-    std::vector<std::pair<Node*,std::size_t>> assignments;
-    std::function<void(Node&)> collect=[&](Node& n) {
-      if(n.op==Op::Variable) {
-        auto it=indices.find(n.name);if(it==indices.end()) throw std::runtime_error("missing schema variable");
-        assignments.emplace_back(&n,it->second);
-      }
-      if(n.left) collect(*n.left);
-      if(n.right) collect(*n.right);
-    };
-    collect(*this); // Validation completes before mutating any binding.
-    for(auto [node,index]:assignments) node->slot=index;
-  }
-  double evaluate(std::span<const double> values) const {
-    return evaluate_by([&](const Node& n) {
-      if(n.slot>=values.size() || !std::isfinite(values[n.slot])) throw std::runtime_error("invalid variable slot");
-      return values[n.slot];
-    });
-  }
+  // Binding copies the parsed tree into an independently owned, read-only object.
+  class Bound;
+  Bound bind_variables(std::span<const std::string> schema) const;
   // Sequential batch APIs reuse this immutable compiled expression. Error policy:
   // fail fast with the row index; no partial result is returned, input is untouched.
   std::vector<double> evaluate_batch(std::span<const Variables> documents) const {
@@ -114,6 +93,35 @@ struct Node {
   }
   std::string name;
 };
+class Node::Bound {
+  std::unique_ptr<const Node> root;
+  explicit Bound(std::unique_ptr<Node> tree): root(std::move(tree)) {}
+  friend struct Node;
+public:
+  double evaluate(std::span<const double> values) const {
+    return root->evaluate_by([&](const Node& n) {
+      if(n.slot>=values.size() || !std::isfinite(values[n.slot])) throw std::runtime_error("invalid variable slot");
+      return values[n.slot];
+    });
+  }
+};
+inline Node::Bound Node::bind_variables(std::span<const std::string> schema) const {
+  if(schema.size()>256) throw std::runtime_error("schema limit");
+  std::unordered_map<std::string,std::size_t> indices;
+  for(std::size_t i=0;i<schema.size();++i)
+    if(schema[i].empty() || !indices.emplace(schema[i],i).second) throw std::runtime_error("invalid schema");
+  std::function<std::unique_ptr<Node>(const Node&)> copy=[&](const Node& n) {
+    auto result=std::make_unique<Node>();result->op=n.op;result->number=n.number;result->name=n.name;
+    if(n.op==Op::Variable) {
+      auto it=indices.find(n.name);if(it==indices.end()) throw std::runtime_error("missing schema variable");
+      result->slot=it->second;
+    }
+    if(n.left)result->left=copy(*n.left);
+    if(n.right)result->right=copy(*n.right);
+    return result;
+  };
+  return Bound(copy(*this));
+}
 class Parser {
   std::string text;
   std::size_t pos{}, count{};

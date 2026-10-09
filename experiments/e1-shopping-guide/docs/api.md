@@ -1,6 +1,6 @@
 # E1 接口与一致性契约
 
-最后更新：2026-10-09；Codex；原创建来源 backend-cloud-labs@1770378；本次修订基线 backend-cloud-labs@544bf3a + 本轮修改，旧创建来源保留。
+最后更新：2026-10-09；Codex；原创建来源 backend-cloud-labs@1770378；本轮源码与测量来源见仓库根目录 docs/measurements/2026-10-09-fourth-review.json。
 
 | 接口 | 输入 | 返回 |
 |---|---|---|
@@ -20,4 +20,6 @@ JSON 未知字段、尾随 JSON、超过 1MB 或参数非法返回 400。不存�
 
 HTTP Handler 自动持有共享的本地修复队列。源写成功、缓存填充失败时记下版本；同进程后续读该key绕过未校验缓存，回源修复成功后再允许cache-first热命中。源写仍返回200+degraded=true。队列默认最多1024个key，溢出保守地关闭该队列的所有未校验读，直到重建该队列；没有遗忘待修复key后继续信任旧值。
 
-该队列不是持久Outbox，也没有后台轮询：修复由后续读触发，进程重启、其他实例和绕过服务的源写不在跟踪范围，仍可能陈旧。Go调用方使用 `guide.NewService` 或显式共享 `Repairs`；旧直接构造且Repairs=nil的调用方不启用补偿。
+该队列不是持久Outbox，也没有后台轮询：修复由后续读触发，进程重启、其他实例和绕过服务的源写不在跟踪范围，仍可能陈旧。Go调用方使用 `guide.NewService` 或显式共享 `Repairs`；直接构造且Repairs=nil时，cache-first的Get/Put明确返回ErrRepairQueueRequired，写入前拒绝，不会静默关闭补偿；strict仍可不配置队列。
+
+空修复队列使用原子dirty状态跳过互斥锁；mark/clear在锁内同步地图与dirty，有标记或溢出时仍加锁。它不承诺与源提交并发发生的读具备线性一致性：读在写失败标记发布前可能已经选择缓存。标记不按TTL自动过期，溢出仍保守保持到进程结束；当前Cache接口不提供可证明的旧缓存最长寿命，且旧版本回填可能刷新TTL，不能简单定时删除安全屏障。

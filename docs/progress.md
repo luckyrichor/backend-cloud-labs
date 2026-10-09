@@ -105,3 +105,11 @@ E1内存热命中5轮中位179.6/135.2 ns/op，源读取1/0每请求；不是生
 最终scripts/check.sh通过：E1 18/E2 8/E4 9项Go顶层测试（共35，含子测试）race、vet均通过；真实临时Redis两项用例无skip。E3 Release CTest3/3（旧222+19568、新1500差分及边界）通过；ASan/UBSan Debug CTest3/3，detect_leaks=0。E3十轮哈希/slot/转换slot中位47.6856/14.51135/34.85875 ns/doc，结果checksum一致。E4组合用例binpack拒绝urgent，preempt接纳且占用12，preempt-binpack接纳且占用16、驱逐2次；不声称全面优于其他策略。
 
 新证据见 measurements/2026-10-09-third-review.json 与各CSV；历史报告保留原源码。无新常驻部署。补偿不跨重启/实例，IP限额不替代认证，slot优化不是百亿检索验收；所有这些边界同步各README。
+
+## 2026-10-09：第四轮并发与类型边界
+
+E1无标记atomic读快路径已实现；锁内同步版本标记/溢出和dirty，清空后恢复快路径。cache-first缺Repairs显式报错且Put在源提交前拒绝，NewService/HTTP默认队列保持。暂不自动过期标记和overflow：接口无TTL上界、旧回填可刷新寿命，简单TTL清理不安全，此项仍是明确未解决限制。
+
+E2 IPv6用/64聚合连接/保留身份配额，mapped IPv4归一。E3 bind返回独立拥有树的只读Bound，验证独立schema、原树修改和销毁不影响运行对象。E4报告驱逐事件打断CPU/内存，与拒绝/最终占用并列，组合场景preempt打断6/6且拒绝1、组合8/8且拒绝0。设计/E1/E2表头当前版本指向统一元数据，历史结果保留历史版本。
+
+自动回归39项Go顶层（E1 20/E2 9/E4 10）race+vet，2项真实Redis未skip；E3 Release与ASan/UBSan CTest3/3，泄漏检测关闭。并发基准每组3次、300ms，GOMAXPROCS=1/4/8，共享同一队列；8工作线程locked-empty中位30.16 ns/op、atomic-empty1.247 ns/op，有其他商品标记时48.51 ns/op。这是队列隔离实验，不是API吞吐或请求尾延迟。Service并发基准包含内存store/cache锁，strict/cache-first 8线程中位222.1/191.3 ns/op；顺序ReadModes在GOMAXPROCS=1中位185.7/148.0，与历史源码时间不同，不能单因归因。测量元数据见2026-10-09-fourth-review.json；前轮slot数字未按新Bound复测，不宣称属于本轮。

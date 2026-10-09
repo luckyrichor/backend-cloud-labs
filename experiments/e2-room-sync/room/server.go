@@ -13,6 +13,7 @@ import (
 	"io"
 	"math"
 	"net"
+	"net/netip"
 	"sync"
 	"time"
 )
@@ -316,5 +317,18 @@ func remoteHost(c net.Conn) string {
 	if err != nil {
 		return c.RemoteAddr().String()
 	}
-	return host
+	return quotaHost(host)
+}
+
+// IPv4 is per address; native IPv6 shares a /64 quota. Unmap IPv4-mapped IPv6.
+func quotaHost(host string) string {
+	addr, err := netip.ParseAddr(host)
+	if err != nil {
+		return host
+	}
+	addr = addr.Unmap().WithZone("")
+	if addr.Is4() {
+		return addr.String()
+	}
+	return netip.PrefixFrom(addr, 64).Masked().String()
 }

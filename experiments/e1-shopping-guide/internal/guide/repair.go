@@ -1,6 +1,9 @@
 package guide
 
-import "sync"
+import (
+	"sync"
+	"sync/atomic"
+)
 
 // RepairQueue tracks committed writes whose cache fill failed. Share it across
 // all readers/writers for the same source/cache. It is not a durable outbox.
@@ -9,6 +12,7 @@ type RepairQueue struct {
 	versions map[string]int64
 	limit    int
 	overflow bool
+	dirty    atomic.Bool // True when any mark or sticky overflow exists; published under mu.
 }
 
 func NewRepairQueue(limit int) *RepairQueue {
@@ -25,14 +29,16 @@ func (q *RepairQueue) mark(id string, version int64) {
 	defer q.mu.Unlock()
 	if _, ok := q.versions[id]; !ok && len(q.versions) >= q.limit {
 		q.overflow = true
+		q.dirty.Store(true)
 		return
 	}
 	if version > q.versions[id] {
 		q.versions[id] = version
+		q.dirty.Store(true)
 	}
 }
 func (q *RepairQueue) pending(id string) bool {
-	if q == nil {
+	if q == nil || !q.dirty.Load() {
 		return false
 	}
 	q.mu.Lock()
@@ -41,7 +47,7 @@ func (q *RepairQueue) pending(id string) bool {
 	return ok || q.overflow
 }
 func (q *RepairQueue) clear(id string, version int64) {
-	if q == nil {
+	if q == nil || !q.dirty.Load() {
 		return
 	}
 	q.mu.Lock()
@@ -49,5 +55,6 @@ func (q *RepairQueue) clear(id string, version int64) {
 	if floor, ok := q.versions[id]; ok && version >= floor {
 		delete(q.versions, id)
 	}
+	q.dirty.Store(q.overflow || len(q.versions) != 0)
 	// Overflow conservatively disables unvalidated reads for this queue's lifetime.
 }

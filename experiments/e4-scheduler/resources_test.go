@@ -17,3 +17,10 @@ func TestBothResourcesConstrainPlacement(t *testing.T) {
 		}
 	}
 }
+
+func TestInterruptedResourcesCountEventsNotRejectedWork(t *testing.T) {
+	r := Result{Preempted: []Job{{"a", Resource{2, 3}, 1}, {"a", Resource{2, 3}, 1}}, Rejected: []Job{{"b", Resource{8, 8}, 1}}}
+	if got := r.InterruptedResources(); got != (Resource{4, 6}) {
+		t.Fatal(got)
+	}
+}

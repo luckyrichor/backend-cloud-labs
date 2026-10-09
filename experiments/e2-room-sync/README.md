@@ -1,6 +1,6 @@
 # E2 房间状态同步
 
-最后更新：2026-10-09（北京时间）；Codex；原创建来源 backend-cloud-labs@8519ae7；第二轮修订基线 97eb85c + 工作树。
+最后更新：2026-10-09（北京时间）；Codex；原创建来源 backend-cloud-labs@8519ae7；本轮源码与测量来源统一见 docs/measurements/2026-10-09-fourth-review.json（仓库根目录）；历史章节记录当时结果。
 
 独立 Go module，零第三方依赖。默认 `go run ./cmd/room` 监听 127.0.0.1:8082，可用 ROOM_ADDRESS 修改。协议为 TCP 长连接上的每行一个 JSON，默认每 50ms 一个权威帧。
 
@@ -35,3 +35,7 @@ W6：真实 TCP 两客户端同帧状态相同，断线恢复、重复输入去�
 module已统一为github.com/luckyrichor/backend-cloud-labs/experiments/e2-room-sync；E4也统一experiments路径。默认同IP最多16个TCP连接（含握手）以及16个在线/宽限身份，所有IP合计最多256个TCP连接；128玩家身份总上限保留。NewWithLimits可调整限额。断线后保留身份仍计入原IP名额，不能快速断线轮换占满128名额；连接名额释放后有效token允许恢复同一身份。
 
 同IP上限可能影响共享NAT用户，不能识别分布式攻击或证明真实账号身份，生产仍需认证与账号配额。在线/宽限玩家的快照新增connected布尔字段；断线时false、宽限到期后从players移除。客户端应把false当暂离，把后续缺失当离房，重连使用已应用seq；没有添加可靠的离房事件流。8项顶层测试race通过，包括配额、断线轮换防绕过、名额释放与恢复、在线状态/到期移除。
+
+### IPv6限额补充
+
+原先按单个地址计数，现IPv4按地址，IPv6按/64网络前缀，对TCP连接和保留身份均生效；IPv4-mapped IPv6先Unmap，地址zone不造成绕过。单元用例覆盖同前缀、不同前缀和映射地址。/64是实验策略，可误限制共享前缀，拥有多个前缀的用户仍可绕过；不替代账号认证。

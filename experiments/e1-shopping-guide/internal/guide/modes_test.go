@@ -26,10 +26,10 @@ func TestReadModesExposeFreshnessSourceLoadTradeoff(t *testing.T) {
 			ctx := context.Background()
 			store := &countingStore{Store: catalog.NewMemoryStore()}
 			c := cache.NewMemory(time.Minute)
-			service := guide.Service{Store: store, Cache: c, Mode: mode}
+			service := guide.NewService(store, c, mode)
 			_, _ = service.Put(ctx, catalog.Item{ID: "sku", PriceCent: 100, Stock: 1})
 			// Committed write during cache outage leaves the old cached revision behind.
-			offline := guide.Service{Store: store, Cache: broken{}, Mode: mode}
+			offline := guide.NewService(store, broken{}, mode)
 			written, err := offline.Put(ctx, catalog.Item{ID: "sku", PriceCent: 200, Stock: 1})
 			if err != nil || !written.Degraded {
 				t.Fatal(written, err)
@@ -52,7 +52,7 @@ func TestReadModesExposeFreshnessSourceLoadTradeoff(t *testing.T) {
 			if err != nil || refreshed.Item.Version != 2 || store.reads != wantReads+1 {
 				t.Fatal(refreshed, err, store.reads)
 			}
-			unavailable := guide.Service{Store: store, Cache: broken{}, Mode: mode}
+			unavailable := guide.NewService(store, broken{}, mode)
 			fallback, err := unavailable.Get(ctx, "sku")
 			if err != nil || !fallback.Degraded || fallback.Item.Version != 2 {
 				t.Fatal(fallback, err)
@@ -84,6 +84,38 @@ func BenchmarkReadModes(b *testing.B) {
 			}
 			b.StopTimer()
 			b.ReportMetric(float64(store.reads)/float64(b.N), "source-reads/op")
+		})
+	}
+}
+
+func TestMissingRepairQueueFailsBeforeCacheFirstWrite(t *testing.T) {
+	store := catalog.NewMemoryStore()
+	s := guide.Service{Store: store, Cache: cache.NewMemory(time.Hour), Mode: guide.CacheFirst}
+	if _, err := s.Put(context.Background(), catalog.Item{ID: "sku"}); err != guide.ErrRepairQueueRequired {
+		t.Fatal(err)
+	}
+	if _, err := s.Get(context.Background(), "sku"); err != guide.ErrRepairQueueRequired {
+		t.Fatal(err)
+	}
+	if _, err := store.Get(context.Background(), "sku"); err != catalog.ErrNotFound {
+		t.Fatal("write was committed", err)
+	}
+}
+
+func BenchmarkServiceReadParallel(b *testing.B) {
+	for _, mode := range []guide.ReadMode{guide.Strict, guide.CacheFirst} {
+		b.Run(string(mode), func(b *testing.B) {
+			s := guide.NewService(catalog.NewMemoryStore(), cache.NewMemory(time.Hour), mode)
+			_, _ = s.Put(context.Background(), catalog.Item{ID: "sku", Stock: 1})
+			b.ResetTimer()
+			b.RunParallel(func(pb *testing.PB) {
+				for pb.Next() {
+					r, err := s.Get(context.Background(), "sku")
+					if err != nil || r.Item.Version != 1 {
+						b.Error("invalid result")
+					}
+				}
+			})
 		})
 	}
 }

@@ -169,3 +169,14 @@ func Schedule(nodes []Node, jobs []Job, strategy Strategy) (Result, error) {
 	}
 	return result, nil
 }
+
+// InterruptedResources sums every preemption event, including repeat evictions.
+// CPU and memory are separate units; this is not elapsed work or a total cost score.
+func (r Result) InterruptedResources() Resource {
+	var total Resource
+	for _, job := range r.Preempted {
+		total.CPU += job.Need.CPU
+		total.Memory += job.Need.Memory
+	}
+	return total
+}

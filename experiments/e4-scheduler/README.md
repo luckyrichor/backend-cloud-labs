@@ -62,3 +62,7 @@ compare现输出scenario列及cpu_used；保留packing旧场景，并增加full_
 - packing_and_preemption：2/6/2/6单位低优先任务后到8单位紧急任务。binpack使用16资源但拒绝紧急；preempt接纳后使用12资源、驱逐1个；preempt-binpack接纳后使用16资源、驱逐2个，Pending有2个。这说明本到达序列中组合可保留更多驻留资源，代价是更多驱逐，并非所有指标都更优。
 
 9项顶层测试race通过，组合场景回归同时核对接纳、占用和驱逐。module路径同步experiments，抢占仍为贪心离线实验。
+
+## 打断资源量
+
+Result.InterruptedResources()分别累计Preempted事件的CPU和Memory，多次驱逐同任务会重复累计；不把Rejected计为已运行任务打断。它不测已消耗的CPU时间、丢失进度或实际恢复成本，也不把两种单位相加成总分。新CSV见 ../../docs/measurements/2026-10-09-e4-interruption.csv；组合场景preempt打断6 CPU/6 Memory并拒绝1项，preempt-binpack打断8/8且拒绝0项。组合有更多驻留量，也承担更多打断，不能只靠驱逐次数论优劣。

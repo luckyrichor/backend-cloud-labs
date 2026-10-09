@@ -9,6 +9,7 @@ import (
 )
 
 var ErrCacheMiss = errors.New("cache miss")
+var ErrRepairQueueRequired = errors.New("cache-first requires a shared repair queue; use NewService")
 
 type Cache interface {
 	Get(context.Context, string) (catalog.Item, error)
@@ -42,6 +43,9 @@ func NewService(store catalog.Store, cache Cache, mode ReadMode) Service {
 }
 
 func (s Service) Get(ctx context.Context, id string) (Result, error) {
+	if s.Mode == CacheFirst && s.Repairs == nil {
+		return Result{}, ErrRepairQueueRequired
+	}
 	if !ValidReadMode(s.Mode) {
 		return Result{}, errors.New("invalid cache read mode")
 	}
@@ -75,6 +79,9 @@ func (s Service) Get(ctx context.Context, id string) (Result, error) {
 	return Result{authoritative, "store", degraded}, nil
 }
 func (s Service) Put(ctx context.Context, item catalog.Item) (Result, error) {
+	if s.Mode == CacheFirst && s.Repairs == nil {
+		return Result{}, ErrRepairQueueRequired
+	}
 	authoritative, err := s.Store.Put(ctx, item)
 	if err != nil {
 		return Result{}, err

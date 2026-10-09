@@ -65,10 +65,12 @@ auto indices = rule->filter_batch(documents); // {0}，按输入顺序返回
 
 ## 编译绑定变量下标（2026-10-09）
 
-新增 `rule->bind_variables(schema)` 与 `evaluate(span<const double>)`，在编译/准备阶段把名称解析为slot；运行期数组路径不查哈希。原Variables接口和批量接口保留。两种路径共享同一枚举AST执行逻辑、短路和数值检查。绑定必须在共享AST之前完成，不可与并发求值同时修改；schema要求名称唯一且包含规则涉及的变量，缺失schema在绑定时拒绝，失败重绑不损坏旧绑定。运行时只检查实际访问的slot，因此短路仍可跳过缺失值/非法值。
+新增 `auto bound = rule->bind_variables(schema)` 与 `bound.evaluate(span<const double>)`，在编译/准备阶段把名称解析为slot；运行期数组路径不查哈希。原Variables接口和批量接口保留。两种路径共享同一枚举AST执行逻辑、短路和数值检查。绑定返回独立拥有克隆树的Node::Bound，运行期只暴露const evaluate，不暴露重绑/可变节点；原解析树的修改不影响Bound；schema要求名称唯一且包含规则涉及的变量，缺失schema在绑定时拒绝，失败新绑定不损坏已有Bound。运行时只检查实际访问的slot，因此短路仍可跳过缺失值/非法值。
 
-Release与ASan/UBSan CTest3/3通过，保留222+19568检查，新增1500条map/slot数值差分及短路、非法值、缺schema、重复schema、未绑定、失败重绑、除零专项。泄漏检测关闭，不宣称验证泄漏。
+Release与ASan/UBSan CTest3/3通过，保留222+19568检查，新增1500条map/slot数值差分及短路、非法值、缺schema、重复schema、独立schema、原树修改隔离、失败新绑定、除零专项。泄漏检测关闭，不宣称验证泄漏。
 
 TX独立Release测量：10万独立合成文档，每轮重复10次，共10轮，3模式轮换顺序，所有结果checksum一致。哈希AST中位47.6856 ns/doc，预先准备数组slot_AST14.51135 ns/doc，逐条转换后slot34.85875 ns/doc。构建输入和绑定不在计时内；convert_then_slot将两次名字查找及数组准备计入。每行是整轮平均，非请求p95。原始数据见 ../../docs/measurements/2026-10-09-e3-slots.csv。
 
 这支持本规则及数据布局中减少变量查找的优化；不是证明所有规则的首要瓶颈，也不是字节码/索引/并行或百亿DOC能力。输入已是行数组时收益较大，从map转换时收益缩小。复测：`build/e3/rule_slot_bench`（根目录，先完成构建与测试，再独立运行）。
+
+第四轮把绑定与运行期对象分开；原名称AST接口保留，Bound不依赖原树生命周期，构造与复制schema成本仍在运行计时外。上面的14.51135/34.85875数据是第三轮源码的历史测量，不宣称是第四轮复测；第四轮仅回归验证等价语义与接口隔离。
