@@ -61,3 +61,28 @@ func TestRedisLegacyPayloadIsNotUsedAfterJSONContractChange(t *testing.T) {
 		t.Fatal(item, err)
 	}
 }
+
+func TestRedisNewSourceLifetimeUsesIndependentNamespace(t *testing.T) {
+	address := os.Getenv("E1_REDIS_TEST_ADDR")
+	if address == "" {
+		t.Skip("set E1_REDIS_TEST_ADDR")
+	}
+	client := redis.NewClient(&redis.Options{Addr: address})
+	defer client.Close()
+	c := &cache.Redis{Client: client, Prefix: "e1-test:lifetime:", TTL: time.Minute}
+	ctx := context.Background()
+	old := guide.NewService(catalog.NewMemoryStore(), c, guide.CacheFirst)
+	for i := 0; i < 5; i++ {
+		if _, err := old.Put(ctx, catalog.Item{ID: "sku", PriceCent: 900}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	fresh := guide.NewService(catalog.NewMemoryStore(), c, guide.CacheFirst)
+	if _, err := fresh.Put(ctx, catalog.Item{ID: "sku", PriceCent: 100}); err != nil {
+		t.Fatal(err)
+	}
+	r, err := fresh.Get(ctx, "sku")
+	if err != nil || r.Item.Version != 1 || r.Item.PriceCent != 100 || r.Source != "cache_unvalidated" {
+		t.Fatal(r, err)
+	}
+}

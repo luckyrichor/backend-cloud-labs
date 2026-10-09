@@ -24,3 +24,10 @@ func TestInterruptedResourcesCountEventsNotRejectedWork(t *testing.T) {
 		t.Fatal(got)
 	}
 }
+
+func TestUnservedResourcesCountsRejectedAndPendingNotEvents(t *testing.T) {
+	r := Result{Rejected: []Job{{"a", Resource{6, 4}, 1}}, Pending: []Job{{"b", Resource{2, 3}, 1}}, Preempted: []Job{{"b", Resource{2, 3}, 1}, {"b", Resource{2, 3}, 1}}}
+	if got := r.UnservedResources(); got != (Resource{8, 7}) {
+		t.Fatal(got)
+	}
+}

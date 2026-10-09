@@ -1,7 +1,7 @@
 #pragma once
 #include <cmath>
 #include <cctype>
-#include <cstdlib>
+#include <charconv>
 #include <functional>
 #include <memory>
 #include <stdexcept>
@@ -142,10 +142,21 @@ class Parser {
       if(pos==text.size()) throw std::runtime_error("missing operand");
       unsigned char c=text[pos];
       if(std::isdigit(c) || c=='.') {
-        char* end=nullptr; const char* start=text.c_str()+pos;
-        double value=std::strtod(start,&end);
-        if(end==start || !std::isfinite(value)) throw std::runtime_error("invalid number");
-        pos=static_cast<std::size_t>(end-text.c_str()); auto n=node("number"); n->number=value; return n;
+        // Decimal grammar: digits[.digits] or .digits, optional e/E signed exponent.
+        // Scan before conversion so libc extensions (hex, inf, locale) cannot leak in.
+        const auto start=pos;
+        auto digits=[&]() {auto begin=pos;while(pos<text.size() && text[pos]>='0' && text[pos]<='9')++pos;return pos-begin;};
+        auto before=digits();std::size_t after=0;
+        if(pos<text.size() && text[pos]=='.'){++pos;after=digits();}
+        if(before+after==0)throw std::runtime_error("invalid number");
+        if(pos<text.size() && (text[pos]=='e' || text[pos]=='E')){
+          ++pos;if(pos<text.size() && (text[pos]=='+' || text[pos]=='-'))++pos;
+          if(digits()==0)throw std::runtime_error("invalid exponent");
+        }
+        double value{};
+        auto converted=std::from_chars(text.data()+start,text.data()+pos,value,std::chars_format::general);
+        if(converted.ec!=std::errc{} || converted.ptr!=text.data()+pos || !std::isfinite(value))throw std::runtime_error("invalid number");
+        auto n=node("number");n->number=value;return n;
       }
       if(std::isalpha(c) || c=='_') {
         auto start=pos++; while(pos<text.size() && (std::isalnum(static_cast<unsigned char>(text[pos])) || text[pos]=='_')) ++pos;

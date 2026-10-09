@@ -1,12 +1,12 @@
 # E2 房间状态同步
 
-最后更新：2026-10-09（北京时间）；Codex；原创建来源 backend-cloud-labs@8519ae7；本轮源码与测量来源统一见 docs/measurements/2026-10-09-fourth-review.json（仓库根目录）；历史章节记录当时结果。
+最后更新：2026-10-09（北京时间）；Codex；原创建来源 backend-cloud-labs@8519ae7；本轮源码与测量来源统一见 docs/measurements/2026-10-09-fifth-review.json（仓库根目录）；历史章节记录当时结果。
 
 独立 Go module，零第三方依赖。默认 `go run ./cmd/room` 监听 127.0.0.1:8082，可用 ROOM_ADDRESS 修改。协议为 TCP 长连接上的每行一个 JSON，默认每 50ms 一个权威帧。
 
 ## 协议
 
-首次连接发送 `{"type":"join"}`。服务端 welcome 返回随机 id 与 token，仅发给该连接，然后立即发完整 snapshot。移动输入：`{"type":"move","seq":1,"dx":1,"dy":0}`，增量范围 [-1,1]，seq 正整数且递增。帧循环有界处理输入，再给全体连接同一帧状态 `{type:snapshot,frame,players:{id:{x,y,seq}}}`。seq 是已应用输入的确认值；同号/旧号不重复移动。
+首次连接发送 `{"type":"join"}`。服务端 welcome 返回随机 id 与 token，仅发给该连接，然后立即发完整 snapshot。移动输入：`{"type":"move","seq":1,"dx":1,"dy":0}`，增量范围 [-1,1]，seq 正整数且递增。帧循环有界处理输入，再给全体连接同一帧状态 `{type:snapshot,frame,players:{id:{x,y,seq}}}`。seq 是已消费/合并到本帧意图的最大序号；同号/旧号不重复移动。每帧最多消费32条，但只应用其中最新有效意图一次；对(dx,dy)归一化，使总距离最多1单位/帧。客户端应每帧提交一次意图，不能再把每条消息视为必须累计的位移。
 
 重连发送 `{"type":"join","id":"原ID","token":"原token"}`，恢复位置和 seq，关闭原连接；排队中的旧连接输入也被 connection 身份检查拒绝。token 是演示会话恢复凭据，不是用户账号认证。保留 token，后续输入使用大于 snapshot.seq 的序号。
 
@@ -39,3 +39,7 @@ module已统一为github.com/luckyrichor/backend-cloud-labs/experiments/e2-room-
 ### IPv6限额补充
 
 原先按单个地址计数，现IPv4按地址，IPv6按/64网络前缀，对TCP连接和保留身份均生效；IPv4-mapped IPv6先Unmap，地址zone不造成绕过。单元用例覆盖同前缀、不同前缀和映射地址。/64是实验策略，可误限制共享前缀，拥有多个前缀的用户仍可绕过；不替代账号认证。
+
+## 速度边界（第五轮）
+
+原每帧32条累加会使洪泛者加速，这一轮修正为每帧最多一次、斜向总长度不超过1的权威移动。64条队列洪泛在两帧各移动一次，重复/旧序号与旧连接无效。它只限制此协议的位置更新速度，不提供碰撞检测、账号认证、外挂检测或完整游戏防作弊；拥塞/服务器掉帧仍会影响体验。

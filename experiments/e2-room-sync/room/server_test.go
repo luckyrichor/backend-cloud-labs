@@ -180,7 +180,7 @@ func TestPerConnectionQueueBudgetProtectsHealthyPlayer(t *testing.T) {
 	go func() { s.frames(ctx); close(done) }()
 	select {
 	case m := <-b.out:
-		if m.Players["healthy"].Seq != 1 || m.Players["flood"].Seq != 32 {
+		if m.Players["healthy"].Seq != 1 || m.Players["flood"].Seq != 32 || m.Players["flood"].X != 1 {
 			t.Fatalf("unfair frame: %+v", m)
 		}
 	case <-time.After(time.Second):
@@ -311,5 +311,30 @@ func TestSnapshotExplicitlyMarksRetainedDisconnectAndExpiry(t *testing.T) {
 	s.expireLocked(now.Add(time.Second))
 	if _, exists := s.snapshotLocked().Players["gone"]; exists {
 		t.Fatal("expired player retained")
+	}
+}
+
+func TestMovementBudgetUsesOneLatestIntentAndBoundsDiagonal(t *testing.T) {
+	s := New(time.Hour)
+	c, other := net.Pipe()
+	defer c.Close()
+	defer other.Close()
+	peer := &session{connection: c, commands: make(chan input, 64)}
+	for seq := uint64(1); seq <= 64; seq++ {
+		peer.commands <- input{"p", c, seq, 1, 1}
+	}
+	s.applyMovesLocked(peer)
+	if peer.player.Seq != 32 || peer.player.X*peer.player.X+peer.player.Y*peer.player.Y > 1.000000001 {
+		t.Fatal(peer.player)
+	}
+	first := peer.player.X
+	s.applyMovesLocked(peer)
+	if peer.player.Seq != 64 || peer.player.X != 2*first {
+		t.Fatal(peer.player)
+	}
+	peer.commands <- input{"p", c, 63, 1, 0}
+	s.applyMovesLocked(peer)
+	if peer.player.X != 2*first {
+		t.Fatal("old sequence moved", peer.player)
 	}
 }

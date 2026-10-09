@@ -6,6 +6,7 @@ import (
 	"errors"
 	"github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/catalog"
 	"sort"
+	"sync"
 )
 
 var ErrCacheMiss = errors.New("cache miss")
@@ -31,10 +32,11 @@ const (
 func ValidReadMode(mode ReadMode) bool { return mode == "" || mode == Strict || mode == CacheFirst }
 
 type Service struct {
-	Mode    ReadMode
-	Store   catalog.Store
-	Cache   Cache
-	Repairs *RepairQueue
+	Mode       ReadMode
+	Store      catalog.Store
+	Cache      Cache
+	Repairs    *RepairQueue
+	generation uint64
 }
 
 // NewService enables bounded local read-repair; share this value across requests.
@@ -43,6 +45,7 @@ func NewService(store catalog.Store, cache Cache, mode ReadMode) Service {
 }
 
 func (s Service) Get(ctx context.Context, id string) (Result, error) {
+	s = s.snapshotCache()
 	if s.Mode == CacheFirst && s.Repairs == nil {
 		return Result{}, ErrRepairQueueRequired
 	}
@@ -68,17 +71,18 @@ func (s Service) Get(ctx context.Context, id string) (Result, error) {
 	}
 	cached, cacheErr := s.Cache.Get(ctx, id)
 	if cacheErr == nil && cached.Version == authoritative.Version {
-		s.Repairs.clear(id, authoritative.Version)
+		s.Repairs.clearFor(s.generation, id, authoritative.Version)
 		return Result{cached, "cache_validated", false}, nil
 	}
 	_, fillErr := s.Cache.PutIfNewer(ctx, authoritative)
 	if fillErr == nil {
-		s.Repairs.clear(id, authoritative.Version)
+		s.Repairs.clearFor(s.generation, id, authoritative.Version)
 	}
 	degraded := (cacheErr != nil && !errors.Is(cacheErr, ErrCacheMiss)) || fillErr != nil
 	return Result{authoritative, "store", degraded}, nil
 }
 func (s Service) Put(ctx context.Context, item catalog.Item) (Result, error) {
+	s = s.snapshotCache()
 	if s.Mode == CacheFirst && s.Repairs == nil {
 		return Result{}, ErrRepairQueueRequired
 	}
@@ -87,33 +91,52 @@ func (s Service) Put(ctx context.Context, item catalog.Item) (Result, error) {
 		return Result{}, err
 	}
 	_, err = s.Cache.PutIfNewer(ctx, authoritative)
-	if err != nil {
-		s.Repairs.mark(authoritative.ID, authoritative.Version)
-	} else {
-		s.Repairs.clear(authoritative.ID, authoritative.Version)
-	}
+	s.Repairs.finishWrite(s.generation, authoritative.ID, authoritative.Version, err == nil)
 	// Cache errors never disguise an already-committed source write as a failed write.
 	return Result{authoritative, "store", err != nil}, nil
 }
 func (s Service) Recommend(ctx context.Context, ids []string, budgetCent int64) ([]Result, error) {
-	results := make([]Result, 0)
-	seen := make(map[string]bool)
+	// At most eight workers per recommendation; indexed slots preserve the
+	// input error order and all workers finish before returning or sorting.
+	unique := make([]string, 0, len(ids))
+	seen := map[string]bool{}
 	for _, id := range ids {
-		if seen[id] {
+		if !seen[id] {
+			seen[id] = true
+			unique = append(unique, id)
+		}
+	}
+	rows := make([]Result, len(unique))
+	errs := make([]error, len(unique))
+	jobs := make(chan int, len(unique))
+	for i := range unique {
+		jobs <- i
+	}
+	close(jobs)
+	var wg sync.WaitGroup
+	for worker := 0; worker < min(8, len(unique)); worker++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for i := range jobs {
+				rows[i], errs[i] = s.Get(ctx, unique[i])
+			}
+		}()
+	}
+	wg.Wait()
+	results := make([]Result, 0, len(unique))
+	for i, result := range rows {
+		if errors.Is(errs[i], catalog.ErrNotFound) {
 			continue
 		}
-		seen[id] = true
-		result, err := s.Get(ctx, id)
-		if errors.Is(err, catalog.ErrNotFound) {
-			continue
-		}
-		if err != nil {
-			return nil, err
+		if errs[i] != nil {
+			return nil, errs[i]
 		}
 		if result.Item.Stock > 0 && result.Item.PriceCent <= budgetCent {
 			results = append(results, result)
 		}
 	}
+
 	sort.Slice(results, func(i, j int) bool {
 		if results[i].Item.PriceCent == results[j].Item.PriceCent {
 			return results[i].Item.ID < results[j].Item.ID

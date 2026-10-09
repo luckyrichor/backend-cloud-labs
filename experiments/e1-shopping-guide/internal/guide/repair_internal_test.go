@@ -11,8 +11,8 @@ func TestRepairVersionFenceAndBoundedOverflow(t *testing.T) {
 	}
 	q.mark("b", 3)
 	q.clear("a", 2)
-	if len(q.versions) > 1 || !q.pending("any-key") {
-		t.Fatal("overflow dropped safety")
+	if len(q.versions) > 1 || q.pending("any-key") || q.epoch.Load() != 1 {
+		t.Fatal("overflow did not rotate")
 	}
 }
 
@@ -51,7 +51,7 @@ func BenchmarkRepairReadParallel(b *testing.B) {
 					if name == "locked-empty" {
 						q.mu.Lock()
 						_, ok := q.versions["sku"]
-						pending := ok || q.overflow
+						pending := ok
 						q.mu.Unlock()
 						if pending {
 							b.Error("unexpected pending")
@@ -62,5 +62,24 @@ func BenchmarkRepairReadParallel(b *testing.B) {
 				}
 			})
 		})
+	}
+}
+
+func TestGenerationFencesOldClearAndSuccessfulCrossEpochWrite(t *testing.T) {
+	q := NewRepairQueue(1)
+	old := q.epoch.Load()
+	q.mark("a", 2)
+	q.mark("b", 2)                   // rotate
+	q.finishWrite(old, "a", 3, true) // old cache fill succeeded after new source commit
+	if !q.pending("a") {
+		t.Fatal("cross-epoch write lost invalidation")
+	}
+	q.clearFor(old, "a", 3)
+	if !q.pending("a") {
+		t.Fatal("old fill cleared new mark")
+	}
+	q.clearFor(q.epoch.Load(), "a", 3)
+	if q.pending("a") {
+		t.Fatal("current fill did not clear")
 	}
 }

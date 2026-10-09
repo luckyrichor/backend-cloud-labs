@@ -1,52 +1,40 @@
-# E1 导购服务 + 缓存一致性
+# E1 导购服务与缓存一致性
 
-最后更新：2026-10-09；Codex；原创建来源 backend-cloud-labs@1770378；本轮源码与测量来源统一见 docs/measurements/2026-10-09-fourth-review.json（仓库根目录）；历史章节记录当时结果。
+最后更新：2026-10-09；Codex；原创建来源 backend-cloud-labs@1770378；当前来源统一见仓库根目录 docs/measurements/2026-10-09-fifth-review.json。
 
-W3 E1 自动验收已通过：可运行 HTTP 导购最小服务、确定性旧读者缓存回填竞态复现、单调版本填充修复、缓存 outage/read/write/recovery 降级。本实验保留 W1 Item+Store 骨架，并增加独立缓存层。
+内存source赋予每商品单调版本；缓存独立于source，内存/Redis拒绝延迟旧版本回填。Item统一snake_case；Redis Lua用十进制字符串比较避免大整数精度丢失。服务源数据不持久化，重启丢失商品。
+
+## 运行与接口
 
 ```bash
+# 本实验目录
 go test ./... -race
 go vet ./...
-gofmt -l .
 go run ./cmd/guide
-# 可选真实 Redis（容器默认在 tx）
-E1_REDIS_TEST_ADDR=127.0.0.1:56379 go test ./... -race -count=1
+CACHE_READ_MODE=cache-first go run ./cmd/guide
 REDIS_ADDR=127.0.0.1:56379 go run ./cmd/guide
 ```
 
-Redis 用例不配地址会显式 skip，本次验收配置临时 Redis 后实跑无 skip。接口见 [docs/api.md](docs/api.md)，取舍见仓库 docs/design-decisions.md。
+实际Redis集成须设置E1_REDIS_TEST_ADDR，不设置明确skip；根目录scripts/check.sh在TX创建独占临时Redis并完整验收。API契约见[docs/api.md](docs/api.md)。默认strict读取source核对版本；cache-first命中返回cache_unvalidated以降低源负载。
 
-竞态复现：读者先取 v1 暂停 → 写者存 v2 并更新缓存 → 旧读者覆盖缓存为 v1。测试先验证朴素 map 回填产生不一致，再验证内存/Redis PutIfNewer 拒绝旧版本。Redis Lua 将比较和写入原子执行；恢复期严格 source 版本校验处理缓存故障期间漏写。不是用 sleep 赌概率。
+推荐先去重，最多8个并发Get，库存>0、价格<=预算过滤，价格升序、同价ID字典序。工作协程全部退出后才返回；按去重后的输入顺序选择第一个业务错误。HTTP候选最多100，不是全局数据库并发限制。
 
-覆盖边界：岗位 06 中一致性、接口设计、降级的实验；source 为内存而非持久数据库，推荐按候选 ID 去重，库存>0、价格<=预算过滤；按价格升序、同价 ID 字典序排序。默认严格读会验证 source，可选 cache-first 用新鲜度换源读取负载；不声称生产吞吐或完整导购排序。E2～E4 独立实验已验收，E5 未做。Redis 崩溃不丢 source 写，但服务自身重启会丢内存商品数据。
+## 失败修复与缓存代际
 
+使用NewService或共享Repairs；HTTP Handler默认创建1024容量队列，cache-first漏配队列显式报ErrRepairQueueRequired（写入前拒绝）。源提交后缓存失败仍返回写成功与degraded=true。
 
-## 双模式对照（2026-10-08）
+每个队列拥有随机source-lifetime命名空间与单调generation；每次请求在source操作前捕获不可变缓存视图。1024个标记溢出时换代，使旧缓存/旧请求回填不可被新请求访问，并清空修复标记、恢复cache-first。跨代完成的源写即使填旧缓存成功，也登记当前代修复；旧代读不能清除新代标记。新队列/source生命周期不复用旧Redis高版本，避免重启后的版本重置冲突。业务JSON仍返回原商品ID，物理缓存ID含私有命名空间。
 
-`CACHE_READ_MODE=strict`（默认，包括未设置）保持每次验证 source 版本；`CACHE_READ_MODE=cache-first` 在缓存命中时直接返回 `source=cache_unvalidated`，不读取 source；缓存未命中/故障仍读源、故障标记 degraded。非法模式在启动时拒绝。两种写入都先提交 source、再原子更新缓存，缓存失败不伪装源写入失败。
+标记有版本栅栏，成功后续读/写可清除；空队列原子快路径跳过队列锁。内存缓存读取用RWMutex；持续填充期间定期回收过期条目，旧Redis命名空间靠TTL清理，不扫描/删除其他实例的缓存。
 
-**cache-first 不保证最新版本。** 丢失缓存更新时，恢复后可以命中旧值；`degraded=false` 只表示本次未遇到缓存错误，不代表数据已校验。到期/驱逐后读源修复，但延迟填充与重复故障会影响滞后时长，TTL 不是严格的新鲜度 SLA。价格/库存关键决策应使用 strict 或另行核对源数据。
+**代价与范围**：换代冷启动、旧代存储存活到TTL/回收；队列限定本进程同一source/cache共享调用，不提供多实例失效、持久Outbox或服务重启后的源恢复。请求开始到写失败标记发布之间仍有并发窗口，cache-first不能用于要求线性一致的价格/库存决策。不存在简单“一个TTL后删标记”的安全保证。
 
-确定性对照：缓存 v1 → 源提交 v2 但缓存故障 → 恢复读。strict 返回 v2、源读取1次；cache-first 返回 v1、源读取0次。令缓存过期后两者均刷新到 v2；缓存不可用时两者均降级到源。回归不靠 sleep 竞态。
+## 可复算测量
+
+完整Get路径在同一源码切换fast=false/true、rw=false/true，严格和cache-first分别比较；RunParallel共享一个服务，GOMAXPROCS1/4/8，每配置3次、200ms。原始输出2026-10-09-e1-service-comparison.txt；包含代际视图/键处理、内存源/缓存锁，不含HTTP、Redis或真实数据库延迟。中位数与局限见[现状与边界](../../docs/status.md)。
 
 ```bash
-CACHE_READ_MODE=cache-first go run ./cmd/guide
-go test ./internal/guide -run '^$' -bench BenchmarkReadModes -benchmem -count=5
+go test ./internal/guide -run '^$' -bench '^BenchmarkServiceReadComparison$' -benchmem -cpu 1,4,8 -benchtime=200ms -count=3
 ```
 
-TX 5轮内存源+内存缓存热命中微测：strict 中位179.6 ns/op，cache-first 135.2 ns/op；源读取分别1/0次每请求，均0 B/op。包含 Go 锁与时间检查，没有真实数据库/Redis/HTTP延迟，不能推算生产吞吐收益。原始值见 ../../docs/measurements/2026-10-08-e1-read-modes.txt。
-
-
-## 第三轮修订（2026-10-09）
-
-Item显式JSON标签与响应契约测试已完成；go-redis为直接依赖，go mod tidy整理锁定校验；内存缓存新增NewMemoryWithClock，过期测试用受控时钟、不依赖sleep。缓存写失败补偿使用共享Repairs版本队列：NewService和HTTP Handler默认启用，队列上限1024、溢出回源；成功修复后恢复热命中。补偿是本地读触发，不跨重启/实例，不是持久队列。历史双模式测试仍展示未被同一队列观测的更新所导致的陈旧风险。新源码复测数据见 ../../docs/measurements/2026-10-09-e1-read-modes.txt，旧测速属于旧提交，不能混用。完整新契约见docs/api.md。
-
-当前启用修复队列的内存热命中3轮复测：strict207.3 ns/op，cache-first158.9 ns/op，源读取1/0每请求；增加队列检查后不沿用旧性能数字。本次不同代码/不同轮数，不把与旧值的差异全部归因于修复队列。
-
-## 第四轮：无修复项的读快路径
-
-修复队列用atomic.Bool发布“有标记或溢出”；空队列pending/clear不再拿锁，地图和状态修改仍在同一锁内。cache-first漏填Repairs现在明确报ErrRepairQueueRequired，推荐NewService；保持值类型复制与共享队列一致，未使用不安全的隐式懒初始化。strict不配置队列仍可回源验证。
-
-TX RunParallel，GOMAXPROCS=1/4/8，每组3次、300ms，共享队列但隔离store/cache锁；locked-empty保留上一实现的空地图加锁读取。8工作线程中位locked-empty30.16、atomic-empty1.247 ns/op；有一个其他商品标记时atomic-marked48.51 ns/op，说明优化只针对空队列。服务并发读取另测（内存store/cache仍有锁），结果不能直接外推API吞吐。原始输出见 ../../docs/measurements/2026-10-09-e1-atomic-reads.txt。不同历史版本/时间的179.6、207.3不能独立证明23–28ns全来自队列。
-
-**暂不自动过期标记/恢复overflow**：Cache接口没有TTL上界，旧读者还可能刷新旧缓存寿命；简单“等一个TTL”会移除仍需存在的屏障。要实现可回收屏障，需要缓存侧版本栅栏或受控回填生命周期/持久失效协议；当前保持保守退化与1024有界内存，未宣称解决永久溢出。
+历史179.6/135.2、207.3/158.9、队列隔离30.16/1.247属于以前源码和不同测量口径，各原始CSV/JSON保留，不能当本轮整体前后对照。本轮对照只改变两个不可变开关，代际协议在所有组中都启用。

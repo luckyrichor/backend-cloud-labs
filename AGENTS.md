@@ -106,6 +106,4 @@ bash workplan-docs/scripts/run-on-tx.sh agent-memory 'docker compose up -d postg
 
 ## 2026-10-09 当前约束
 
-E1 Item已统一snake_case，Redis v2键隔离旧JSON；NewService/HTTP Handler启用1024容量本地失败修复队列，溢出保守回源，不宣称持久补偿。E2/E4统一experiments module路径，E2默认每IP16连接/16保留身份、全局256TCP及128身份，快照带connected；非账号认证。E3可预绑定变量slot，保留哈希接口，bind返回独立私有只读Bound；不原地重绑；测量区分预布局和运行期转换。E4三个对照场景同时报告接纳/驱逐/占用，不宣称组合总是更优。最新验收39个Go测试与CTest3/3，见docs/progress.md。
-
-第四轮E1空队列atomic快路径、cache-first缺队列显式错误；标记/overflow因寿命协议未定义仍保守不回收。E2 IPv6按/64聚合，IPv4按地址。E4另报打断CPU/内存事件总量。当前证据统一见docs/measurements/2026-10-09-fourth-review.json；历史测量不改写来源。
+当前摘要docs/status.md，历史过程docs/progress.md，当前证据docs/measurements/2026-10-09-fifth-review.json。E1响应snake_case、推荐8并发；NewService/HTTP共享1024容量修复队列与source生命周期/缓存代际，溢出换代恢复热命中，旧请求视图固定且跨代源写重新标记；cache-first漏配队列显式报错。内存缓存RWMutex，仍是内存source与本地修复，不宣称跨实例或持久恢复。E2最多一次单位移动/帧、最新输入合并与序号确认；IPv4地址/IPv6 /64配额、30秒断线宽限，非账号鉴权或完整反作弊。E3仅十进制语法、枚举AST与批量、独立只读Bound，未实现VM/索引/百亿检索。E4分别报告打断事件资源与最终未服务资源。最终49Go顶层race+vet、3真实Redis、CTest4/4；ASan/UBSan关闭泄漏检测。前几轮数字只对应其历史报告。

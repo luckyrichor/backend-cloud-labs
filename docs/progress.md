@@ -1,5 +1,7 @@
 # 进度记录
 
+
+当前一页摘要见 [现状与边界](status.md)。下面是历史记录；每条测试/测量只对应当时元数据版本。
 最后更新：2026-10-09（北京时间）
 
 本文件是 `backend-cloud-labs` 的进度事实源，汇总到 `workplan-docs/进度总览.md`。
@@ -113,3 +115,13 @@ E1无标记atomic读快路径已实现；锁内同步版本标记/溢出和dirty
 E2 IPv6用/64聚合连接/保留身份配额，mapped IPv4归一。E3 bind返回独立拥有树的只读Bound，验证独立schema、原树修改和销毁不影响运行对象。E4报告驱逐事件打断CPU/内存，与拒绝/最终占用并列，组合场景preempt打断6/6且拒绝1、组合8/8且拒绝0。设计/E1/E2表头当前版本指向统一元数据，历史结果保留历史版本。
 
 自动回归39项Go顶层（E1 20/E2 9/E4 10）race+vet，2项真实Redis未skip；E3 Release与ASan/UBSan CTest3/3，泄漏检测关闭。并发基准每组3次、300ms，GOMAXPROCS=1/4/8，共享同一队列；8工作线程locked-empty中位30.16 ns/op、atomic-empty1.247 ns/op，有其他商品标记时48.51 ns/op。这是队列隔离实验，不是API吞吐或请求尾延迟。Service并发基准包含内存store/cache锁，strict/cache-first 8线程中位222.1/191.3 ns/op；顺序ReadModes在GOMAXPROCS=1中位185.7/148.0，与历史源码时间不同，不能单因归因。测量元数据见2026-10-09-fourth-review.json；前轮slot数字未按新Bound复测，不宣称属于本轮。
+
+## 2026-10-09：第五轮协议、语法与同源码复测
+
+修正E3十进制扫描、locale独立转换与拒绝十六进制专项；E2每帧合并最新移动意图，只应用一次并限制斜向长度；E1推荐8路并发且等待所有worker完成，内存缓存RWMutex；新增source生命周期/缓存代际，1024标记溢出后恢复cache-first，捕获视图隔离旧回填，跨代源写重新标记。内存持续填充回收过期旧条目；Redis由TTL回收旧代。E4新增最终Rejected+Pending未服务资源量。
+
+同源码完整Get路径切fast/rw开关，GOMAXPROCS1/4/8、每配置3次200ms；8并发旧式锁组合strict/cache-first323.7/401.7，新组合187.6/181.3 ns/op。Bound复测10轮中位哈希46.3972/预数组17.03175/逐条转换35.4393 ns/doc、checksum一致。不是HTTP或生产吞吐；不将历史版本差异归因为树复制。E3 README重写为当前接口+证据版本映射，新一页摘要docs/status.md。
+
+最终49项Go顶层race+vet，3项真实Redis未skip；Release和ASan/UBSan CTest4/4。增加确定性跨代旧读、跨代成功旧填写、源生命周期、高版本Redis、推荐并行及取消、移动洪泛回归。执行中一次写测试文件误用了实验目录加根目录相对路径，命令报No such file并未写入，已改正路径后验收；首次服务比较完成后缓存视图前缀预计算实现又优化，旧比较结果丢弃并按最终实现重跑。
+
+本轮不采用VM、后台排空和TTL删标记，理由与当前边界统一见status.md；永久溢出已由代际协议解决。此实现限定共享本地source/cache队列，source重启数据恢复/跨实例失效仍未实现。来源和源码摘要统一见2026-10-09-fifth-review.json。

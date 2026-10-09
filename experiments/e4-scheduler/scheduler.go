@@ -180,3 +180,16 @@ func (r Result) InterruptedResources() Resource {
 	}
 	return total
 }
+
+// UnservedResources sums final rejected and waiting jobs once each, rather than
+// preemption history. CPU and memory stay separate; not an elapsed-work metric.
+func (r Result) UnservedResources() Resource {
+	var total Resource
+	for _, jobs := range [][]Job{r.Rejected, r.Pending} {
+		for _, job := range jobs {
+			total.CPU += job.Need.CPU
+			total.Memory += job.Need.Memory
+		}
+	}
+	return total
+}

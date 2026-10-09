@@ -273,18 +273,7 @@ func (s *Server) frames(ctx context.Context) {
 			// Each connection gets its own bounded queue and frame budget.
 			// A flood cannot consume another player's admission slots.
 			for _, peer := range s.sessions {
-				for count := 0; count < 32; count++ {
-					select {
-					case cmd := <-peer.commands:
-						if peer.connection == cmd.connection && cmd.seq > peer.player.Seq {
-							peer.player.X += cmd.dx
-							peer.player.Y += cmd.dy
-							peer.player.Seq = cmd.seq
-						}
-					default:
-						count = 32
-					}
-				}
+				s.applyMovesLocked(peer)
 			}
 			s.frame++
 			snapshot := s.snapshotLocked()
@@ -331,4 +320,34 @@ func quotaHost(host string) string {
 		return addr.String()
 	}
 	return netip.PrefixFrom(addr, 64).Masked().String()
+}
+
+// A frame consumes up to 32 records for fairness but applies only the latest
+// increasing sequence as one movement intent. Packet rate cannot multiply speed.
+func (s *Server) applyMovesLocked(peer *session) {
+	var latest input
+	seq := peer.player.Seq
+	for count := 0; count < 32; count++ {
+		select {
+		case cmd := <-peer.commands:
+			if peer.connection == cmd.connection && cmd.seq > seq {
+				latest = cmd
+				seq = cmd.seq
+			}
+		default:
+			count = 32
+		}
+	}
+	if seq == peer.player.Seq {
+		return
+	}
+	dx, dy := latest.dx, latest.dy
+	length := math.Hypot(dx, dy)
+	if length > 1 {
+		dx /= length
+		dy /= length
+	}
+	peer.player.X += dx
+	peer.player.Y += dy
+	peer.player.Seq = seq
 }

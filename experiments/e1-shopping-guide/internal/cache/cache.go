@@ -13,10 +13,12 @@ type entry struct {
 	expires time.Time
 }
 type Memory struct {
-	mu      sync.Mutex
-	entries map[string]entry
-	TTL     time.Duration
-	now     func() time.Time
+	mu            sync.RWMutex
+	entries       map[string]entry
+	TTL           time.Duration
+	now           func() time.Time
+	parallelReads bool
+	writes        uint64
 }
 
 func NewMemory(ttl time.Duration) *Memory { return NewMemoryWithClock(ttl, time.Now) }
@@ -26,14 +28,19 @@ func NewMemoryWithClock(ttl time.Duration, now func() time.Time) *Memory {
 	if now == nil {
 		panic("clock is required")
 	}
-	return &Memory{entries: map[string]entry{}, TTL: ttl, now: now}
+	return &Memory{entries: map[string]entry{}, TTL: ttl, now: now, parallelReads: true}
 }
 func (c *Memory) Get(ctx context.Context, id string) (catalog.Item, error) {
 	if err := ctx.Err(); err != nil {
 		return catalog.Item{}, err
 	}
-	c.mu.Lock()
-	defer c.mu.Unlock()
+	if c.parallelReads {
+		c.mu.RLock()
+		defer c.mu.RUnlock()
+	} else {
+		c.mu.Lock()
+		defer c.mu.Unlock()
+	}
 	e, ok := c.entries[id]
 	if !ok || c.now().After(e.expires) {
 		return catalog.Item{}, guide.ErrCacheMiss
@@ -50,6 +57,23 @@ func (c *Memory) PutIfNewer(ctx context.Context, item catalog.Item) (bool, error
 	if ok && c.now().Before(e.expires) && e.item.Version > item.Version {
 		return false, nil
 	}
-	c.entries[item.ID] = entry{item, c.now().Add(c.TTL)}
+	now := c.now()
+	c.writes++
+	if c.writes%256 == 0 {
+		for id, entry := range c.entries {
+			if !now.Before(entry.expires) {
+				delete(c.entries, id)
+			}
+		}
+	}
+	c.entries[item.ID] = entry{item, now.Add(c.TTL)}
 	return true, nil
+}
+
+// NewMemoryWithReadLock controls the immutable read-lock mode for matched
+// benchmarks. Normal constructors use concurrent read locks.
+func NewMemoryWithReadLock(ttl time.Duration, parallel bool) *Memory {
+	c := NewMemory(ttl)
+	c.parallelReads = parallel
+	return c
 }

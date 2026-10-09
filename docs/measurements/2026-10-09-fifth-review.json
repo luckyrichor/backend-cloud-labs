@@ -1,0 +1,128 @@
+{
+  "generated_beijing": "2026-10-09T14:30:30.193136+08:00",
+  "base_commit": "df360586c53f7c6f701283bf990a29c8fe8c0e65",
+  "state_at_measurement": "base commit + uncommitted fifth-review source; exact tested source pinned by SHA256",
+  "source_sha256": {
+    "experiments/e1-shopping-guide/cmd/guide/main.go": "3fc0b984eba84ae27d10fdeb1f80f3083e4e72c12da584966032f89367c7b56b",
+    "experiments/e1-shopping-guide/go.mod": "0b1096aae75667b6e943b3f2ffe763dfcec96c613d4f06a3e078f41f4e5ba1ff",
+    "experiments/e1-shopping-guide/go.sum": "11f820b74e9b11921ade077aa57ac4071cad479b97fc326be48bb5ebec4b2fc4",
+    "experiments/e1-shopping-guide/internal/cache/cache.go": "89523a4e8afa2471f770ef6cb55e258ccef9931bd9618a63649a7442b363e03e",
+    "experiments/e1-shopping-guide/internal/cache/cleanup_test.go": "a822c2927693a70d5796db04d8a48519406b01c9a715d3544117fd85587d01c5",
+    "experiments/e1-shopping-guide/internal/cache/clock_test.go": "ae1d81c9281c77a03e4fbe1477a7aebcc863304ffa3d517c0b182fdec0bd11a7",
+    "experiments/e1-shopping-guide/internal/cache/redis.go": "f7fffb797c5ffb437fa72a1d7f8a8b9a84b5dc3eba7cb1bfca10f2dde0bc64b1",
+    "experiments/e1-shopping-guide/internal/cache/redis_test.go": "048a326a83f7bbbbf7a4f0caa9fe888ff307c84c910e9e457ec721d928b85054",
+    "experiments/e1-shopping-guide/internal/catalog/catalog.go": "d58ae0d28e316d60a98433fd98c4c2ff883947f5cafc03e52ec222c6499cb204",
+    "experiments/e1-shopping-guide/internal/catalog/catalog_test.go": "60a9061c2b1f7933db5863d84f06a3550e1ad3da786a0e601a1197f593bb0ca4",
+    "experiments/e1-shopping-guide/internal/guide/concurrency_test.go": "b32378b1e0eebc43470982f63b64470d56fed136adc9501037598ddfc2983311",
+    "experiments/e1-shopping-guide/internal/guide/modes_test.go": "f3f7fb8cb9727b0c9280189584a752683befecb7d688562e490e3c9831829e8e",
+    "experiments/e1-shopping-guide/internal/guide/repair.go": "4b4991af14bcb6fec675a70f0fe8ff5ff54cdde162d754005b24d5bf4a7d7412",
+    "experiments/e1-shopping-guide/internal/guide/repair_internal_test.go": "cffcf2a3195c5518663acbdcd730273a88af5e302092190de96bed70daed12dc",
+    "experiments/e1-shopping-guide/internal/guide/repair_test.go": "1a7c133728f4559501430b78a0812db1b708526bb1ec9ccd1fde73b9535b55ca",
+    "experiments/e1-shopping-guide/internal/guide/service.go": "67788521578e9f7df89a84506bd9eaed30a0d889b054bb69d9a9513aade0541d",
+    "experiments/e1-shopping-guide/internal/guide/service_test.go": "c29de0d7196eec3a662007bdb1fe5aa579f3b16810bce098a3ca12afa092e2cc",
+    "experiments/e1-shopping-guide/internal/httpapi/handler.go": "9037a3fa5806a543e0c92e275508e65d729b9ba14fb3d34e870528c3acefe0f8",
+    "experiments/e1-shopping-guide/internal/httpapi/handler_test.go": "f2bde5979275a81bbedb2c2ccf182a485531f158bf363bba2a4248bcec998bbd",
+    "experiments/e2-room-sync/cmd/room/main.go": "1583125eeed43c1e3f02d95188404f9ae903fad13cb492a5666b9832b7637af4",
+    "experiments/e2-room-sync/go.mod": "b129e0df0a8067c170e9c91963d1b39af543f7cb20797dec4bd05b63f64cd57c",
+    "experiments/e2-room-sync/room/quota_test.go": "248b1247353e49019741d568ceaa75976fc6cc47dffae0313feee12d4711975c",
+    "experiments/e2-room-sync/room/server.go": "6e8372830fa246702ee90bfb7c8d15651b2c87fc743c8ed748f3ab344cae008a",
+    "experiments/e2-room-sync/room/server_test.go": "caefa0c2ec58b7e170fcddb9b08558576ea90a477b8039b60b6a8cf73fb1f3ff",
+    "experiments/e3-rule-engine/CMakeLists.txt": "77b81d50714cac333a033f5dbdec381a6d220f85bfeb2e600d18be42432cb122",
+    "experiments/e3-rule-engine/batch_tests.cpp": "d8fa7d75e885ed1721859718d4c59b99e4502209d5003ee0e0d2fab363977b3e",
+    "experiments/e3-rule-engine/benchmark.cpp": "51b003988819ebaef1825aff3e35b3c13d03e84f88773fe4cc7a1a43003e9b0f",
+    "experiments/e3-rule-engine/decimal_tests.cpp": "10a24e4fcd08390d7fd987245e66f93e164108525f4f361c3286587c333c586d",
+    "experiments/e3-rule-engine/expression.hpp": "e5872e697f614d37ecd263ff0b044c62308283318aacefd753ed5a0195066035",
+    "experiments/e3-rule-engine/slot_benchmark.cpp": "a4bf87a8f13ef6f8fd6d36154e08bbcbd1a36ef71f41e96421398596e9f0dd24",
+    "experiments/e3-rule-engine/slot_tests.cpp": "8d40cd4320698ea8b8d6d23355cd9f40ef8193bddd728a7192de25526f214612",
+    "experiments/e3-rule-engine/string_baseline.hpp": "b415d6d1c61d546a8f9c4f4e344543e13a248ac4b0c0f8341c2e5ae9faf4cd1a",
+    "experiments/e3-rule-engine/tests.cpp": "c455ab45d9be26b01c126f592d1a8e926de2066e597070e5b3bda10fae2f6148",
+    "experiments/e4-scheduler/cmd/compare/main.go": "cabb0b82ccf30d3d17803814b2b14bab3f6fef3f73daa8a77e46ebaa4d9bda98",
+    "experiments/e4-scheduler/go.mod": "f2da9eaf0e20bf252b733bc370b20bcc64155b9a7592841f5fe932ebb8c08c90",
+    "experiments/e4-scheduler/requeue_test.go": "6731a6ef0de9f1e647d66848376af89ae002b9f87115151650f486392ecdbf4a",
+    "experiments/e4-scheduler/resources_test.go": "a8734d5fe3f46e165d59db5d7f1215e7390ce609961c643eebebaf513363dd35",
+    "experiments/e4-scheduler/scheduler.go": "07ff8748f621fc0d82da9bef0d574a7e9ea79b7e5bf599566d50d6f6e31e8ccb",
+    "experiments/e4-scheduler/scheduler_test.go": "90896f467ad015aa541e8d4e8e5d2bb8124ec30df908fb9ecee1098b839c1141",
+    "experiments/e4-scheduler/victim_size_test.go": "991ed0c17763856684e15bbf0e7daa95dcb5edf5722139ebe24e9f9ab72004af"
+  },
+  "artifact_sha256": {
+    "docs/measurements/2026-10-09-e1-service-comparison.txt": "48376a4c88c453379deb12a99fed601a990e8bd0a19dbc74099f3496dd96afd8",
+    "docs/measurements/2026-10-09-e3-bound-slots.csv": "ae76f9f514fad2dd0173690f86b95a82aa7d764af1333beca974c3f75984ae59",
+    "docs/measurements/2026-10-09-e4-unserved.csv": "66a3bb0a7cfc1d2284581504840cad7a2b2b8193f5b7515a6526003fd075a384"
+  },
+  "toolchain": {
+    "go": "go version go1.27.1 linux/amd64",
+    "cpp": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0"
+  },
+  "service_benchmark": {
+    "command": "go test ./internal/guide -run '^$' -bench '^BenchmarkServiceReadComparison$' -benchmem -cpu 1,4,8 -benchtime=200ms -count=3",
+    "description": "Complete Service.Get with in-memory store/cache, shared service, RunParallel; immutable fast/rw switches; namespace generation enabled in every group",
+    "median_ns_per_op": {
+      "BenchmarkServiceReadComparison/strict/fast=false/rw=false": 343.1,
+      "BenchmarkServiceReadComparison/strict/fast=false/rw=false-4": 310.5,
+      "BenchmarkServiceReadComparison/strict/fast=false/rw=false-8": 323.7,
+      "BenchmarkServiceReadComparison/strict/fast=false/rw=true": 370.8,
+      "BenchmarkServiceReadComparison/strict/fast=false/rw=true-4": 212.8,
+      "BenchmarkServiceReadComparison/strict/fast=false/rw=true-8": 211.5,
+      "BenchmarkServiceReadComparison/strict/fast=true/rw=false": 337.9,
+      "BenchmarkServiceReadComparison/strict/fast=true/rw=false-4": 314.8,
+      "BenchmarkServiceReadComparison/strict/fast=true/rw=false-8": 296.9,
+      "BenchmarkServiceReadComparison/strict/fast=true/rw=true": 322.7,
+      "BenchmarkServiceReadComparison/strict/fast=true/rw=true-4": 124.4,
+      "BenchmarkServiceReadComparison/strict/fast=true/rw=true-8": 187.6,
+      "BenchmarkServiceReadComparison/cache-first/fast=false/rw=false": 311.4,
+      "BenchmarkServiceReadComparison/cache-first/fast=false/rw=false-4": 315.8,
+      "BenchmarkServiceReadComparison/cache-first/fast=false/rw=false-8": 401.7,
+      "BenchmarkServiceReadComparison/cache-first/fast=false/rw=true": 299.6,
+      "BenchmarkServiceReadComparison/cache-first/fast=false/rw=true-4": 256.9,
+      "BenchmarkServiceReadComparison/cache-first/fast=false/rw=true-8": 322.7,
+      "BenchmarkServiceReadComparison/cache-first/fast=true/rw=false": 320.2,
+      "BenchmarkServiceReadComparison/cache-first/fast=true/rw=false-4": 309.4,
+      "BenchmarkServiceReadComparison/cache-first/fast=true/rw=false-8": 320.4,
+      "BenchmarkServiceReadComparison/cache-first/fast=true/rw=true": 300.5,
+      "BenchmarkServiceReadComparison/cache-first/fast=true/rw=true-4": 140.0,
+      "BenchmarkServiceReadComparison/cache-first/fast=true/rw=true-8": 181.3
+    }
+  },
+  "bound_benchmark": {
+    "command": "build/e3/rule_slot_bench",
+    "independent_documents": 100000,
+    "repeats_per_round": 10,
+    "rounds_per_mode": 10,
+    "checksum": "470000",
+    "median_ns_per_doc": {
+      "hash_ast": 46.3972,
+      "slot_ast": 17.03175,
+      "convert_then_slot": 35.4393
+    },
+    "construction_and_binding_in_timing": false
+  },
+  "validation": {
+    "go_top_level_tests": 49,
+    "go_by_experiment": {
+      "E1": 28,
+      "E2": 10,
+      "E4": 11
+    },
+    "go_race": true,
+    "go_vet": true,
+    "real_redis_tests": 3,
+    "release_ctest": "4/4",
+    "asan_ubsan_ctest": "4/4",
+    "leak_detection": false
+  },
+  "decisions_not_adopted": {
+    "bytecode": "No requirement to implement both AST and VM; no matched AST/VM evidence; short-circuit jumps are feasible",
+    "background_repair_worker": "Generation rotation resolves permanent overflow; preserve read repair without new worker/retry/shutdown lifecycle",
+    "ttl_marker_expiry": "Old fills can extend cache lifetime; reachability isolation used instead"
+  },
+  "limitations": [
+    "Shared TX VM without pinned cores",
+    "Not HTTP/Redis/real database service benchmark",
+    "Historical Bound timing belongs to earlier source/time; no causal tree-copy overhead claim",
+    "Local source/cache/repair-queue lifetime; no cross-instance invalidation or persistent source",
+    "Rotation cold start and old namespace storage until TTL/opportunistic reclamation",
+    "One movement intent per frame is a protocol change, not comprehensive anti-cheat",
+    "Largest independent rules dataset 100000; no billion-scale claim",
+    "Resource sums are not elapsed-work or restart-cost metrics"
+  ]
+}

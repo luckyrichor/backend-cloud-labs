@@ -25,7 +25,8 @@ func TestReadModesExposeFreshnessSourceLoadTradeoff(t *testing.T) {
 		t.Run(string(mode), func(t *testing.T) {
 			ctx := context.Background()
 			store := &countingStore{Store: catalog.NewMemoryStore()}
-			c := cache.NewMemory(time.Minute)
+			now := time.Now()
+			c := cache.NewMemoryWithClock(time.Minute, func() time.Time { return now })
 			service := guide.NewService(store, c, mode)
 			_, _ = service.Put(ctx, catalog.Item{ID: "sku", PriceCent: 100, Stock: 1})
 			// Committed write during cache outage leaves the old cached revision behind.
@@ -46,8 +47,7 @@ func TestReadModesExposeFreshnessSourceLoadTradeoff(t *testing.T) {
 				t.Fatal(result, store.reads)
 			}
 			// Expired cache forces source refresh in either mode.
-			c.TTL = -time.Second
-			_, _ = c.PutIfNewer(ctx, result.Item)
+			now = now.Add(2 * time.Minute)
 			refreshed, err := service.Get(ctx, "sku")
 			if err != nil || refreshed.Item.Version != 2 || store.reads != wantReads+1 {
 				t.Fatal(refreshed, err, store.reads)
@@ -117,5 +117,30 @@ func BenchmarkServiceReadParallel(b *testing.B) {
 				}
 			})
 		})
+	}
+}
+
+// Full Get path; only immutable queue/read-lock switches differ in one source.
+func BenchmarkServiceReadComparison(b *testing.B) {
+	for _, mode := range []guide.ReadMode{guide.Strict, guide.CacheFirst} {
+		for _, fast := range []bool{false, true} {
+			for _, rw := range []bool{false, true} {
+				b.Run(fmt.Sprintf("%s/fast=%t/rw=%t", mode, fast, rw), func(b *testing.B) {
+					s := guide.Service{Store: catalog.NewMemoryStore(), Cache: cache.NewMemoryWithReadLock(time.Hour, rw), Mode: mode, Repairs: guide.NewRepairQueueWithFastPath(1024, fast)}
+					if _, err := s.Put(context.Background(), catalog.Item{ID: "sku", Stock: 1}); err != nil {
+						b.Fatal(err)
+					}
+					b.ResetTimer()
+					b.RunParallel(func(pb *testing.PB) {
+						for pb.Next() {
+							r, err := s.Get(context.Background(), "sku")
+							if err != nil || r.Item.Version != 1 {
+								b.Error("invalid read")
+							}
+						}
+					})
+				})
+			}
+		}
 	}
 }

@@ -66,3 +66,7 @@ compare现输出scenario列及cpu_used；保留packing旧场景，并增加full_
 ## 打断资源量
 
 Result.InterruptedResources()分别累计Preempted事件的CPU和Memory，多次驱逐同任务会重复累计；不把Rejected计为已运行任务打断。它不测已消耗的CPU时间、丢失进度或实际恢复成本，也不把两种单位相加成总分。新CSV见 ../../docs/measurements/2026-10-09-e4-interruption.csv；组合场景preempt打断6 CPU/6 Memory并拒绝1项，preempt-binpack打断8/8且拒绝0项。组合有更多驻留量，也承担更多打断，不能只靠驱逐次数论优劣。
+
+## 未服务的需求量（第五轮）
+
+Result.UnservedResources()按最终Rejected+Pending分别累加CPU和Memory，不累加历史Preempted，避免同任务多次驱逐重复计入未服务需求。组合场景preempt未服务12 CPU/12 Memory，preempt-binpack为8/8；同时仍报告打断6/6与8/8。数据见 ../../docs/measurements/2026-10-09-e4-unserved.csv；两类资源不混成一个总分。
