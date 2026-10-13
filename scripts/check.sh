@@ -11,7 +11,7 @@ done
 if [[ "$ready" != true ]]; then echo "Redis not ready" >&2; exit 1; fi
 export E1_REDIS_TEST_ADDR
 E1_REDIS_TEST_ADDR=$(docker port "$container" 6379/tcp)
-for experiment in e1-shopping-guide e2-room-sync e4-scheduler; do
+for experiment in e1-shopping-guide e2-room-sync e4-scheduler e5-cmdb; do
   (cd "experiments/$experiment"; go test -race -count=1 ./...; go vet ./...)
 done
 cmake -S experiments/e3-rule-engine -B build/e3 -DCMAKE_BUILD_TYPE=Release

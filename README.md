@@ -37,3 +37,7 @@
 
 
 2026-10-09第三轮：E1统一snake_case、注入时钟与本地缓存失败补偿；E2加IP准入和connected快照；E3加schema绑定数组slot及转换成本测量；E4加三场景对照。35个Go测试race与vet、真实Redis通过，Release/ASan/UBSan CTest3/3。边界与实际源码摘要见 [第三轮证据](docs/measurements/2026-10-09-third-review.json)，不得沿用旧报告为新接口/性能背书。
+
+## E5 CMDB
+
+[配置项、关系图和审计回溯](experiments/e5-cmdb/README.md)已实现；原计划五个实验均有独立验收入口。

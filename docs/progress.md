@@ -125,3 +125,7 @@ E2 IPv6用/64聚合连接/保留身份配额，mapped IPv4归一。E3 bind返回
 最终49项Go顶层race+vet，3项真实Redis未skip；Release和ASan/UBSan CTest4/4。增加确定性跨代旧读、跨代成功旧填写、源生命周期、高版本Redis、推荐并行及取消、移动洪泛回归。执行中一次写测试文件误用了实验目录加根目录相对路径，命令报No such file并未写入，已改正路径后验收；首次服务比较完成后缓存视图前缀预计算实现又优化，旧比较结果丢弃并按最终实现重跑。
 
 本轮不采用VM、后台排空和TTL删标记，理由与当前边界统一见status.md；永久溢出已由代际协议解决。此实现限定共享本地source/cache队列，source重启数据恢复/跨实例失效仍未实现。来源和源码摘要统一见2026-10-09-fifth-review.json。
+
+## 2026-10-13 E5 CMDB（Codex）
+
+来源 766efcf + 本轮修改。独立Go模块，配置项CRUD/有向关系、0..10层out/in/both图、全图revision CAS、actor/reason审计与历史快照。图和审计同文件临时write/fsync/rename发布；失败不更新内存，重启检查连续快照链。五项测试含20并发CAS、历史/循环/反向、副本隔离、存储失败及HTTP；完整check.sh四Go模块race+vet/真实Redis、E3 Release4/4通过。证据源摘要见measurements/2026-10-13-cmdb.json。单进程原子文件实验，无真实身份认证/防篡改/电源故障无损保证；完整快照存储非生产大规模策略。

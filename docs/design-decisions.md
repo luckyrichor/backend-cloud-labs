@@ -61,3 +61,7 @@ E2原生IPv6用/64聚合TCP/身份配额，mapped IPv4归一成IPv4，不把IP�
 E3数字先按十进制文法扫描，再from_chars转换。字节码跳转短路本来可行；未做VM的理由是尚无与枚举/slot AST匹配输入的性能证据与必要性，不能拿实现复杂度当作技术不可行。当前Bound重新测速且注明构造成本计时外。E1同一源码双开关比较完整Get与内存后端；E4资源需求和打断事件分别累加，不能用同一总分替代代价分析。
 
 旧章节的sticky overflow/不回收为各历史阶段选择；当前能力与限制以status.md和第五轮元数据为准，不覆盖历史源码哈希。
+
+## 2026-10-13 E5 CMDB（Codex）
+
+来源 766efcf + 本轮修改。独立Go模块，配置项CRUD/有向关系、0..10层out/in/both图、全图revision CAS、actor/reason审计与历史快照。图和审计同文件临时write/fsync/rename发布；失败不更新内存，重启检查连续快照链。五项测试含20并发CAS、历史/循环/反向、副本隔离、存储失败及HTTP；完整check.sh四Go模块race+vet/真实Redis、E3 Release4/4通过。证据源摘要见measurements/2026-10-13-cmdb.json。单进程原子文件实验，无真实身份认证/防篡改/电源故障无损保证；完整快照存储非生产大规模策略。

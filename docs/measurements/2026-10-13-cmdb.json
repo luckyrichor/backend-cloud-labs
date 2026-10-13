@@ -1,0 +1,12 @@
+{
+  "source_head": "766efcf",
+  "working_tree_changes": true,
+  "source_sha256": {
+    "experiments/e5-cmdb/store.go": "6a91290563b5de80db0dabfc8ba6b7c0887f5a254c79d57fc575fc400e9119a6",
+    "experiments/e5-cmdb/http.go": "c4caf432d1ea52ad5f630def6d4545eeb51f38a4f3900e23b2c9bf7c9114c0a9",
+    "experiments/e5-cmdb/store_test.go": "f21f2da61d3c59d6502d6d1962b7736eb0013489aa1323a9418696f817ce993f",
+    "experiments/e5-cmdb/cmd/cmdb/main.go": "6fc8d8049e950bfa3a952cea10277d4a048bd35fb2c16df6bfb5d9b73790adb2"
+  },
+  "verification": "scripts/check.sh: all four Go modules race/count=1 and vet; Redis integration enabled; E3 Release CTest4/4; E5 five top-level tests; durable reopen, cycle/reverse/history graph, failed persistence rollback, twenty concurrent CAS and HTTP validated",
+  "e5_tests": "TestDurabilityHistoryAndIsolation\nTestPersistenceFailureNoCommit\nTestConcurrentCAS\nTestHTTPAndHistoricalGraph\nTestUpdateUnlinkDeleteAndReverse\nok  \tgithub.com/luckyrichor/backend-cloud-labs/e5-cmdb\t0.003s\n?   \tgithub.com/luckyrichor/backend-cloud-labs/e5-cmdb/cmd/cmdb\t[no test files]\n"
+}
