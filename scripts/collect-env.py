@@ -39,7 +39,7 @@ def collect(role, target=None, ports=(), samples=20):
         "nofile": resource.getrlimit(resource.RLIMIT_NOFILE),
         "timezone": time.tzname,
         "process_TZ": os.environ.get("TZ"),
-        "host_timezone": command(["timedatectl", "show", "-p", "Timezone", "--value"]), "disk": shutil.disk_usage(Path.cwd())._asdict(),
+        "host_timezone": command(["readlink", "/etc/localtime"]) if sys.platform == "darwin" else command(["timedatectl", "show", "-p", "Timezone", "--value"]), "disk": shutil.disk_usage(Path.cwd())._asdict(),
         "git_commit": command(["git", "rev-parse", "HEAD"])["stdout"],
         "working_tree_modified_before_collection": False,
         "collector_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
