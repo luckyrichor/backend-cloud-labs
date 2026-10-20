@@ -65,3 +65,13 @@ E3数字先按十进制文法扫描，再from_chars转换。字节码跳转短�
 ## 2026-10-13 E5 CMDB（Codex）
 
 来源 766efcf + 本轮修改。独立Go模块，配置项CRUD/有向关系、0..10层out/in/both图、全图revision CAS、actor/reason审计与历史快照。图和审计同文件临时write/fsync/rename发布；失败不更新内存，重启检查连续快照链。五项测试含20并发CAS、历史/循环/反向、副本隔离、存储失败及HTTP；完整check.sh四Go模块race+vet/真实Redis、E3 Release4/4通过。证据源摘要见measurements/2026-10-13-cmdb.json。单进程原子文件实验，无真实身份认证/防篡改/电源故障无损保证；完整快照存储非生产大规模策略。
+
+## 2026-10-20 P0：接入新完善方案与保留历史证据
+
+用户要求按 `docs/backend-cloud-labs 面试级完善方案.md` 继续。按其 F 节执行 P0–P7，CP1/CP2/CP3 为明确审阅点；本轮先推进 P0，不把基础设施准备说成七条故事已完成。
+
+E5 保留既有 module 路径 `github.com/luckyrichor/backend-cloud-labs/e5-cmdb`。它与其他实验命名不同但已可独立构建；重命名没有功能收益，反而改变 import/下游路径。修正当前 status 表格与 bootstrap 遗漏，不改写历史测量中的 working_tree_changes=true，也不覆盖用户原方案；新测量应在干净提交上重跑。
+
+此前“不做 VM”的段落是当时决策。新方案已授权在 P3 增加 VM；当前尚未实现，届时保留旧决策并追加变化与同口径差分证据。P0 不提前把 VM 写成既有能力。
+
+环境采集脚本区分 tx 和 Mac，拒绝在 Linux 生成 Mac 证据。Mac→tx 必须由真实 Mac 发起；本机回环只能是校准，不能冒充主压测链路。
