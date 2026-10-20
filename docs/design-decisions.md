@@ -86,3 +86,5 @@ E5 保留既有 module 路径 `github.com/luckyrichor/backend-cloud-labs/e5-cmdb
 - ExprTk 固定 upstream 提交 1e4a80b5ec9b4832ed59c6faa65f625a01b18ef0，MIT 原文保留在仓库外，g++ -std=c++20 -O0 编译及 x*2+1=5 运行通过。此为可用性证明，不是 P3 四路差分或性能参照。
 - Amazon 旧 datarepo.eng.ucsd.edu 文件地址返回 HTTP 404；官方页面现行 mcauleylab.ucsd.edu 地址下载 All_Beauty 成功。属于来源 URL 修订，不是切换为合成数据。原方案保持原样，附录 C 的当前核实结果以 datasets/manifest.json 与 P0 报告为准。阿里选择两个 MSCallGraph 分片，行数扣除已验证 CSV 表头；SNAP 仍为网页图形状参照，不称 CMDB。
 - 源站原始许可/说明页面保留仓库外副本，manifest 记录原文 URL、字节及 SHA256；未明确许可的来源不因此被标成开放许可。原始数据不进 Git。
+
+P0 监控判据补充：核心栈启动前已有 swap 占用，不能视为本栈开始换页。核心栈空载 vmstat 十个一秒区间 si/so 均为 0，内存仍有余量，因此继续部署各限 256 MiB 的 Prometheus 与 Grafana，再采集空载证据；若持续换页再提交回退选择。监控发布也仅限 loopback，Grafana 随机初始口令仅保留私有文件。Prometheus 短保留期和空间上限适合本机实验，不作生产配置。

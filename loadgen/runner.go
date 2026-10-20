@@ -70,7 +70,7 @@ func measured(h *hdr.Histogram, d time.Duration) bool {
 	return h.RecordValue(n) == nil
 }
 func Run(ctx context.Context, c Config) (Result, error) {
-	if c.Rate <= 0 || c.Rate > 100000 || c.Duration <= 0 || c.Timeout <= 0 || c.MaxInflight <= 0 {
+	if c.Rate <= 0 || c.Rate > 100000 || c.Duration <= 0 || c.Timeout <= 0 || c.MaxInflight <= 0 || c.MaxInflight > 100000 {
 		return Result{}, errors.New("positive bounded rate, duration, timeout and concurrency required")
 	}
 	if c.Protocol != "http" && c.Protocol != "tcp" {

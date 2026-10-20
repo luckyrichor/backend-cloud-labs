@@ -1,4 +1,4 @@
-FROM busybox:1.37.0
+FROM busybox:1.37.0@sha256:bdf57e528e45e4433820e045b29b4597825a1c9e38353532d90a01445013f82e
 ARG SOURCE_COMMIT=unverified
 LABEL org.opencontainers.image.revision=$SOURCE_COMMIT
 COPY .local/bin/e5 /service

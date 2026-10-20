@@ -1,0 +1,6 @@
+global:
+  scrape_interval: 5s
+scrape_configs:
+  - job_name: backend-cloud-labs
+    static_configs:
+      - targets: ["e1:9086", "e2:9082", "e3:9083", "e5:9085"]

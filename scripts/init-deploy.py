@@ -3,7 +3,7 @@
 import json, secrets
 from pathlib import Path
 root=Path('.local/deploy');root.mkdir(parents=True,exist_ok=True);root.chmod(0o700)
-for name in ('mysql_root_password','mysql_app_password'):
+for name in ('mysql_root_password','mysql_app_password','grafana_admin_password'):
  p=root/name
  if not p.exists():p.write_text(secrets.token_hex(24)+'\n')
  p.chmod(0o444) # parent directory is 0700; container mysql UID must read bind-mounted secrets

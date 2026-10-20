@@ -23,8 +23,11 @@ for port in (19086,19082,19083,19085):
  metrics=req(port,'/metrics').decode();assert '_bucket{le="+Inf"}' in metrics and '_count' in metrics
  req(port,'/debug/pprof/')
 for port in (18086,18083,18085):req(port,'/debug/pprof/',404);req(port,'/metrics',404)
+targets=json.loads(req(19190,'/api/v1/targets'))['data']['activeTargets']
+assert len(targets)==4 and all(t['health']=='up' for t in targets)
+assert json.loads(req(13100,'/api/health'))['database']=='ok'
 containers=[]
-for name in ('mysql','redis','e1','e2','e3','e5'):
+for name in ('mysql','redis','e1','e2','e3','e5','prometheus','grafana'):
  raw=subprocess.check_output(['docker','inspect','--format','{{json .State}}','bcl-p0-'+name+'-1']);state=json.loads(raw)
  assert state['Running'] and state['Health']['Status']=='healthy',name
  # Export only non-secret resource/image fields.

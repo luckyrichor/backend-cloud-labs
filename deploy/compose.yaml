@@ -1,7 +1,7 @@
 name: bcl-p0
 services:
   mysql:
-    image: mysql:8.0
+    image: mysql:8.0@sha256:7dcddc01f13bab2f15cde676d44d01f61fc9f99fe7785e86196dfc07d358ae2b
     command: ["--server-id=101", "--log-bin=mysql-bin", "--binlog-format=ROW", "--binlog-row-image=FULL", "--innodb-buffer-pool-size=256M"]
     environment:
       MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
@@ -13,7 +13,7 @@ services:
     ulimits: {nofile: {soft: 65536, hard: 65536}}
     healthcheck: {test: ["CMD-SHELL", 'MYSQL_PWD="$$(cat /run/secrets/mysql_root_password)" mysql -uroot -h127.0.0.1 --execute="SELECT 1 FROM bcl.bench_run LIMIT 0" >/dev/null 2>&1'], interval: 5s, timeout: 3s, retries: 30}
   redis:
-    image: redis:7-alpine
+    image: redis:7-alpine@sha256:520775a41a63e77e06c73e35d2fd9cc15921a609516818796b4ecbb813078bc7
     command: ["redis-server", "--maxmemory", "128mb", "--maxmemory-policy", "allkeys-lru"]
     ports: ["127.0.0.1:16379:6379"]
     cpuset: "1"
@@ -51,9 +51,37 @@ services:
     cpuset: "3"
     mem_limit: 256m
     ulimits: {nofile: {soft: 65536, hard: 65536}}
+  prometheus:
+    image: prom/prometheus@sha256:efd719c99d83b060d9daefdcf00360461adf279f45ef5391f8d111892118753e
+    command: ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.retention.time=2d", "--storage.tsdb.retention.size=256MB"]
+    volumes: ["./prometheus.yaml:/etc/prometheus/prometheus.yml:ro", "prometheus_data:/prometheus"]
+    ports: ["127.0.0.1:19190:9090"]
+    cpuset: "1"
+    mem_limit: 256m
+    ulimits: {nofile: {soft: 65536, hard: 65536}}
+    healthcheck: {test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:9090/-/ready"], interval: 5s, timeout: 3s, retries: 20}
+  grafana:
+    image: grafana/grafana@sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD__FILE: /run/secrets/grafana_admin_password
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+      GF_PLUGINS_PREINSTALL_DISABLED: "true"
+    secrets: [grafana_admin_password]
+    volumes: ["./grafana/provisioning:/etc/grafana/provisioning:ro", "grafana_data:/var/lib/grafana"]
+    ports: ["127.0.0.1:13100:3000"]
+    cpuset: "1"
+    mem_limit: 256m
+    ulimits: {nofile: {soft: 65536, hard: 65536}}
+    depends_on: {prometheus: {condition: service_healthy}}
+    healthcheck: {test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:3000/api/health"], interval: 5s, timeout: 3s, retries: 20}
 secrets:
+  grafana_admin_password: {file: ../.local/deploy/grafana_admin_password}
   mysql_root_password: {file: ../.local/deploy/mysql_root_password}
   mysql_app_password: {file: ../.local/deploy/mysql_app_password}
 volumes:
+  grafana_data:
+  prometheus_data:
   mysql_data:
   cmdb_data:

@@ -36,3 +36,5 @@ python3 scripts/collect-env.py --role mac --target 127.0.0.1 --ports 18086 18082
 还需对 tx 实际 SSH 主机地址执行 direct TCP connect 采样并记录直接服务端口不可达。转发采样必须标记 SSH 隧道；不把 tx loopback 当作 Mac→tx 测量。当前尚未取得 Mac 采集结果，P0-2 与 CP1 前提未完成。
 
 Prometheus/Grafana 的部署决定见 P0 交付报告。禁止把预存 swap 推断为本栈造成的内存不足；保留栈前后内存与 swap 活动原始记录。
+
+Prometheus 19190 与 Grafana 13100 同样仅供 loopback/SSH 转发访问。监控容器各限制 256 MiB，Prometheus 仅抓本项目四个管理端口，保留 2 天且不超过 256 MB；实际镜像 digest 与空载换页记录见正式证据。Grafana 管理口令位于私有 .local/deploy/grafana_admin_password；不要复制到报告或群聊。后续性能实验同机监控开销必须保持一致并注明。
