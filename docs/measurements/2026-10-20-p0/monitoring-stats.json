@@ -1,0 +1,107 @@
+{
+  "generated_at": "2026-10-20T13:09:36.589456+00:00",
+  "containers": [
+    {
+      "BlockIO": "25.4MB / 16.6MB",
+      "CPUPerc": "0.31%",
+      "Container": "bcl-p0-mysql-1",
+      "ID": "5a5333cb872a",
+      "MemPerc": "37.35%",
+      "MemUsage": "382.4MiB / 1GiB",
+      "Name": "bcl-p0-mysql-1",
+      "NetIO": "10.1kB / 8.98kB",
+      "PIDs": "41"
+    },
+    {
+      "BlockIO": "1.08MB / 0B",
+      "CPUPerc": "0.39%",
+      "Container": "bcl-p0-redis-1",
+      "ID": "c3e3becad73e",
+      "MemPerc": "2.19%",
+      "MemUsage": "4.195MiB / 192MiB",
+      "Name": "bcl-p0-redis-1",
+      "NetIO": "5.95kB / 2.13kB",
+      "PIDs": "6"
+    },
+    {
+      "BlockIO": "160kB / 0B",
+      "CPUPerc": "0.02%",
+      "Container": "bcl-p0-e1-1",
+      "ID": "bd80f4729b28",
+      "MemPerc": "0.92%",
+      "MemUsage": "1.77MiB / 192MiB",
+      "Name": "bcl-p0-e1-1",
+      "NetIO": "14.9kB / 43.3kB",
+      "PIDs": "3"
+    },
+    {
+      "BlockIO": "4.1kB / 0B",
+      "CPUPerc": "0.16%",
+      "Container": "bcl-p0-e2-1",
+      "ID": "8cfa4b205815",
+      "MemPerc": "0.79%",
+      "MemUsage": "2.012MiB / 256MiB",
+      "Name": "bcl-p0-e2-1",
+      "NetIO": "13.2kB / 41.6kB",
+      "PIDs": "6"
+    },
+    {
+      "BlockIO": "127kB / 0B",
+      "CPUPerc": "0.02%",
+      "Container": "bcl-p0-e3-1",
+      "ID": "95f8a0dcb51d",
+      "MemPerc": "0.66%",
+      "MemUsage": "1.684MiB / 256MiB",
+      "Name": "bcl-p0-e3-1",
+      "NetIO": "15.2kB / 42.7kB",
+      "PIDs": "3"
+    },
+    {
+      "BlockIO": "0B / 0B",
+      "CPUPerc": "0.00%",
+      "Container": "bcl-p0-e5-1",
+      "ID": "de6ba0c86145",
+      "MemPerc": "0.59%",
+      "MemUsage": "1.516MiB / 256MiB",
+      "Name": "bcl-p0-e5-1",
+      "NetIO": "13.5kB / 39.8kB",
+      "PIDs": "3"
+    },
+    {
+      "BlockIO": "40.4MB / 168kB",
+      "CPUPerc": "0.22%",
+      "Container": "bcl-p0-prometheus-1",
+      "ID": "4b9017df305a",
+      "MemPerc": "25.48%",
+      "MemUsage": "65.23MiB / 256MiB",
+      "Name": "bcl-p0-prometheus-1",
+      "NetIO": "231kB / 75.3kB",
+      "PIDs": "6"
+    },
+    {
+      "BlockIO": "2.47MB / 51.3MB",
+      "CPUPerc": "0.41%",
+      "Container": "bcl-p0-grafana-1",
+      "ID": "fb222e9af349",
+      "MemPerc": "80.59%",
+      "MemUsage": "206.3MiB / 256MiB",
+      "Name": "bcl-p0-grafana-1",
+      "NetIO": "14.4kB / 7.52kB",
+      "PIDs": "73"
+    }
+  ],
+  "meminfo": "MemTotal:        7869640 kB\nMemFree:         1450092 kB\nMemAvailable:    5688096 kB\nBuffers:           70384 kB\nCached:          3956848 kB\nSwapCached:        66660 kB\nActive:          2038308 kB\nInactive:        3561656 kB\nActive(anon):    1182424 kB\nInactive(anon):   403608 kB\nActive(file):     855884 kB\nInactive(file):  3158048 kB\nUnevictable:       28892 kB\nMlocked:           27356 kB\nSwapTotal:       2035708 kB\nSwapFree:        1065460 kB\nZswap:                 0 kB\nZswapped:              0 kB\nDirty:               864 kB\nWriteback:             0 kB\nAnonPages:       1593836 kB\nMapped:          1191012 kB\nShmem:              4676 kB\nKReclaimable:     529696 kB\nSlab:             660796 kB\nSReclaimable:     529696 kB\nSUnreclaim:       131100 kB\nKernelStack:       13160 kB\nPageTables:        35160 kB\nSecPageTables:         0 kB\nNFS_Unstable:          0 kB\nBounce:                0 kB\nWritebackTmp:          0 kB\nCommitLimit:     5970528 kB\nCommitted_AS:    9619588 kB\nVmallocTotal:   34359738367 kB\nVmallocUsed:       29864 kB\nVmallocChunk:          0 kB\nPercpu:             4576 kB\nHardwareCorrupted:     0 kB\nAnonHugePages:      6144 kB\nShmemHugePages:        0 kB\nShmemPmdMapped:        0 kB\nFileHugePages:         0 kB\nFilePmdMapped:         0 kB\nUnaccepted:            0 kB\nHugePages_Total:       0\nHugePages_Free:        0\nHugePages_Rsvd:        0\nHugePages_Surp:        0\nHugepagesize:       2048 kB\nHugetlb:               0 kB\nDirectMap4k:      182136 kB\nDirectMap2M:     6109184 kB\nDirectMap1G:     4194304 kB\n",
+  "core_idle": {
+    "interval_count": 10,
+    "max_swap_in_kib_per_second": 0,
+    "max_swap_out_kib_per_second": 0,
+    "note": "first cumulative-since-boot vmstat row excluded"
+  },
+  "monitoring_idle": {
+    "interval_count": 10,
+    "max_swap_in_kib_per_second": 0,
+    "max_swap_out_kib_per_second": 0,
+    "note": "first cumulative-since-boot vmstat row excluded"
+  },
+  "decision": "deployed: no swap in/out in sampled idle intervals; pre-existing swap cannot establish causation"
+}

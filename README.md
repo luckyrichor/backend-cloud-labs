@@ -43,3 +43,5 @@
 ## E5 CMDB
 
 [配置项、关系图和审计回溯](experiments/e5-cmdb/README.md)已实现；原计划五个实验均有独立验收入口。
+
+当前开发交付：[P0 tx 侧报告（Mac 待补证）](docs/P0-tx交付报告-2026-10-20.md)；[容器与复现命令](deploy/README.md)。

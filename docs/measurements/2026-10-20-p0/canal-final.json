@@ -1,0 +1,1 @@
+{"binlog_format":"ROW","binlog_row_image":"FULL","canal_row_event_received":true,"mysql_version":"8.0.46","scope":"one real INSERT; not crash recovery or S2 correctness"}

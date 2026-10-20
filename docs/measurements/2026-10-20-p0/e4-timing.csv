@@ -1,0 +1,13 @@
+scenario,strategy,resident,rejected,preempted,pending,urgent_admitted,nodes_used,cpu_used,interrupted_cpu,interrupted_memory,unserved_cpu,unserved_memory,schedule_ns
+packing,spread,2,1,0,0,false,2,8,0,0,8,8,8826
+packing,binpack,3,0,0,0,true,2,16,0,0,0,0,3817
+packing,preempt,3,0,1,0,true,2,16,4,4,0,0,2275
+packing,preempt-binpack,3,0,0,0,true,2,16,0,0,0,0,1062
+full_nodes,spread,2,1,0,0,false,2,16,0,0,8,8,821
+full_nodes,binpack,2,1,0,0,false,2,16,0,0,8,8,951
+full_nodes,preempt,2,0,1,1,true,2,16,8,8,8,8,1453
+full_nodes,preempt-binpack,2,0,1,1,true,2,16,8,8,8,8,1413
+packing_and_preemption,spread,3,2,0,0,false,2,10,0,0,14,14,5541
+packing_and_preemption,binpack,4,1,0,0,false,2,16,0,0,8,8,1082
+packing_and_preemption,preempt,3,1,1,1,true,2,12,6,6,12,12,2715
+packing_and_preemption,preempt-binpack,3,0,2,2,true,2,16,8,8,8,8,2885

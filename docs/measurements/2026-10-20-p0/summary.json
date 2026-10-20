@@ -1,0 +1,100 @@
+{
+  "generated_at": "2026-10-20T13:09:36.904334+00:00",
+  "source_commit": "5b421c1039da7b0d2ee3965c66f1afca434737f2",
+  "working_tree_modified_before_measurements": false,
+  "go_tests": {
+    "github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/httpapi": 2,
+    "github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/catalog": 5,
+    "github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/guide": 16,
+    "github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/cache": 5,
+    "github.com/luckyrichor/backend-cloud-labs/experiments/e2-room-sync/room": 12,
+    "github.com/luckyrichor/backend-cloud-labs/experiments/e4-scheduler": 11,
+    "github.com/luckyrichor/backend-cloud-labs/e5-cmdb": 5,
+    "github.com/luckyrichor/backend-cloud-labs/support/telemetry": 2,
+    "github.com/luckyrichor/backend-cloud-labs/loadgen": 3,
+    "github.com/luckyrichor/backend-cloud-labs/experiments/e3-rule-engine/httpdemo": 2
+  },
+  "top_level_go_tests": 63,
+  "skipped": [],
+  "ctest_count": 7,
+  "hdr_version": "v1.4.0",
+  "canal_version": "v1.16.0",
+  "mysql_driver_version": "v1.10.1",
+  "exprtk_commit": "1e4a80b5ec9b4832ed59c6faa65f625a01b18ef0",
+  "exprtk_header_sha256": "a056126bb009b5676a0aade83f86035d384ea8fd4392037380e4774353871218",
+  "exprtk_license_sha256": "297ec85315977901cbab99af49836ff5253614791f468dbf8db41424237a9e95",
+  "exprtk_license": "MIT",
+  "binaries": {
+    "e3": "81a5e8830fa52e5d5c232f0c4cea1ac537b00fa49f7efa253a68f990cbe3d3c2",
+    "e2": "c42c4a4973bc218b1672a589c6599beb6d9bd3c4d5bbf017d5ee5cec0b7b24cc",
+    "e1": "2ac1dd936238de889195b2be6a65ff97ee8004d41a389eba659065b644d81d85",
+    "rule-eval": "799f9a6a57e00e4122267eafd42fbdcd9199003e0d789982ee97c3b27f05dc8f",
+    "e5": "49e6493005dcf469966256d1b441eb7498a8d2e24a2d070879fbbe5e794594db"
+  },
+  "mac_evidence": "missing; no Linux substitute",
+  "P0_accepted": false,
+  "next_phase_started": false,
+  "scope": "P0 availability/calibration only; no S1-S7 performance conclusions",
+  "runtime_images": [
+    {
+      "id": "sha256:7dcddc01f13bab2f15cde676d44d01f61fc9f99fe7785e86196dfc07d358ae2b",
+      "repo_digests": [
+        "mysql@sha256:7dcddc01f13bab2f15cde676d44d01f61fc9f99fe7785e86196dfc07d358ae2b"
+      ]
+    },
+    {
+      "id": "sha256:520775a41a63e77e06c73e35d2fd9cc15921a609516818796b4ecbb813078bc7",
+      "repo_digests": [
+        "redis@sha256:520775a41a63e77e06c73e35d2fd9cc15921a609516818796b4ecbb813078bc7"
+      ]
+    },
+    {
+      "id": "sha256:bdf57e528e45e4433820e045b29b4597825a1c9e38353532d90a01445013f82e",
+      "repo_digests": [
+        "busybox@sha256:bdf57e528e45e4433820e045b29b4597825a1c9e38353532d90a01445013f82e"
+      ]
+    },
+    {
+      "id": "sha256:efd719c99d83b060d9daefdcf00360461adf279f45ef5391f8d111892118753e",
+      "repo_digests": [
+        "prom/prometheus@sha256:efd719c99d83b060d9daefdcf00360461adf279f45ef5391f8d111892118753e"
+      ]
+    },
+    {
+      "id": "sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f",
+      "repo_digests": [
+        "grafana/grafana@sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f"
+      ]
+    }
+  ],
+  "formal_commands": [
+    "python3 scripts/collect-env.py --role tx --output .local/p0/env-tx-final.json",
+    "vmstat 1 11",
+    "bash scripts/build-deploy.sh",
+    "BCL_SOURCE_COMMIT=$(git rev-parse HEAD) docker compose -f deploy/compose.yaml build",
+    "docker compose -f deploy/compose.yaml up -d --wait --wait-timeout 120",
+    "python3 scripts/smoke-deploy.py",
+    "bash scripts/check.sh",
+    "python3 scripts/with-p0-env.py go -C loadgen run ./cmd/loadgen --repo .. --selftest --output ../.local/p0/loadgen-selftest.json",
+    "python3 scripts/with-p0-env.py go -C tools/p0-probe run .",
+    "go -C experiments/e4-scheduler run ./cmd/compare",
+    "g++ -std=c++20 -O0 -I.local/third-party/exprtk tools/exprtk-probe.cpp -o .local/third-party/exprtk/probe"
+  ],
+  "artifact_sha256": {
+    "idle-monitoring-vmstat.txt": "90cf4525e1264c7bbed7052e38863f2c0cd7b3f61cd64b83064cf2e4032a7f36",
+    "env-tx-final.json": "2126609218171381727ee5edf7ae0ddcb0453a61f3e1ff8fabc2010844cc247d",
+    "env-tx-initial.json": "596113c81b1e8c2ddc746285bf270a7f0c3f01f6a76f13f308dc56a8719064c0",
+    "check-final.log": "11c403eb21bd65188a3c0754d0471dd3c13bb53299deff6d86c85e915181b8b3",
+    "idle-vmstat.txt": "15a33d45234265a38e02b01083074620ccf99e15fc6bd5b9ff2c49aacbf047ec",
+    "e4-timing.csv": "aeab1ce3a0834f4d0cc06a44f093f3e0c1dee36254a3d580648df941c303a67b",
+    "exprtk-final-build.log": "84d1ccc4b2e6c71acabd5da602458738fc31e0ca9ba744bbc1de49680c2b2d89",
+    "registry.txt": "2bea185f031d3afbeb0dbc7e5822899d9a5e0ca97ff6f987b8160bee5f93e329",
+    "monitoring-stats.json": "1e149aea9103e78738764c74d76bf137d91ad27462aae87a1ae746a9c73065be",
+    "mysql-auth.txt": "638ff91ed90b8a886e2ba6a93e54fd066edc4556cd14a9ad5a6db3ae0df15fcc",
+    "smoke.json": "b6857abdb6be4885dcd49e5936752c5a4b365ad8c6b01ca71c163766c638038d",
+    "loadgen-selftest.json": "19f3d9d1480c8d3e6c3ce51d5df33abd48207fb905c1bdc74d16650db73e24a3",
+    "canal-final.json": "02538c37d211e5b9764d16d2a2acd06eedb63c2efda52507adc95ae1e91813fb",
+    "exprtk-final.txt": "f0b5c2c2211c8d67ed15e75e656c7862d086e9245420892a7de62cd9ec582a06",
+    "prom-targets.json": "893ed5b4f8744215530a1790f3ecd574235496183ad7a3261b6115c96c6c1f4f"
+  }
+}
