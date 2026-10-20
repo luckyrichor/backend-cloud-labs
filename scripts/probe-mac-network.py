@@ -22,6 +22,37 @@ def connect(host,port,n):
  def percentile(q):return good[max(0,math.ceil(len(good)*q)-1)] if good else None
  return {'host':host,'port':port,'metric':'TCP connect wall time, includes TCP handshake; not HTTP latency','observations':rows,'successes':len(good),'attempts':n,'p50_ms':percentile(.5),'p95_ms':percentile(.95),'p99_ms':percentile(.99)}
 
+def application(host,port):
+ start=time.perf_counter()
+ result={'host':host,'port':port,'service_verified':False}
+ try:
+  with socket.create_connection((host,port),timeout=3) as s:
+   s.settimeout(4)
+   if port==18082:
+    s.sendall(b'{"type":"join"}\n');f=s.makefile('rb');line=f.readline(65537);msg=json.loads(line);result['service_verified']=msg.get('type')=='welcome'
+   else:
+    path={18086:'/items/kettle',18083:'/evaluate',18085:'/state'}[port]
+    body=b'{"expression":"x*2+1","variables":{"x":2}}' if port==18083 else b''
+    method='POST' if body else 'GET'
+    request=f'{method} {path} HTTP/1.1\r\nHost: {host}:{port}\r\nConnection: close\r\nContent-Type: application/json\r\nContent-Length: {len(body)}\r\n\r\n'.encode()+body
+    s.sendall(request);data=b''
+    while len(data)<1048576:
+     chunk=s.recv(min(65536,1048576-len(data)))
+     if not chunk:break
+     data+=chunk
+    header,_,body=data.partition(b'\r\n\r\n');status=header.split(b'\r\n')[0].split()
+    result['http_status']=int(status[1]) if len(status)>1 and status[1].isdigit() else None
+    result['received_bytes']=len(data)
+    # HTTP 200 alone does not prove the expected service. Validate expected schema.
+    if result['http_status']==200:
+     value=json.loads(body)
+     if port==18083:result['service_verified']=value.get('value')==5
+     elif port==18085:result['service_verified']='revision' in value
+     else:result['service_verified']='item' in value and value['item'].get('id')=='kettle'
+ except (OSError,ValueError) as e:result['error_type']=type(e).__name__
+ result['seconds']=time.perf_counter()-start
+ return result
+
 def main():
  p=argparse.ArgumentParser();p.add_argument('--ssh-host',default='tx');p.add_argument('--output',type=Path,required=True);a=p.parse_args()
  if sys.platform!='darwin':p.error('must run on actual Mac')
@@ -36,6 +67,9 @@ def main():
   direct=[pool.submit(connect,host,port,20) for port in [sshport]+ports]
   ping=pool.submit(command,['ping','-n','-c','20',host],30)
   result['direct']=[f.result() for f in direct];result['icmp']=ping.result()
+  result['direct_application']=[f.result() for f in [pool.submit(application,host,port) for port in ports]]
+ result['route']=command(['route','-n','get',host])
+ result['tcp_connect_caution']='Fast connect can reflect a local proxy/TUN accepting sockets. Only ICMP and actual service replies establish remote observations.'
  listeners=[];localports=[]
  for _ in ports:
   s=socket.socket();s.bind(('127.0.0.1',0));localports.append(s.getsockname()[1]);listeners.append(s)
