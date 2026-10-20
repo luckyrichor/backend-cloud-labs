@@ -10,6 +10,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"math"
 	"net"
@@ -50,15 +51,39 @@ type input struct {
 	dx, dy     float64
 }
 type Server struct {
-	mu                    sync.Mutex
-	sessions              map[string]*session
-	connections           map[net.Conn]bool
-	retention             time.Duration
-	perIP, maxConnections int
-	ipCounts              map[string]int
-	frame                 uint64
-	interval              time.Duration
-	wg                    sync.WaitGroup
+	mu                             sync.Mutex
+	sessions                       map[string]*session
+	connections                    map[net.Conn]bool
+	retention                      time.Duration
+	perIP, maxConnections          int
+	perIPIdentities, maxIdentities int
+	Observer                       Observer
+	ipCounts                       map[string]int
+	frame                          uint64
+	interval                       time.Duration
+	wg                             sync.WaitGroup
+}
+
+// Observer receives aggregate measurements only, never identity or recovery tokens.
+type Observer interface {
+	Frame(time.Duration)
+	Bytes(int)
+}
+type Config struct {
+	Interval, Retention                                              time.Duration
+	PerIPConnections, PerIPIdentities, MaxConnections, MaxIdentities int
+	Observer                                                         Observer
+}
+
+func DefaultConfig(interval time.Duration) Config {
+	return Config{Interval: interval, Retention: 30 * time.Second, PerIPConnections: 16, PerIPIdentities: 16, MaxConnections: 256, MaxIdentities: 128}
+}
+func NewConfigured(c Config) (*Server, error) {
+	if c.Interval <= 0 || c.Retention <= 0 || c.PerIPConnections <= 0 || c.PerIPIdentities <= 0 || c.MaxConnections <= 0 || c.MaxIdentities <= 0 {
+		return nil, fmt.Errorf("frame interval, retention and all quotas must be positive")
+	}
+	return &Server{sessions: make(map[string]*session), connections: make(map[net.Conn]bool), retention: c.Retention, interval: c.Interval,
+		perIP: c.PerIPConnections, perIPIdentities: c.PerIPIdentities, maxConnections: c.MaxConnections, maxIdentities: c.MaxIdentities, Observer: c.Observer, ipCounts: map[string]int{}}, nil
 }
 
 func New(interval time.Duration) *Server { return NewWithRetention(interval, 30*time.Second) }
@@ -70,11 +95,19 @@ func NewWithRetention(interval, retention time.Duration) *Server {
 
 // Per-IP limits mitigate one-host floods, not distributed or authenticated abuse.
 func NewWithLimits(interval, retention time.Duration, perIP, maxConnections int) *Server {
-	if interval <= 0 || retention <= 0 || perIP <= 0 || maxConnections <= 0 {
-		panic("frame interval and retention must be positive")
+	c := DefaultConfig(interval)
+	c.Retention = retention
+	c.PerIPConnections = perIP
+	c.PerIPIdentities = perIP
+	c.MaxConnections = maxConnections
+	s, err := NewConfigured(c)
+	if err != nil {
+		panic(err)
 	}
-	return &Server{sessions: make(map[string]*session), connections: make(map[net.Conn]bool),
-		retention: retention, interval: interval, perIP: perIP, maxConnections: maxConnections, ipCounts: map[string]int{}}
+	// Legacy constructors deliberately couple both quotas to perIP. Explicit
+	// Config callers can set independent connection and retained-identity limits.
+	s.perIPIdentities = 0
+	return s
 }
 func randomToken() string {
 	var b [16]byte
@@ -180,7 +213,11 @@ func (s *Server) handle(ctx context.Context, c net.Conn) {
 				identities++
 			}
 		}
-		if len(s.sessions) >= 128 || identities >= s.perIP {
+		identityLimit := s.perIPIdentities
+		if identityLimit == 0 {
+			identityLimit = s.perIP
+		}
+		if len(s.sessions) >= s.maxIdentities || identities >= identityLimit {
 			s.mu.Unlock()
 			return
 		} // Connected plus unexpired disconnected identities are bounded.
@@ -200,7 +237,7 @@ func (s *Server) handle(ctx context.Context, c net.Conn) {
 	go func() {
 		defer close(writerDone)
 		defer c.Close()
-		encoder := json.NewEncoder(c)
+		encoder := json.NewEncoder(measuredWriter{Writer: c, observer: s.Observer})
 		for {
 			select {
 			case message := <-out:
@@ -268,6 +305,7 @@ func (s *Server) frames(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		case <-ticker.C:
+			started := time.Now()
 			s.mu.Lock()
 			s.expireLocked(time.Now())
 			// Each connection gets its own bounded queue and frame budget.
@@ -288,8 +326,24 @@ func (s *Server) frames(ctx context.Context) {
 				}
 			}
 			s.mu.Unlock()
+			if s.Observer != nil {
+				s.Observer.Frame(time.Since(started))
+			}
 		}
 	}
+}
+
+type measuredWriter struct {
+	io.Writer
+	observer Observer
+}
+
+func (w measuredWriter) Write(p []byte) (int, error) {
+	n, err := w.Writer.Write(p)
+	if w.observer != nil {
+		w.observer.Bytes(n)
+	}
+	return n, err
 }
 
 // Caller holds mu. Live connections are never expired.

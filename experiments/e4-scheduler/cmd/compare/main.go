@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	s "github.com/luckyrichor/backend-cloud-labs/experiments/e4-scheduler"
+	"time"
 )
 
 func main() {
@@ -15,10 +16,12 @@ func main() {
 		{"packing_and_preemption", []s.Job{job("small-a", 2, 1), job("large-a", 6, 1), job("small-b", 2, 1), job("large-b", 6, 1), job("urgent", 8, 10)}},
 	}
 	nodes := []s.Node{{ID: "a", Capacity: s.Resource{CPU: 8, Memory: 8}}, {ID: "b", Capacity: s.Resource{CPU: 8, Memory: 8}}}
-	fmt.Println("scenario,strategy,resident,rejected,preempted,pending,urgent_admitted,nodes_used,cpu_used,interrupted_cpu,interrupted_memory,unserved_cpu,unserved_memory")
+	fmt.Println("scenario,strategy,resident,rejected,preempted,pending,urgent_admitted,nodes_used,cpu_used,interrupted_cpu,interrupted_memory,unserved_cpu,unserved_memory,schedule_ns")
 	for _, scenario := range scenarios {
 		for _, strategy := range []s.Strategy{s.Spread, s.BinPack, s.Preempt, s.PreemptBinPack} {
+			started := time.Now()
 			r, err := s.Schedule(nodes, scenario.jobs, strategy)
+			elapsed := time.Since(started).Nanoseconds()
 			if err != nil {
 				panic(err)
 			}
@@ -32,7 +35,7 @@ func main() {
 			}
 			interrupted := r.InterruptedResources()
 			unserved := r.UnservedResources()
-			fmt.Printf("%s,%s,%d,%d,%d,%d,%t,%d,%d,%d,%d,%d,%d\n", scenario.name, strategy, len(r.Placements), len(r.Rejected), len(r.Preempted), len(r.Pending), urgent, len(used), cpu, interrupted.CPU, interrupted.Memory, unserved.CPU, unserved.Memory)
+			fmt.Printf("%s,%s,%d,%d,%d,%d,%t,%d,%d,%d,%d,%d,%d,%d\n", scenario.name, strategy, len(r.Placements), len(r.Rejected), len(r.Preempted), len(r.Pending), urgent, len(used), cpu, interrupted.CPU, interrupted.Memory, unserved.CPU, unserved.Memory, elapsed)
 		}
 	}
 }

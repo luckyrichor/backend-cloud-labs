@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 cd "$(dirname "$0")/.."
-for experiment in e1-shopping-guide e2-room-sync e4-scheduler e5-cmdb; do
-  (cd "experiments/$experiment"; go mod download)
+for module in experiments/e1-shopping-guide experiments/e2-room-sync experiments/e4-scheduler experiments/e5-cmdb support/telemetry loadgen experiments/e3-rule-engine/httpdemo tools/p0-probe; do
+  (cd "$module"; go mod download)
 done
 bash scripts/check.sh

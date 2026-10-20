@@ -6,6 +6,7 @@ import (
 	"github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/catalog"
 	"github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/guide"
 	"github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/httpapi"
+	"github.com/luckyrichor/backend-cloud-labs/support/telemetry"
 	"github.com/redis/go-redis/v9"
 	"log"
 	"net/http"
@@ -14,6 +15,14 @@ import (
 )
 
 func main() {
+	adminAddress := telemetry.Address("ADMIN_ADDRESS", "127.0.0.1:9086")
+	telemetry.ExitHealthcheck(adminAddress)
+	metrics := &telemetry.Metrics{}
+	admin, err := telemetry.Start(adminAddress, metrics)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer admin.Close()
 	store := catalog.NewMemoryStore()
 	_, _ = store.Put(context.Background(), catalog.Item{ID: "kettle", Title: "水壶", PriceCent: 4990, Stock: 10})
 	var cached guide.Cache = cache.NewMemory(time.Minute)
@@ -27,7 +36,7 @@ func main() {
 	if !guide.ValidReadMode(mode) {
 		log.Fatal("CACHE_READ_MODE must be strict or cache-first")
 	}
-	server := &http.Server{Addr: "127.0.0.1:8086", Handler: httpapi.Handler(guide.Service{Store: store, Cache: cached, Mode: mode}),
+	server := &http.Server{Addr: telemetry.Address("GUIDE_ADDRESS", "127.0.0.1:8086"), Handler: metrics.HTTP(httpapi.Handler(guide.Service{Store: store, Cache: cached, Mode: mode})),
 		ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 5 * time.Second, WriteTimeout: 5 * time.Second}
 	log.Fatal(server.ListenAndServe())
 }

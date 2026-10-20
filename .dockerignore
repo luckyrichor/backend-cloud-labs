@@ -1,0 +1,6 @@
+**
+!.local/
+!.local/bin/
+!.local/bin/**
+!deploy/
+!deploy/*.Dockerfile

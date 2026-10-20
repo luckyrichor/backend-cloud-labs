@@ -129,3 +129,7 @@ E2 IPv6用/64聚合连接/保留身份配额，mapped IPv4归一。E3 bind返回
 ## 2026-10-13 E5 CMDB（Codex）
 
 来源 766efcf + 本轮修改。独立Go模块，配置项CRUD/有向关系、0..10层out/in/both图、全图revision CAS、actor/reason审计与历史快照。图和审计同文件临时write/fsync/rename发布；失败不更新内存，重启检查连续快照链。五项测试含20并发CAS、历史/循环/反向、副本隔离、存储失败及HTTP；完整check.sh四Go模块race+vet/真实Redis、E3 Release4/4通过。证据源摘要见measurements/2026-10-13-cmdb.json。单进程原子文件实验，无真实身份认证/防篡改/电源故障无损保证；完整快照存储非生产大规模策略。
+
+### 2026-10-20 · P0 tx 独立实现（正式测量待后续证据提交）
+
+已补容器化、独立管理端点、E2 可配置配额、E3 C++ HTTP 演示、E4 墙钟输出、开环 loadgen、MySQL bench_run 与 canal 选型探针、数据下载校验脚本。开发回归实际通过 Go 顶层 63 项 race 测试及 vet、CTest 7/7；其中包含原有真实 Redis 用例。开发错误包括 E2 配额兼容回归、MySQL secret 权限与临时健康误报，均已修复。Amazon 旧 URL 404，现行官方地址验证成功；六个数据文件均有哈希及行数。正式源码提交、干净工作区测量及其报告在后续记录，不将这里的开发工作区结果标为干净测量。Mac 环境/网络和 CP1 决定未完成，未进入 P1。

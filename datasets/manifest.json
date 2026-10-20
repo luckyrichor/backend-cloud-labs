@@ -1,0 +1,237 @@
+{
+  "generated_at": "2026-10-20T12:52:07.540711+00:00",
+  "proxy_explicit": "http://127.0.0.1:7890",
+  "datasets": [
+    {
+      "id": "azure",
+      "url": "https://github.com/Azure/AzurePublicDataset/releases/download/dataset-packing-2020/azurevmallocation_dataset2020_AzurePackingTraceV1.zip",
+      "page": "https://github.com/Azure/AzurePublicDataset/blob/master/AzureTracesForPacking2020.md",
+      "license_statement": "CC BY Attribution; cite Protean OSDI 2020",
+      "raw_data_not_redistributed": true,
+      "exit_code": 0,
+      "http_status": 200,
+      "error": "",
+      "received_bytes": 53416762,
+      "bytes": 53416762,
+      "sha256": "af967499c4f2c38bb37f8fbb202768115cff6c2e522272a498a414762d85fe16",
+      "rows": 5559800,
+      "vm_types": 4619,
+      "priority_counts": {
+        "0": 4963900,
+        "1": 595900
+      },
+      "sqlite_bytes": 181116928,
+      "sqlite_sha256": "bb7e935b0bea31389b99060035f50371e384bb192baf8ed5e75b863f00b8159e",
+      "integrity": "ok",
+      "verified": true,
+      "seconds": 97.05854056915268,
+      "license_original_sources": [
+        {
+          "url": "https://raw.githubusercontent.com/Azure/AzurePublicDataset/master/LICENSE",
+          "exit_code": 0,
+          "bytes": 18653,
+          "sha256": "9bbc1ea9fe5c96df01b311a2ac864d5b18fc87b9948bfd14770e4b44db755ee9"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/Azure/AzurePublicDataset/master/AzureTracesForPacking2020.md",
+          "exit_code": 0,
+          "bytes": 4744,
+          "sha256": "17caad0677de089518d34fc1155d1b672895dcfb2ef5ce8e017160296eb564b5"
+        }
+      ]
+    },
+    {
+      "id": "amazon",
+      "url": "https://mcauleylab.ucsd.edu/public_datasets/data/amazon_2023/raw/meta_categories/meta_All_Beauty.jsonl.gz",
+      "page": "https://amazon-reviews-2023.github.io/",
+      "license_statement": "License unspecified on checked page; owner approved portfolio evaluation in supplied plan; no raw redistribution",
+      "raw_data_not_redistributed": true,
+      "exit_code": 0,
+      "http_status": 200,
+      "error": "",
+      "received_bytes": 39871253,
+      "bytes": 39871253,
+      "sha256": "51f8255c2794afd60e274c10d3e2d09dc1f671eba4ba35f74f748d8631216d05",
+      "rows": 112590,
+      "field_names": [
+        "average_rating",
+        "bought_together",
+        "categories",
+        "description",
+        "details",
+        "features",
+        "images",
+        "main_category",
+        "parent_asin",
+        "price",
+        "rating_number",
+        "store",
+        "title",
+        "videos"
+      ],
+      "synthetic": false,
+      "verified": true,
+      "seconds": 57.395023154094815,
+      "previous_attempts": [
+        {
+          "id": "amazon",
+          "url": "https://datarepo.eng.ucsd.edu/mcauley_group/data/amazon_2023/raw/meta_categories/meta_All_Beauty.jsonl.gz",
+          "page": "https://amazon-reviews-2023.github.io/",
+          "license_statement": "License unspecified on checked page; owner approved portfolio evaluation in supplied plan; no raw redistribution",
+          "raw_data_not_redistributed": true,
+          "exit_code": 22,
+          "http_status": 404,
+          "error": "curl: (22) The requested URL returned error: 404",
+          "received_bytes": 0,
+          "verified": false,
+          "rows": null,
+          "sha256": null,
+          "error_type": "ValueError",
+          "validation_error": "download failed",
+          "fallback_status": "pending CP1 owner decision; no silent substitution",
+          "seconds": 1.183393414132297
+        }
+      ],
+      "license_original_sources": [
+        {
+          "url": "https://amazon-reviews-2023.github.io/",
+          "exit_code": 0,
+          "bytes": 52198,
+          "sha256": "cf0e6cdb219ce81489b2e9a51a2b6ad916fa5134bf8a5de3adb542f7662c45cf"
+        }
+      ]
+    },
+    {
+      "id": "snap",
+      "url": "https://snap.stanford.edu/data/web-Google.txt.gz",
+      "page": "https://snap.stanford.edu/data/web-Google.html",
+      "license_statement": "No explicit license on source page; citation requested; shape reference only",
+      "raw_data_not_redistributed": true,
+      "exit_code": 0,
+      "http_status": 200,
+      "error": "",
+      "received_bytes": 21168784,
+      "bytes": 21168784,
+      "sha256": "bcac0af0471d749f4a8c010bca92b61cf2868a0570741de06892fc062f265ea6",
+      "rows": 5105039,
+      "nodes": 875713,
+      "synthetic": false,
+      "meaning": "web link graph, not CMDB",
+      "verified": true,
+      "seconds": 22.662434472935274,
+      "license_original_sources": [
+        {
+          "url": "https://snap.stanford.edu/data/web-Google.html",
+          "exit_code": 0,
+          "bytes": 12433,
+          "sha256": "f2819cd297da1b7901d1e8ea9ebe0e742ed66a11bbd11a3056bce358fea3fc04"
+        }
+      ]
+    },
+    {
+      "id": "uci",
+      "url": "https://archive.ics.uci.edu/static/public/502/online+retail+ii.zip",
+      "page": "https://archive.ics.uci.edu/dataset/502/online+retail+ii",
+      "license_statement": "CC BY 4.0",
+      "raw_data_not_redistributed": true,
+      "exit_code": 0,
+      "http_status": 200,
+      "error": "",
+      "received_bytes": 45622418,
+      "bytes": 45622418,
+      "sha256": "572e36277c2390fbfde10664750731e0a86f55e33470d91919085f0408e67bfb",
+      "rows": 1067371,
+      "worksheet_data_rows": {
+        "xl/worksheets/sheet1.xml": 525461,
+        "xl/worksheets/sheet2.xml": 541910
+      },
+      "meaning": "transaction rows, not unique products",
+      "verified": true,
+      "seconds": 43.40122838993557,
+      "license_original_sources": [
+        {
+          "url": "https://archive.ics.uci.edu/dataset/502/online+retail+ii",
+          "exit_code": 0,
+          "bytes": 85208,
+          "sha256": "22d2f914e794c7c0443c3686aa99f8d5793d4863f9033a281089b66f62204e57"
+        }
+      ]
+    },
+    {
+      "id": "alibaba-0",
+      "url": "https://aliopentrace.oss-cn-beijing.aliyuncs.com/v2021MicroservicesTraces/MSCallGraph/MSCallGraph_0.tar.gz",
+      "page": "https://github.com/alibaba/clusterdata/tree/master/cluster-trace-microservices-v2021",
+      "license_statement": "Research/learning only per repository; no explicit standalone data license",
+      "raw_data_not_redistributed": true,
+      "exit_code": 0,
+      "http_status": 200,
+      "error": "",
+      "received_bytes": 161892812,
+      "bytes": 161892812,
+      "sha256": "b5cba70a4064018af096096b4fdb4c81161a1e681e1add78930201846ad9a235",
+      "rows": 6088846,
+      "member_lines_including_headers": {
+        "MSCallGraph_0.csv": 6088847
+      },
+      "meaning": "sampled callgraph rows, not CMDB",
+      "verified": true,
+      "seconds": 16.25225199596025,
+      "license_original_sources": [
+        {
+          "url": "https://raw.githubusercontent.com/alibaba/clusterdata/master/README.md",
+          "exit_code": 0,
+          "bytes": 13728,
+          "sha256": "4a4843de730fc2bfb725fb37c6bbe46257c54087161ea7b9329a2663c97a6a90"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/alibaba/clusterdata/master/cluster-trace-microservices-v2021/README.md",
+          "exit_code": 0,
+          "bytes": 11412,
+          "sha256": "d4dab2129a4c269a57fde8547e65e0118a70c27eef96a2a5883b2dcfa29ff735"
+        }
+      ],
+      "header_rows": 1,
+      "header_verified": "traceid,timestamp,rpcid,um,rpctype,dm,interface,rt"
+    },
+    {
+      "id": "alibaba-1",
+      "url": "https://aliopentrace.oss-cn-beijing.aliyuncs.com/v2021MicroservicesTraces/MSCallGraph/MSCallGraph_1.tar.gz",
+      "page": "https://github.com/alibaba/clusterdata/tree/master/cluster-trace-microservices-v2021",
+      "license_statement": "Research/learning only per repository; no explicit standalone data license",
+      "raw_data_not_redistributed": true,
+      "exit_code": 0,
+      "http_status": 200,
+      "error": "",
+      "received_bytes": 170426353,
+      "bytes": 170426353,
+      "sha256": "0af45d69547293865471ea9ece2e310a74108f8ee66c3367be7454f189b12b81",
+      "rows": 6397788,
+      "member_lines_including_headers": {
+        "MSCallGraph_1.csv": 6397789
+      },
+      "meaning": "sampled callgraph rows, not CMDB",
+      "verified": true,
+      "seconds": 25.246664558071643,
+      "license_original_sources": [
+        {
+          "url": "https://raw.githubusercontent.com/alibaba/clusterdata/master/README.md",
+          "exit_code": 0,
+          "bytes": 13728,
+          "sha256": "4a4843de730fc2bfb725fb37c6bbe46257c54087161ea7b9329a2663c97a6a90"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/alibaba/clusterdata/master/cluster-trace-microservices-v2021/README.md",
+          "exit_code": 0,
+          "bytes": 11412,
+          "sha256": "d4dab2129a4c269a57fde8547e65e0118a70c27eef96a2a5883b2dcfa29ff735"
+        }
+      ],
+      "header_rows": 1,
+      "header_verified": "traceid,timestamp,rpcid,um,rpctype,dm,interface,rt"
+    }
+  ],
+  "synthetic_tracks": {
+    "source": "synthetic",
+    "status": "P1 not yet generated"
+  }
+}

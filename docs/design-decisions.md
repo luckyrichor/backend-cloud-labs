@@ -75,3 +75,14 @@ E5 保留既有 module 路径 `github.com/luckyrichor/backend-cloud-labs/e5-cmdb
 此前“不做 VM”的段落是当时决策。新方案已授权在 P3 增加 VM；当前尚未实现，届时保留旧决策并追加变化与同口径差分证据。P0 不提前把 VM 写成既有能力。
 
 环境采集脚本区分 tx 和 Mac，拒绝在 Linux 生成 Mac 证据。Mac→tx 必须由真实 Mac 发起；本机回环只能是校准，不能冒充主压测链路。
+
+### 2026-10-20 · P0 基础实现与验证边界
+
+- 各服务复用独立 support/telemetry 模块，管理接口与业务路由分开。直方图无用户/请求体/URL 标签，E2 记录实际发送字节与帧计算耗时。宿主只发布 loopback 端口，Mac 使用 SSH 转发，真实网络证据尚待 Mac 采集。
+- E2 显式配置允许连接与保留身份分别限额；旧构造函数仍联动，避免改变已有测试和调用方行为。初版拆分导致旧配额测试失败，恢复兼容后通过。
+- loadgen 固定计划到达与请求完成独立，记录调度延迟与计划到达至完成直方图；并发饱和不静默降速，计 dropped 并标无效。回显/暂停只是客户端校准，不是服务性能故事。
+- MySQL 8.0.46 默认 caching_sha2_password、ROW/FULL，go-mysql v1.16.0 canal 已收到实际 INSERT 的事件。此结论不覆盖断点恢复、重复/乱序等 P2 正确性要求，无需 outbox 回退。
+- MySQL 首次初始化遇到 secret 文件 0600 导致容器 mysql 用户无法读取；临时服务器又被原 mysqladmin ping 误报健康。修复为宿主 0700 私有目录内只读 secret 和正式 TCP 上的 bcl.bench_run 查询；实际连接与事件验证通过。不删除已有卷。
+- ExprTk 固定 upstream 提交 1e4a80b5ec9b4832ed59c6faa65f625a01b18ef0，MIT 原文保留在仓库外，g++ -std=c++20 -O0 编译及 x*2+1=5 运行通过。此为可用性证明，不是 P3 四路差分或性能参照。
+- Amazon 旧 datarepo.eng.ucsd.edu 文件地址返回 HTTP 404；官方页面现行 mcauleylab.ucsd.edu 地址下载 All_Beauty 成功。属于来源 URL 修订，不是切换为合成数据。原方案保持原样，附录 C 的当前核实结果以 datasets/manifest.json 与 P0 报告为准。阿里选择两个 MSCallGraph 分片，行数扣除已验证 CSV 表头；SNAP 仍为网页图形状参照，不称 CMDB。
+- 源站原始许可/说明页面保留仓库外副本，manifest 记录原文 URL、字节及 SHA256；未明确许可的来源不因此被标成开放许可。原始数据不进 Git。

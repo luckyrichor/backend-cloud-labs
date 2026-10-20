@@ -9,3 +9,7 @@ require (
 	go.uber.org/atomic v1.11.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect
 )
+
+require github.com/luckyrichor/backend-cloud-labs/support/telemetry v0.0.0
+
+replace github.com/luckyrichor/backend-cloud-labs/support/telemetry => ../../support/telemetry
