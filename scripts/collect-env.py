@@ -50,7 +50,8 @@ def collect(role, target=None, ports=(), samples=20):
     if sys.platform == "darwin":
         result["cpu"] = command(["sysctl", "-n", "machdep.cpu.brand_string"])
         result["memory"] = command(["sysctl", "hw.memsize", "vm.swapusage"])
-        result["kernel"] = command(["sw_vers"])
+        result["os_version"] = command(["sw_vers"])
+        result["kernel"] = command(["uname", "-a"])
     else:
         result["cpu"] = command(["lscpu", "--json"])
         result["memory"] = Path("/proc/meminfo").read_text()
