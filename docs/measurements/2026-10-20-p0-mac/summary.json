@@ -1,0 +1,44 @@
+{
+  "generated_at": "2026-10-20T13:22:33.002261+00:00",
+  "collector_and_closeout_test_commit": "9f8e770fa4e7d6cb10434d4e9e13fde5146cb947",
+  "service_measurement_source_commit": "5b421c1039da7b0d2ee3965c66f1afca434737f2",
+  "service_sources_unchanged": true,
+  "working_tree_modified_before_measurements": false,
+  "top_level_go_tests": 63,
+  "go_tests": {
+    "github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/catalog": 5,
+    "github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/guide": 16,
+    "github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/httpapi": 2,
+    "github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/cache": 5,
+    "github.com/luckyrichor/backend-cloud-labs/experiments/e2-room-sync/room": 12,
+    "github.com/luckyrichor/backend-cloud-labs/experiments/e4-scheduler": 11,
+    "github.com/luckyrichor/backend-cloud-labs/e5-cmdb": 5,
+    "github.com/luckyrichor/backend-cloud-labs/support/telemetry": 2,
+    "github.com/luckyrichor/backend-cloud-labs/loadgen": 3,
+    "github.com/luckyrichor/backend-cloud-labs/experiments/e3-rule-engine/httpdemo": 2
+  },
+  "ctest_count": 7,
+  "skipped": [],
+  "icmp_ms": {
+    "count": 20,
+    "min": 10.597,
+    "mean": 20.87925,
+    "p50": 15.239,
+    "p95": 34.357,
+    "p99": 97.488,
+    "max": 97.488
+  },
+  "network_scope": "actual Mac current route via utun5; not a proxy-free physical-link benchmark",
+  "public_business_service_verified": false,
+  "ssh_forward_business_verified": true,
+  "temporary_forwards_closed": true,
+  "P0_automatic_checks_complete": true,
+  "P0_owner_CP1_approved": false,
+  "P1_started": false,
+  "artifact_sha256": {
+    "check-final.log": "b6d9122fc01e1adc77b6cec9d639179a513bb804ebb99c085e13e26c096464fc",
+    "network-mac-tx.json": "ce2a7c5cf87876bb834796f1f5191b2d003d64259d9b3e1a2bfa5e5c975bbf88",
+    "smoke.json": "d9fe634a030d79fd791271f9ea399e01b525d078f30f5ed7934c495ffa0cefeb",
+    "env-mac.json": "a0d50df644c36c6e9812c519b45281a5c301bdc67caf550d87ca077df58fbda5"
+  }
+}

@@ -88,3 +88,10 @@ E5 保留既有 module 路径 `github.com/luckyrichor/backend-cloud-labs/e5-cmdb
 - 源站原始许可/说明页面保留仓库外副本，manifest 记录原文 URL、字节及 SHA256；未明确许可的来源不因此被标成开放许可。原始数据不进 Git。
 
 P0 监控判据补充：核心栈启动前已有 swap 占用，不能视为本栈开始换页。核心栈空载 vmstat 十个一秒区间 si/so 均为 0，内存仍有余量，因此继续部署各限 256 MiB 的 Prometheus 与 Grafana，再采集空载证据；若持续换页再提交回退选择。监控发布也仅限 loopback，Grafana 随机初始口令仅保留私有文件。Prometheus 短保留期和空间上限适合本机实验，不作生产配置。
+
+
+### 2026-10-20 · Mac 网络验证与 CP1 状态更新
+
+真实 Mac 环境与网络证据已补齐：docs/measurements/2026-10-20-p0-mac/。Mac→tx 当前路由经 utun5，公网目标四业务端口的 TCP connect 成功不代表服务可达；实际 HTTP/房间协议验证全部超时。已用 Mac 发起的临时 SSH loopback 转发验证四服务真实回复，并清理转发。后续 Mac 发压采用 SSH 转发且报告路径开销；转发本地 TCP 接入时间不能当 Mac→tx 往返时延。保留 ICMP 原始回显及路由，不声称无代理网络。
+
+Mac 默认 nofile=256，已有 swap 占用，Docker daemon 未运行。未修改用户应用或启动本地容器。工具链、fd 与客户端资源状态需在后续正式发压前准备并记录。这些不妨碍本轮 P0 环境/可达性核实，但当前网络探测不能支撑服务吞吐结论。P0 自动检查完成，依方案 F 停在 CP1 等负责人审阅，未开始 P1。

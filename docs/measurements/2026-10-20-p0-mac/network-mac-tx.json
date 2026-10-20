@@ -1,0 +1,1141 @@
+{
+  "generated_at": "2026-10-20T13:20:43.301084+00:00",
+  "platform": "macOS-27.0.1-arm64-arm-64bit",
+  "hostname": "luomac.local",
+  "source_commit": "9f8e770fa4e7d6cb10434d4e9e13fde5146cb947",
+  "working_tree_modified_before_collection": false,
+  "probe_sha256": "51dd8359cf557ccfad4944bc21894da23f3870ac65a77f40e1912b1bcea4a802",
+  "ssh_host_alias": "tx",
+  "tx_host": "43.142.37.199",
+  "ssh_port": 22,
+  "scope": "P0 reachability only; no S1-S7 throughput conclusion",
+  "direct": [
+    {
+      "host": "43.142.37.199",
+      "port": 22,
+      "metric": "TCP connect wall time, includes TCP handshake; not HTTP latency",
+      "observations": [
+        {
+          "seconds": 0.0033154580000000072,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00047079200000001153,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0004237910000000067,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0006088330000000031,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0004923749999999893,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0004129169999999571,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.000571292000000001,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.000977042000000039,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0005785829999999659,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.000681875000000054,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00038570800000004013,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00040079199999998316,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0004887919999999601,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00044074999999998976,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0005685839999999276,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.000403416999999906,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.000413875000000008,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0004054170000000745,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00031333300000002673,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00048595899999992476,
+          "success": true,
+          "error_type": null
+        }
+      ],
+      "successes": 20,
+      "attempts": 20,
+      "p50_ms": 0.47079200000001153,
+      "p95_ms": 0.977042000000039,
+      "p99_ms": 3.315458000000007
+    },
+    {
+      "host": "43.142.37.199",
+      "port": 18086,
+      "metric": "TCP connect wall time, includes TCP handshake; not HTTP latency",
+      "observations": [
+        {
+          "seconds": 0.0032765000000000016,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0003012500000000029,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0005142499999999939,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00045816600000000984,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00046195799999998455,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0006662920000000128,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00045166700000004445,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.000953499999999996,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0004445829999999984,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0007200420000000873,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0005375410000000302,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0005735829999999886,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0003763750000000954,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00041437499999996685,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0005359999999999809,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00039816700000006033,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0004478329999999531,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00045354100000005726,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0004586660000001075,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0005202090000000492,
+          "success": true,
+          "error_type": null
+        }
+      ],
+      "successes": 20,
+      "attempts": 20,
+      "p50_ms": 0.4586660000001075,
+      "p95_ms": 0.953499999999996,
+      "p99_ms": 3.2765000000000017
+    },
+    {
+      "host": "43.142.37.199",
+      "port": 18082,
+      "metric": "TCP connect wall time, includes TCP handshake; not HTTP latency",
+      "observations": [
+        {
+          "seconds": 0.0031856249999999975,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00038825000000000665,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0004015830000000109,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.000486750000000008,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0004903339999999812,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0003637910000000022,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0004579590000000078,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0006231250000000021,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0003751670000000096,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0007432920000000065,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0005370829999999938,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0004022499999999374,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0007437919999999654,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0004438330000000601,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.000666541000000076,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00048241700000006826,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0006819160000000046,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0006122499999999809,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0004991670000000781,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0005809159999998759,
+          "success": true,
+          "error_type": null
+        }
+      ],
+      "successes": 20,
+      "attempts": 20,
+      "p50_ms": 0.4903339999999812,
+      "p95_ms": 0.7437919999999654,
+      "p99_ms": 3.1856249999999973
+    },
+    {
+      "host": "43.142.37.199",
+      "port": 18083,
+      "metric": "TCP connect wall time, includes TCP handshake; not HTTP latency",
+      "observations": [
+        {
+          "seconds": 0.0031497089999999936,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0004827919999999958,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0004071659999999866,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0004913329999999827,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.000472958999999995,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0003878330000000041,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0005804169999999997,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0011072080000000262,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0005691250000000037,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0006369580000000763,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0004674580000000317,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0003754999999999731,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0004806669999999347,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00047595799999999855,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0004952499999999471,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0003650000000000597,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0003408749999999072,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0005885420000000252,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00038491700000009565,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0006014999999999215,
+          "success": true,
+          "error_type": null
+        }
+      ],
+      "successes": 20,
+      "attempts": 20,
+      "p50_ms": 0.4806669999999347,
+      "p95_ms": 1.1072080000000262,
+      "p99_ms": 3.1497089999999934
+    },
+    {
+      "host": "43.142.37.199",
+      "port": 18085,
+      "metric": "TCP connect wall time, includes TCP handshake; not HTTP latency",
+      "observations": [
+        {
+          "seconds": 0.003141333000000003,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00039654100000000025,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0004940829999999785,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0004954589999999759,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0004253330000000277,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00048745799999999617,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0004929579999999878,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0009712920000000125,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0005088750000000197,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0005995410000000367,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0007487919999999981,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0003778329999999386,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0006487080000000534,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0006917910000000527,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0005899590000000288,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00037479200000001267,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0003766669999999417,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00041762499999997704,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0003891670000000236,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0005236250000000275,
+          "success": true,
+          "error_type": null
+        }
+      ],
+      "successes": 20,
+      "attempts": 20,
+      "p50_ms": 0.4940829999999785,
+      "p95_ms": 0.9712920000000125,
+      "p99_ms": 3.141333000000003
+    }
+  ],
+  "icmp": {
+    "command": [
+      "ping",
+      "-n",
+      "-c",
+      "20",
+      "43.142.37.199"
+    ],
+    "exit_code": 0,
+    "stdout": "PING 43.142.37.199 (43.142.37.199): 56 data bytes\n64 bytes from 43.142.37.199: icmp_seq=0 ttl=53 time=34.357 ms\n64 bytes from 43.142.37.199: icmp_seq=1 ttl=53 time=11.571 ms\n64 bytes from 43.142.37.199: icmp_seq=2 ttl=53 time=12.607 ms\n64 bytes from 43.142.37.199: icmp_seq=3 ttl=53 time=19.519 ms\n64 bytes from 43.142.37.199: icmp_seq=4 ttl=53 time=97.488 ms\n64 bytes from 43.142.37.199: icmp_seq=5 ttl=53 time=17.755 ms\n64 bytes from 43.142.37.199: icmp_seq=6 ttl=53 time=10.597 ms\n64 bytes from 43.142.37.199: icmp_seq=7 ttl=53 time=13.891 ms\n64 bytes from 43.142.37.199: icmp_seq=8 ttl=53 time=18.125 ms\n64 bytes from 43.142.37.199: icmp_seq=9 ttl=53 time=11.922 ms\n64 bytes from 43.142.37.199: icmp_seq=10 ttl=53 time=17.369 ms\n64 bytes from 43.142.37.199: icmp_seq=11 ttl=53 time=13.890 ms\n64 bytes from 43.142.37.199: icmp_seq=12 ttl=53 time=15.239 ms\n64 bytes from 43.142.37.199: icmp_seq=13 ttl=53 time=23.093 ms\n64 bytes from 43.142.37.199: icmp_seq=14 ttl=53 time=20.881 ms\n64 bytes from 43.142.37.199: icmp_seq=15 ttl=53 time=23.551 ms\n64 bytes from 43.142.37.199: icmp_seq=16 ttl=53 time=16.745 ms\n64 bytes from 43.142.37.199: icmp_seq=17 ttl=53 time=14.611 ms\n64 bytes from 43.142.37.199: icmp_seq=18 ttl=53 time=12.383 ms\n64 bytes from 43.142.37.199: icmp_seq=19 ttl=53 time=11.991 ms\n\n--- 43.142.37.199 ping statistics ---\n20 packets transmitted, 20 packets received, 0.0% packet loss\nround-trip min/avg/max/stddev = 10.597/20.879/97.488/18.401 ms",
+    "stderr": ""
+  },
+  "direct_application": [
+    {
+      "host": "43.142.37.199",
+      "port": 18086,
+      "service_verified": false,
+      "error_type": "timeout",
+      "seconds": 4.002835292
+    },
+    {
+      "host": "43.142.37.199",
+      "port": 18082,
+      "service_verified": false,
+      "error_type": "timeout",
+      "seconds": 4.002243290999999
+    },
+    {
+      "host": "43.142.37.199",
+      "port": 18083,
+      "service_verified": false,
+      "error_type": "timeout",
+      "seconds": 4.002445583999997
+    },
+    {
+      "host": "43.142.37.199",
+      "port": 18085,
+      "service_verified": false,
+      "error_type": "timeout",
+      "seconds": 4.002431249999997
+    }
+  ],
+  "route": {
+    "command": [
+      "route",
+      "-n",
+      "get",
+      "43.142.37.199"
+    ],
+    "exit_code": 0,
+    "stdout": "route to: 43.142.37.199\ndestination: 43.142.37.199\n    gateway: 198.18.0.1\n  interface: utun5\n      flags: <UP,GATEWAY,HOST,DONE,WASCLONED,IFSCOPE,IFREF>\n recvpipe  sendpipe  ssthresh  rtt,msec    rttvar  hopcount      mtu     expire\n       0         0         0         4         6         0      9000         0",
+    "stderr": ""
+  },
+  "tcp_connect_caution": "Fast connect can reflect a local proxy/TUN accepting sockets. Only ICMP and actual service replies establish remote observations.",
+  "tunnel": [
+    {
+      "host": "127.0.0.1",
+      "port": 52482,
+      "metric": "TCP connect wall time, includes TCP handshake; not HTTP latency",
+      "observations": [
+        {
+          "seconds": 0.0010493330000009848,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0004179170000000454,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.000408541999998846,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0002917919999987362,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0004855829999996786,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00028350000000187947,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0004484590000011224,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0004474580000000117,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00030849999999915667,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0004804579999984071,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00040574999999876127,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0002632499999997151,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0004764160000014783,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00037595899999942617,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0002153749999997956,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0002547909999996989,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00029587500000261,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00024299999999755073,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0001495410000025288,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00018645899999825133,
+          "success": true,
+          "error_type": null
+        }
+      ],
+      "successes": 20,
+      "attempts": 20,
+      "p50_ms": 0.30849999999915667,
+      "p95_ms": 0.4855829999996786,
+      "p99_ms": 1.0493330000009848
+    },
+    {
+      "host": "127.0.0.1",
+      "port": 52483,
+      "metric": "TCP connect wall time, includes TCP handshake; not HTTP latency",
+      "observations": [
+        {
+          "seconds": 0.0007900000000020668,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0005391249999995296,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00034216700000300193,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00035175000000009504,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0003983749999996178,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0005354999999980237,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0007555830000001151,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00022929100000013136,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0003506659999992223,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0006483750000008115,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0006842909999988933,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00041533399999948983,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0005930829999982734,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00034529100000213475,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00021216600000073527,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0003163749999970378,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00019975000000016507,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00021516600000026642,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00013504200000014066,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0003952499999968495,
+          "success": true,
+          "error_type": null
+        }
+      ],
+      "successes": 20,
+      "attempts": 20,
+      "p50_ms": 0.35175000000009504,
+      "p95_ms": 0.7555830000001151,
+      "p99_ms": 0.7900000000020668
+    },
+    {
+      "host": "127.0.0.1",
+      "port": 52484,
+      "metric": "TCP connect wall time, includes TCP handshake; not HTTP latency",
+      "observations": [
+        {
+          "seconds": 0.0008104170000002853,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0001871250000000657,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0003159579999980622,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00031974999999917486,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0007648340000017129,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0006388330000000053,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0005949160000007225,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0003265839999997411,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00011974999999964098,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00041341700000074866,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0006039579999992384,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0003322499999995898,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00037108299999744077,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00039616700000166816,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0003842089999999132,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00031537499999956253,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0003201249999982281,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0002996250000002476,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0003121660000005022,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00028754199999880825,
+          "success": true,
+          "error_type": null
+        }
+      ],
+      "successes": 20,
+      "attempts": 20,
+      "p50_ms": 0.3265839999997411,
+      "p95_ms": 0.7648340000017129,
+      "p99_ms": 0.8104170000002853
+    },
+    {
+      "host": "127.0.0.1",
+      "port": 52485,
+      "metric": "TCP connect wall time, includes TCP handshake; not HTTP latency",
+      "observations": [
+        {
+          "seconds": 0.0003799170000000629,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0002119170000014492,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00024395800000220902,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00039362500000095224,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0004254999999986353,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00041008399999853395,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0006432089999997004,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00040341700000112724,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0002635000000026366,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0006208329999992657,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0003035000000011223,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0002790420000025051,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 8.779199999864318e-05,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0001954590000003975,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00033154200000140577,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00037566600000005224,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0003948749999977963,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00036833300000083113,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.0002457500000012658,
+          "success": true,
+          "error_type": null
+        },
+        {
+          "seconds": 0.00019991600000324183,
+          "success": true,
+          "error_type": null
+        }
+      ],
+      "successes": 20,
+      "attempts": 20,
+      "p50_ms": 0.33154200000140577,
+      "p95_ms": 0.6208329999992657,
+      "p99_ms": 0.6432089999997004
+    }
+  ],
+  "forward_mapping": [
+    {
+      "local_port": 52482,
+      "tx_loopback_port": 18086
+    },
+    {
+      "local_port": 52483,
+      "tx_loopback_port": 18082
+    },
+    {
+      "local_port": 52484,
+      "tx_loopback_port": 18083
+    },
+    {
+      "local_port": 52485,
+      "tx_loopback_port": 18085
+    }
+  ],
+  "forward_command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ExitOnForwardFailure=yes",
+    "-o",
+    "ConnectTimeout=10",
+    "-N",
+    "-L",
+    "127.0.0.1:52482:127.0.0.1:18086",
+    "-L",
+    "127.0.0.1:52483:127.0.0.1:18082",
+    "-L",
+    "127.0.0.1:52484:127.0.0.1:18083",
+    "-L",
+    "127.0.0.1:52485:127.0.0.1:18085",
+    "tx"
+  ],
+  "forward_replies": [
+    {
+      "remote_port": 18086,
+      "http_status": 200,
+      "bytes": 163,
+      "request_seconds": 0.040723792000001424
+    },
+    {
+      "remote_port": 18082,
+      "welcome_and_snapshot": true
+    },
+    {
+      "remote_port": 18083,
+      "http_status": 200,
+      "bytes": 113,
+      "request_seconds": 0.04133058300000059
+    },
+    {
+      "remote_port": 18085,
+      "http_status": 200,
+      "bytes": 41,
+      "request_seconds": 0.03611583300000021
+    }
+  ],
+  "forward_process_terminated": true,
+  "local_listeners_closed": true
+}

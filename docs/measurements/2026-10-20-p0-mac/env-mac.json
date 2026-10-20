@@ -1,0 +1,93 @@
+{
+  "generated_at": "2026-10-20T13:20:43.023761+00:00",
+  "role": "mac",
+  "hostname": "luomac.local",
+  "platform": "macOS-27.0.1-arm64-arm-64bit",
+  "system": "Darwin",
+  "machine": "arm64",
+  "cpu_count": 10,
+  "nofile": [
+    256,
+    9223372036854775807
+  ],
+  "timezone": [
+    "EST",
+    "EDT"
+  ],
+  "process_TZ": null,
+  "host_timezone": {
+    "command": [
+      "readlink",
+      "/etc/localtime"
+    ],
+    "exit_code": 0,
+    "stdout": "/var/db/timezone/zoneinfo/America/New_York",
+    "stderr": ""
+  },
+  "disk": {
+    "total": 494332366848,
+    "used": 250571251712,
+    "free": 243761115136
+  },
+  "git_commit": "9f8e770fa4e7d6cb10434d4e9e13fde5146cb947",
+  "working_tree_modified_before_collection": false,
+  "collector_sha256": "1996ed342c30c2edf81e70c97693cd0363854046dca5f75818e8a25ba6b363d8",
+  "go": {
+    "command": [
+      "go",
+      "version"
+    ],
+    "exit_code": 0,
+    "stdout": "go version go1.27.0 darwin/arm64",
+    "stderr": ""
+  },
+  "docker": {
+    "command": [
+      "docker",
+      "version",
+      "--format",
+      "{{json .}}"
+    ],
+    "exit_code": 1,
+    "stdout": "{\"Client\":{\"Version\":\"29.7.2\",\"ApiVersion\":\"1.55\",\"DefaultAPIVersion\":\"1.55\",\"GitCommit\":\"a7dcaa6\",\"GoVersion\":\"go1.26.5\",\"Os\":\"darwin\",\"Arch\":\"arm64\",\"BuildTime\":\"Wed Aug  5 18:27:50 2026\",\"Context\":\"desktop-linux\"},\"Server\":null}",
+    "stderr": "failed to connect to the docker API at unix:///Users/lc/.docker/run/docker.sock; check if the path is correct and if the daemon is running: dial unix /Users/lc/.docker/run/docker.sock: connect: no such file or directory"
+  },
+  "network": [],
+  "cpu": {
+    "command": [
+      "sysctl",
+      "-n",
+      "machdep.cpu.brand_string"
+    ],
+    "exit_code": 0,
+    "stdout": "Apple M5",
+    "stderr": ""
+  },
+  "memory": {
+    "command": [
+      "sysctl",
+      "hw.memsize",
+      "vm.swapusage"
+    ],
+    "exit_code": 0,
+    "stdout": "hw.memsize: 17179869184\nvm.swapusage: total = 8192.00M  used = 6518.81M  free = 1673.19M  (encrypted)",
+    "stderr": ""
+  },
+  "os_version": {
+    "command": [
+      "sw_vers"
+    ],
+    "exit_code": 0,
+    "stdout": "ProductName:\t\tmacOS\nProductVersion:\t\t27.0.1\nBuildVersion:\t\t26A434",
+    "stderr": ""
+  },
+  "kernel": {
+    "command": [
+      "uname",
+      "-a"
+    ],
+    "exit_code": 0,
+    "stdout": "Darwin luomac.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:02:59 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T8142 arm64",
+    "stderr": ""
+  }
+}
