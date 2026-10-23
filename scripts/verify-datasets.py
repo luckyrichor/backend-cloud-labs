@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""P0 dataset downloads and integrity checks; raw data lives outside the repository."""
+"""Dataset downloads and integrity checks (P0; P1 added two Amazon categories); raw data lives outside the repository."""
 import argparse, concurrent.futures, csv, datetime, gzip, hashlib, io, json, sqlite3
 import subprocess, tarfile, time, zipfile, xml.etree.ElementTree as ET
 from pathlib import Path
@@ -9,6 +9,8 @@ SQLITE_SHA='bb7e935b0bea31389b99060035f50371e384bb192baf8ed5e75b863f00b8159e'
 SOURCES=[
  ('azure','https://github.com/Azure/AzurePublicDataset/releases/download/dataset-packing-2020/azurevmallocation_dataset2020_AzurePackingTraceV1.zip','azure.zip','https://github.com/Azure/AzurePublicDataset/blob/master/AzureTracesForPacking2020.md','CC BY Attribution; cite Protean OSDI 2020'),
  ('amazon','https://mcauleylab.ucsd.edu/public_datasets/data/amazon_2023/raw/meta_categories/meta_All_Beauty.jsonl.gz','meta_All_Beauty.jsonl.gz','https://amazon-reviews-2023.github.io/','License unspecified on checked page; owner approved portfolio evaluation in supplied plan; no raw redistribution'),
+ ('amazon-appliances','https://mcauleylab.ucsd.edu/public_datasets/data/amazon_2023/raw/meta_categories/meta_Appliances.jsonl.gz','meta_Appliances.jsonl.gz','https://amazon-reviews-2023.github.io/','License unspecified on checked page; owner approved portfolio evaluation in supplied plan; no raw redistribution'),
+ ('amazon-video-games','https://mcauleylab.ucsd.edu/public_datasets/data/amazon_2023/raw/meta_categories/meta_Video_Games.jsonl.gz','meta_Video_Games.jsonl.gz','https://amazon-reviews-2023.github.io/','License unspecified on checked page; owner approved portfolio evaluation in supplied plan; no raw redistribution'),
  ('snap','https://snap.stanford.edu/data/web-Google.txt.gz','web-Google.txt.gz','https://snap.stanford.edu/data/web-Google.html','No explicit license on source page; citation requested; shape reference only'),
  ('uci','https://archive.ics.uci.edu/static/public/502/online+retail+ii.zip','online-retail-ii.zip','https://archive.ics.uci.edu/dataset/502/online+retail+ii','CC BY 4.0'),
  ('alibaba-0','https://aliopentrace.oss-cn-beijing.aliyuncs.com/v2021MicroservicesTraces/MSCallGraph/MSCallGraph_0.tar.gz','MSCallGraph_0.tar.gz','https://github.com/alibaba/clusterdata/tree/master/cluster-trace-microservices-v2021','Research/learning only per repository; no explicit standalone data license'),
@@ -36,7 +38,7 @@ def verify(key,path):
            'vm_types':db.execute('select count(*) from vmType').fetchone()[0],
            'priority_counts':dict(db.execute('select priority,count(*) from vm group by priority')),
            'sqlite_bytes':target.stat().st_size,'sqlite_sha256':sha(target),'integrity':db.execute('pragma integrity_check').fetchone()[0]}
- if key=='amazon':
+ if key.startswith('amazon'):
   rows=0;keys=set()
   with gzip.open(path,'rt') as f:
    for line in f:
@@ -109,4 +111,4 @@ if __name__=='__main__':
    if r['id'] in old and old[r['id']]!=r:r['previous_attempts']=[old[r['id']]]
   updated={r['id']:r for r in results};results=[updated.pop(r['id'],r) for r in previous]+list(updated.values())
  a.output.parent.mkdir(parents=True,exist_ok=True)
- a.output.write_text(json.dumps({'generated_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'proxy_explicit':a.proxy,'datasets':results,'synthetic_tracks':{'source':'synthetic','status':'P1 not yet generated'}},indent=2)+'\n')
+ a.output.write_text(json.dumps({'generated_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'proxy_explicit':a.proxy,'datasets':results,'synthetic_tracks':{'source':'synthetic','status':'generated in P1 by tools/datapipe; see datasets/stats/tracks.json'}},indent=2)+'\n')

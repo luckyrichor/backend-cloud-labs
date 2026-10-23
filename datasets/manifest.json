@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-20T12:52:07.540711+00:00",
+  "generated_at": "2026-10-23T17:34:03.147285+00:00",
   "proxy_explicit": "http://127.0.0.1:7890",
   "datasets": [
     {
@@ -228,10 +228,80 @@
       ],
       "header_rows": 1,
       "header_verified": "traceid,timestamp,rpcid,um,rpctype,dm,interface,rt"
+    },
+    {
+      "id": "amazon-appliances",
+      "url": "https://mcauleylab.ucsd.edu/public_datasets/data/amazon_2023/raw/meta_categories/meta_Appliances.jsonl.gz",
+      "page": "https://amazon-reviews-2023.github.io/",
+      "license_statement": "License unspecified on checked page; owner approved portfolio evaluation in supplied plan; no raw redistribution",
+      "raw_data_not_redistributed": true,
+      "exit_code": 0,
+      "http_status": 200,
+      "error": "",
+      "received_bytes": 66406659,
+      "bytes": 66406659,
+      "sha256": "5a94cffb9ec3be23e42b99643fcab5f48160b3c7a53835451c4457aadcdf9365",
+      "rows": 94327,
+      "field_names": [
+        "author",
+        "average_rating",
+        "bought_together",
+        "categories",
+        "description",
+        "details",
+        "features",
+        "images",
+        "main_category",
+        "parent_asin",
+        "price",
+        "rating_number",
+        "store",
+        "subtitle",
+        "title",
+        "videos"
+      ],
+      "synthetic": false,
+      "verified": true,
+      "seconds": 27.748703069984913
+    },
+    {
+      "id": "amazon-video-games",
+      "url": "https://mcauleylab.ucsd.edu/public_datasets/data/amazon_2023/raw/meta_categories/meta_Video_Games.jsonl.gz",
+      "page": "https://amazon-reviews-2023.github.io/",
+      "license_statement": "License unspecified on checked page; owner approved portfolio evaluation in supplied plan; no raw redistribution",
+      "raw_data_not_redistributed": true,
+      "exit_code": 0,
+      "http_status": 200,
+      "error": "",
+      "received_bytes": 103096082,
+      "bytes": 103096082,
+      "sha256": "ced9696b0874121327a438bfe9d3d01aba45da158e58f94f4920352d75fc1fc9",
+      "rows": 137269,
+      "field_names": [
+        "author",
+        "average_rating",
+        "bought_together",
+        "categories",
+        "description",
+        "details",
+        "features",
+        "images",
+        "main_category",
+        "parent_asin",
+        "price",
+        "rating_number",
+        "store",
+        "subtitle",
+        "title",
+        "videos"
+      ],
+      "synthetic": false,
+      "verified": true,
+      "seconds": 45.77545066410676
     }
   ],
   "synthetic_tracks": {
     "source": "synthetic",
-    "status": "P1 not yet generated"
+    "status": "generated in P1 by tools/datapipe; see datasets/stats/tracks.json"
   }
 }
