@@ -1,0 +1,18 @@
+{
+ "applied": 4,
+ "command": "status",
+ "migrations": 4,
+ "schema_fingerprint": "3ae730f3189169271c753cb09b7975c084591391f3a2fab6327ce95659fa74b3",
+ "tables": [
+  "change_event",
+  "ci",
+  "items",
+  "match_result",
+  "relation",
+  "role_binding",
+  "rule",
+  "snapshot_meta",
+  "tenant",
+  "user_account"
+ ]
+}

@@ -1,0 +1,192 @@
+{
+ "dataset": "docs",
+ "source": "public-resampled+synthetic",
+ "generator": "tools/datapipe/cmd/datagen",
+ "generator_commit": "b0e5aba5010641ce02d89180c9b609973e6a79ec",
+ "working_tree_modified": false,
+ "seed": 20261023,
+ "inputs": [
+  {
+   "path": "meta_All_Beauty.jsonl.gz",
+   "sha256": "51f8255c2794afd60e274c10d3e2d09dc1f671eba4ba35f74f748d8631216d05"
+  },
+  {
+   "path": "meta_Appliances.jsonl.gz",
+   "sha256": "5a94cffb9ec3be23e42b99643fcab5f48160b3c7a53835451c4457aadcdf9365"
+  },
+  {
+   "path": "meta_Video_Games.jsonl.gz",
+   "sha256": "ced9696b0874121327a438bfe9d3d01aba45da158e58f94f4920352d75fc1fc9"
+  }
+ ],
+ "params": {
+  "columns": [
+   {
+    "Name": "price",
+    "Type": 1
+   },
+   {
+    "Name": "rating",
+    "Type": 1
+   },
+   {
+    "Name": "rating_number",
+    "Type": 2
+   },
+   {
+    "Name": "category",
+    "Type": 2
+   },
+   {
+    "Name": "store",
+    "Type": 2
+   },
+   {
+    "Name": "stock",
+    "Type": 2
+   }
+  ],
+  "format": "BCLDOC1, see tools/datapipe/docs.go",
+  "price_perturbation": 0.02,
+  "rating_number_perturbation": 0.05,
+  "sizes": [
+   100000,
+   1000000,
+   10000000
+  ]
+ },
+ "artifacts": [
+  {
+   "path": "docs-100000.bcldoc",
+   "bytes": 3200312,
+   "sha256": "b87b58488d733513062f6013c4f644e1bc9ea87da7bf3020ec9ff62d9abfb8d5",
+   "rows": 100000
+  },
+  {
+   "path": "docs-1000000.bcldoc",
+   "bytes": 32000312,
+   "sha256": "6187aac3f6818ab55b687dc0bf36854239b98691714e15c5d8db3c386e29c365",
+   "rows": 1000000
+  },
+  {
+   "path": "docs-10000000.bcldoc",
+   "bytes": 320000312,
+   "sha256": "11f64e5724dc144a67f2dba8878128c34b0b187cc27dc4224dd094591b313d8b",
+   "rows": 10000000
+  }
+ ],
+ "stats": {
+  "100000": {
+   "rows": 100000,
+   "base_rows": 126367,
+   "amplification": 0.7913458418732738,
+   "distinct_base_rows_drawn": 69160,
+   "price": {
+    "min": 0.01,
+    "max": 20891.71,
+    "mean": 59.86115690000097
+   },
+   "rating": {
+    "min": 1,
+    "max": 5,
+    "mean": 4.172377999999895
+   },
+   "rating_number": {
+    "n": 100000,
+    "mean": 285.83314,
+    "p50": 29,
+    "p90": 468,
+    "p99": 4128,
+    "max": 177652,
+    "zero": 0
+   },
+   "stock": {
+    "n": 100000,
+    "mean": 237.94498,
+    "p50": 171,
+    "p90": 580,
+    "p99": 859,
+    "max": 999,
+    "zero": 5031
+   },
+   "store_unknown": 1376,
+   "summaries_from_first_rows": 100000
+  },
+  "1000000": {
+   "rows": 1000000,
+   "base_rows": 126367,
+   "amplification": 7.913458418732739,
+   "distinct_base_rows_drawn": 126330,
+   "price": {
+    "min": 0.01,
+    "max": 21449.18,
+    "mean": 58.218341969999145
+   },
+   "rating": {
+    "min": 1,
+    "max": 5,
+    "mean": 4.17118160000198
+   },
+   "rating_number": {
+    "n": 1000000,
+    "mean": 289.018789,
+    "p50": 28,
+    "p90": 460,
+    "p99": 4131,
+    "max": 286806,
+    "zero": 0
+   },
+   "stock": {
+    "n": 1000000,
+    "mean": 237.927072,
+    "p50": 172,
+    "p90": 579,
+    "p99": 859,
+    "max": 1000,
+    "zero": 50417
+   },
+   "store_unknown": 13775,
+   "summaries_from_first_rows": 1000000
+  },
+  "10000000": {
+   "rows": 10000000,
+   "base_rows": 126367,
+   "amplification": 79.13458418732739,
+   "distinct_base_rows_drawn": 126367,
+   "price": {
+    "min": 0.01,
+    "max": 21499.49,
+    "mean": 58.25306252300444
+   },
+   "rating": {
+    "min": 1,
+    "max": 5,
+    "mean": 4.171860990016432
+   },
+   "rating_number": {
+    "n": 4194304,
+    "mean": 288.2367217540741,
+    "p50": 28,
+    "p90": 461,
+    "p99": 4148,
+    "max": 292148,
+    "zero": 0
+   },
+   "stock": {
+    "n": 4194304,
+    "mean": 238.15711188316345,
+    "p50": 172,
+    "p90": 578,
+    "p99": 859,
+    "max": 1000,
+    "zero": 209906
+   },
+   "store_unknown": 136911,
+   "summaries_from_first_rows": 4194304
+  }
+ },
+ "data_version": "docs/b0e5aba50106/seed-20261023/6132316b22dc",
+ "notes": [
+  "stock is synthetic; other columns come from resampled public rows with small numeric perturbation"
+ ]
+}

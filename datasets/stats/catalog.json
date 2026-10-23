@@ -1,0 +1,175 @@
+{
+ "dataset": "catalog",
+ "source": "public+synthetic",
+ "generator": "tools/datapipe/cmd/datagen",
+ "generator_commit": "b0e5aba5010641ce02d89180c9b609973e6a79ec",
+ "working_tree_modified": false,
+ "seed": 20261023,
+ "inputs": [
+  {
+   "path": "meta_All_Beauty.jsonl.gz",
+   "sha256": "51f8255c2794afd60e274c10d3e2d09dc1f671eba4ba35f74f748d8631216d05"
+  },
+  {
+   "path": "meta_Appliances.jsonl.gz",
+   "sha256": "5a94cffb9ec3be23e42b99643fcab5f48160b3c7a53835451c4457aadcdf9365"
+  },
+  {
+   "path": "meta_Video_Games.jsonl.gz",
+   "sha256": "ced9696b0874121327a438bfe9d3d01aba45da158e58f94f4920352d75fc1fc9"
+  }
+ ],
+ "params": {
+  "rows": 2000000,
+  "clone_price_perturbation": 0.05,
+  "updated_at": "2026-01-01 00:00:00.000000",
+  "zipf_s_default": 0.99,
+  "assignment": "row i uses base (i-1) mod B; rows 1..B public, later rows synthetic clones"
+ },
+ "artifacts": [
+  {
+   "path": "items.tsv",
+   "bytes": 278265552,
+   "sha256": "8b7cd8c301c291c8a7b91a15bd884b6697f74a622bed35adc565c20b917ae1d7",
+   "rows": 2000000
+  },
+  {
+   "path": "categories.tsv",
+   "bytes": 49521,
+   "sha256": "0bc7b050d69b8cb1dcfcb0635b88c5ce7fd34ef61787cec87a519e4291c3a80f",
+   "rows": 555
+  },
+  {
+   "path": "stores.tsv",
+   "bytes": 392258,
+   "sha256": "225b0a7130c2ea02685e4931975d205349de222961183431ee6a30f27e021c77",
+   "rows": 22604
+  },
+  {
+   "path": "popularity.u32",
+   "bytes": 8000000,
+   "sha256": "57563a96ffb4bc8826c75463d22cea7e9a462352620a8e007c4fb412e0d39136",
+   "rows": 2000000
+  }
+ ],
+ "stats": {
+  "items": {
+   "rows_public_base": 126367,
+   "rows_synthetic_clone": 1873633,
+   "amplification": 15.826916837465477,
+   "price_cent": {
+    "n": 2000000,
+    "mean": 5835.1221115,
+    "p50": 2410,
+    "p90": 10071,
+    "p99": 55704,
+    "max": 2198021,
+    "zero": 0
+   },
+   "stock": {
+    "n": 2000000,
+    "mean": 238.4110235,
+    "p50": 172,
+    "p90": 579,
+    "p99": 859,
+    "max": 999,
+    "zero": 100479
+   },
+   "stock_zero": 100479,
+   "sum_price_cent": 11670244223,
+   "sum_stock": 476822047,
+   "rows_per_domain": {
+    "All_Beauty": 283248,
+    "Appliances": 747600,
+    "Video_Games": 969152
+   },
+   "top_categories": [
+    {
+     "key": "All_Beauty:All Beauty",
+     "count": 281040
+    },
+    {
+     "key": "Appliances:Appliances \u003e Parts \u0026 Accessories",
+     "count": 137088
+    },
+    {
+     "key": "Appliances:Appliances \u003e Parts \u0026 Accessories \u003e Dryer Parts \u0026 Accessories \u003e Replacement Parts",
+     "count": 132592
+    },
+    {
+     "key": "Video_Games:Video Games \u003e PC \u003e Games",
+     "count": 115908
+    },
+    {
+     "key": "Appliances:Appliances \u003e Parts \u0026 Accessories \u003e Refrigerator Parts \u0026 Accessories \u003e Water Filters",
+     "count": 54288
+    },
+    {
+     "key": "Video_Games:Video Games",
+     "count": 45442
+    },
+    {
+     "key": "Video_Games:Video Games \u003e PlayStation 4 \u003e Games",
+     "count": 35521
+    },
+    {
+     "key": "Video_Games:Video Games \u003e Legacy Systems \u003e PlayStation Systems \u003e PlayStation 2 \u003e Games",
+     "count": 29340
+    },
+    {
+     "key": "Video_Games:Video Games \u003e Nintendo Switch \u003e Games",
+     "count": 27715
+    },
+    {
+     "key": "Video_Games:Video Games \u003e PC \u003e Accessories \u003e Gaming Keyboards",
+     "count": 27601
+    },
+    {
+     "key": "Appliances:Appliances \u003e Parts \u0026 Accessories \u003e Washer Parts \u0026 Accessories",
+     "count": 25488
+    },
+    {
+     "key": "Video_Games:Video Games \u003e Legacy Systems \u003e Nintendo Systems \u003e Nintendo DS \u003e Games",
+     "count": 23459
+    },
+    {
+     "key": "Appliances:Small Appliance Parts \u0026 Accessories \u003e Coffee \u0026 Espresso Machine Parts \u0026 Accessories \u003e Coffee Machine Accessories \u003e Coffee Filters \u003e Reusable Filters",
+     "count": 23136
+    },
+    {
+     "key": "Video_Games:Video Games \u003e Legacy Systems \u003e Xbox Systems \u003e Xbox 360 \u003e Games",
+     "count": 22269
+    },
+    {
+     "key": "Video_Games:Video Games \u003e PC \u003e Accessories \u003e Gaming Mice",
+     "count": 21968
+    }
+   ]
+  },
+  "load": {
+   "files": [
+    "meta_All_Beauty.jsonl.gz",
+    "meta_Appliances.jsonl.gz",
+    "meta_Video_Games.jsonl.gz"
+   ],
+   "rows_read": 344186,
+   "kept": 126367,
+   "dropped_no_price": 217748,
+   "dropped_unparsable_or_nonpositive_price": 68,
+   "dropped_no_title": 3,
+   "kept_per_file": {
+    "All_Beauty": 17703,
+    "Appliances": 46725,
+    "Video_Games": 61939
+   },
+   "categories": 555,
+   "stores": 22604,
+   "titles_truncated": 3
+  }
+ },
+ "data_version": "catalog/b0e5aba50106/seed-20261023/8025233af339",
+ "notes": [
+  "stock is synthetic for every row; Amazon metadata has no stock",
+  "zipf_s_default is a starting value for loadgen, which records the value it actually uses"
+ ]
+}

@@ -1,0 +1,10 @@
+{
+ "source_commit": "b0e5aba",
+ "script": "scripts/check.sh",
+ "exit_code": 0,
+ "go_top_level": {
+  "pass": 70
+ },
+ "ctest": "100% tests passed, 0 tests failed out of 7",
+ "includes_real_redis": true
+}

@@ -1,0 +1,23 @@
+{
+ "batch": 2000,
+ "batches_per_tx": 5,
+ "checks": {
+  "count": true,
+  "max_id": true,
+  "sum_price": true,
+  "sum_stock": true
+ },
+ "data_version": "catalog/b0e5aba50106/seed-20261023/8025233af339",
+ "items_sha256": "8b7cd8c301c291c8a7b91a15bd884b6697f74a622bed35adc565c20b917ae1d7",
+ "note": "import throughput is a one-off load figure, not an E1 performance result",
+ "ok": true,
+ "rows_per_second": "48209",
+ "rows_read": 2000000,
+ "seconds": 41.486206983,
+ "table": {
+  "count": 2000000,
+  "max_id": 2000000,
+  "sum_price_cent": 11670244223,
+  "sum_stock": 476822047
+ }
+}

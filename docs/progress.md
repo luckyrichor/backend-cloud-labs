@@ -143,3 +143,15 @@ P0 干净源码 5e1efd8 的验证：全量 race/vet 与 CTest 通过；回显与
 ### 2026-10-20 · P0 Mac 补证与 CP1 交付
 
 经负责人提供的 `ssh luomac` 连接真实 Mac，干净副本同步至 `9f8e770fa4e7d6cb10434d4e9e13fde5146cb947` 后采集。Mac 系统、CPU、内核、内存/swap、磁盘、nofile、Docker 客户端/daemon 状态与时区已记录；未在 Mac 启动容器。ICMP 20 次，平均 20.879 ms；原始记录保存于 `docs/measurements/2026-10-20-p0-mac/`。发现当前路径为 utun5，公网业务端口 TCP connect 快速成功但实际应用响应全部超时，不能据此声称公网可达；四服务 SSH 转发真实回复成功，临时进程及端口清理通过。曾仅用 TCP connect 判断可达，补充应用层及路由验证后纠正该歧义。再次通过 Go 顶层 63 项 race/vet、CTest 7/7；容器健康复核通过。当前只改采集脚本和归档文档，git diff 确认服务源码/部署相对 5b421c1 不变，保留原服务测量版本。P0 自动技术检查补齐，CP1 等负责人确认，P1 未开始。报告：`docs/P0交付报告-v2-2026-10-20.md`；上一版“Mac 待补”是其生成时状态。
+
+### 2026-10-24 · P1 数据流水线（Claude Code）
+
+负责人在群聊中要求“按方案开始”，作为 CP1 通过、进入 P1。代码提交 `b0e5aba`：新增 tools/datapipe（datagen、dbmigrate、itemload）、deploy/mysql/migrations、scripts/derive-degree-stats.py；check.sh 与 bootstrap.sh 纳入新模块。
+
+- **数据源**：All_Beauty 只有 15.7% 的行有价格，且无类目路径。补下载 Appliances（66,406,659 字节，94,327 行）和 Video_Games（103,096,082 字节，137,269 行），经 verify-datasets.py 登记到 manifest，HTTP 200。三个品类共读入 344,186 行，保留有价格、有标题的 126,367 行；丢弃原因见 datasets/stats/catalog.json。
+- **度分布**：阿里两个分片共 12,486,634 行，得到 2,209 个服务、7,091 条服务依赖边、13,516 条服务→存储边；结果保存在 datasets/stats/graph-degree.json，同时带 SNAP 的度分布作形状参照。第一次统计用错了列（把行号列当成第 0 列），得出“只有 2 个节点有出度”这种明显不对的结果；对照表头改正后重算。
+- **生成**：在干净提交上运行 datagen（seed 20261023，约 20 秒），得到商品 200 万行（公开 126,367 行，克隆 1,873,633 行，15.83 倍）、文档 10^5/10^6/10^7 三档、CMDB 10^4/10^5/10^6 三档、两种轨迹（2000 个机器人 × 2400 帧）。数据版本见 datasets/stats/*.json。第二次在同一提交的独立 worktree 中生成到另一目录，15 个文件的 sha256 全部相同（docs/measurements/2026-10-24-p1/run-*.sha256），清单中的哈希与独立的 sha256sum 也一致。第二次运行最初在主目录中被“工作区不干净”拒绝（第一次运行产生的统计文件尚未提交），这是守卫生效，改用 worktree 后完成。
+- **CMDB 实测**：每个配置项 2.19–2.28 条关系，低于方案“约 5 条”，原因与处理见 design-decisions；10^4 档有 1 次度数截断（少 42 条边）。
+- **迁移与导入**：4 个迁移依次执行 up → 全部 down → 全部 up，指纹一致（3ae730f3…）。ci 的“仅存活行唯一”约束已在真实 MySQL 上验证，验证用的事务已回滚。导入 2,000,000 行用时 41.5 秒，行数、最大 id、价格总和、库存总和与清单全部一致（itemload.json）。items 表数据 310 MiB，超过 MySQL buffer pool 的 256 MiB，S1 的读延迟里会包含磁盘读，P2 定位时需要考虑。
+- **测试**：datapipe 新增 7 项测试（race 与 vet 通过）：可复现性、克隆价格范围、热度排列、列式头部与对齐、CMDB 不变量（无自环、无重边、不跨租户、关系种类与端点合法、截断有计数）、轨迹前缀与速度上限、迁移成对。开发中有一项截断测试的前提写错（误以为 60 个服务里只有 7 个有入度权重），修正测试后通过。
+- **收尾回归**：在源码 `b0e5aba` 上运行 scripts/check.sh，退出码 0。Go 顶层 70 项 race 测试通过（P0 的 63 项加 datapipe 7 项），无跳过，vet 通过，含真实 Redis；CTest 7/7。摘要见 check-summary.json。

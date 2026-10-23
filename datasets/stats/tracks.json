@@ -1,0 +1,756 @@
+{
+ "dataset": "tracks",
+ "source": "synthetic",
+ "generator": "tools/datapipe/cmd/datagen",
+ "generator_commit": "b0e5aba5010641ce02d89180c9b609973e6a79ec",
+ "working_tree_modified": false,
+ "seed": 20261023,
+ "params": [
+  {
+   "pattern": 1,
+   "bots": 2000,
+   "frames": 2400,
+   "world": 400,
+   "speed": 1,
+   "max_dwell_frames": 40,
+   "hotspots": 4,
+   "hotspot_share": 0.8,
+   "hotspot_spread": 0.03
+  },
+  {
+   "pattern": 2,
+   "bots": 2000,
+   "frames": 2400,
+   "world": 400,
+   "speed": 1,
+   "max_dwell_frames": 40,
+   "hotspots": 4,
+   "hotspot_share": 0.8,
+   "hotspot_spread": 0.03
+  }
+ ],
+ "artifacts": [
+  {
+   "path": "track-waypoint.bcltrk",
+   "bytes": 38400032,
+   "sha256": "dfd72f6ecd7bb0e59fbbc107077b101758f87b044eb0ee0b7a9feabe2dcb5c6e",
+   "rows": 2400
+  },
+  {
+   "path": "track-hotspot.bcltrk",
+   "bytes": 38400032,
+   "sha256": "be1055e2a2a2c7be348987de47e253a636a0503b845aa515ddff2f9915751367",
+   "rows": 2400
+  }
+ ],
+ "stats": [
+  {
+   "name": "track-waypoint.bcltrk",
+   "idle_intent_share": 0.08572791666666667,
+   "neighbours_within_radius": [
+    {
+     "frame": 600,
+     "bots": 64,
+     "radius": 25,
+     "mean": 1.0625,
+     "max": 4
+    },
+    {
+     "frame": 600,
+     "bots": 64,
+     "radius": 50,
+     "mean": 4,
+     "max": 11
+    },
+    {
+     "frame": 600,
+     "bots": 128,
+     "radius": 25,
+     "mean": 2.265625,
+     "max": 8
+    },
+    {
+     "frame": 600,
+     "bots": 128,
+     "radius": 50,
+     "mean": 7.828125,
+     "max": 16
+    },
+    {
+     "frame": 600,
+     "bots": 256,
+     "radius": 25,
+     "mean": 4.046875,
+     "max": 11
+    },
+    {
+     "frame": 600,
+     "bots": 256,
+     "radius": 50,
+     "mean": 14.9296875,
+     "max": 32
+    },
+    {
+     "frame": 600,
+     "bots": 512,
+     "radius": 25,
+     "mean": 8.26953125,
+     "max": 24
+    },
+    {
+     "frame": 600,
+     "bots": 512,
+     "radius": 50,
+     "mean": 30.67578125,
+     "max": 64
+    },
+    {
+     "frame": 600,
+     "bots": 1000,
+     "radius": 25,
+     "mean": 15.688,
+     "max": 38
+    },
+    {
+     "frame": 600,
+     "bots": 1000,
+     "radius": 50,
+     "mean": 59.34,
+     "max": 112
+    },
+    {
+     "frame": 600,
+     "bots": 2000,
+     "radius": 25,
+     "mean": 31.519,
+     "max": 67
+    },
+    {
+     "frame": 600,
+     "bots": 2000,
+     "radius": 50,
+     "mean": 120.345,
+     "max": 206
+    },
+    {
+     "frame": 1200,
+     "bots": 64,
+     "radius": 25,
+     "mean": 0.9375,
+     "max": 4
+    },
+    {
+     "frame": 1200,
+     "bots": 64,
+     "radius": 50,
+     "mean": 3.84375,
+     "max": 8
+    },
+    {
+     "frame": 1200,
+     "bots": 128,
+     "radius": 25,
+     "mean": 1.65625,
+     "max": 6
+    },
+    {
+     "frame": 1200,
+     "bots": 128,
+     "radius": 50,
+     "mean": 7.546875,
+     "max": 15
+    },
+    {
+     "frame": 1200,
+     "bots": 256,
+     "radius": 25,
+     "mean": 3.703125,
+     "max": 11
+    },
+    {
+     "frame": 1200,
+     "bots": 256,
+     "radius": 50,
+     "mean": 14.859375,
+     "max": 26
+    },
+    {
+     "frame": 1200,
+     "bots": 512,
+     "radius": 25,
+     "mean": 7.47265625,
+     "max": 16
+    },
+    {
+     "frame": 1200,
+     "bots": 512,
+     "radius": 50,
+     "mean": 29.12890625,
+     "max": 47
+    },
+    {
+     "frame": 1200,
+     "bots": 1000,
+     "radius": 25,
+     "mean": 15.218,
+     "max": 31
+    },
+    {
+     "frame": 1200,
+     "bots": 1000,
+     "radius": 50,
+     "mean": 58.982,
+     "max": 98
+    },
+    {
+     "frame": 1200,
+     "bots": 2000,
+     "radius": 25,
+     "mean": 31.121,
+     "max": 57
+    },
+    {
+     "frame": 1200,
+     "bots": 2000,
+     "radius": 50,
+     "mean": 121.118,
+     "max": 197
+    },
+    {
+     "frame": 1800,
+     "bots": 64,
+     "radius": 25,
+     "mean": 1.03125,
+     "max": 4
+    },
+    {
+     "frame": 1800,
+     "bots": 64,
+     "radius": 50,
+     "mean": 4.03125,
+     "max": 12
+    },
+    {
+     "frame": 1800,
+     "bots": 128,
+     "radius": 25,
+     "mean": 2.1875,
+     "max": 6
+    },
+    {
+     "frame": 1800,
+     "bots": 128,
+     "radius": 50,
+     "mean": 8.3125,
+     "max": 20
+    },
+    {
+     "frame": 1800,
+     "bots": 256,
+     "radius": 25,
+     "mean": 4.2109375,
+     "max": 12
+    },
+    {
+     "frame": 1800,
+     "bots": 256,
+     "radius": 50,
+     "mean": 15.6328125,
+     "max": 29
+    },
+    {
+     "frame": 1800,
+     "bots": 512,
+     "radius": 25,
+     "mean": 8.25390625,
+     "max": 19
+    },
+    {
+     "frame": 1800,
+     "bots": 512,
+     "radius": 50,
+     "mean": 32.14453125,
+     "max": 57
+    },
+    {
+     "frame": 1800,
+     "bots": 1000,
+     "radius": 25,
+     "mean": 15.788,
+     "max": 35
+    },
+    {
+     "frame": 1800,
+     "bots": 1000,
+     "radius": 50,
+     "mean": 61.97,
+     "max": 105
+    },
+    {
+     "frame": 1800,
+     "bots": 2000,
+     "radius": 25,
+     "mean": 31.033,
+     "max": 62
+    },
+    {
+     "frame": 1800,
+     "bots": 2000,
+     "radius": 50,
+     "mean": 120.78,
+     "max": 202
+    },
+    {
+     "frame": 2399,
+     "bots": 64,
+     "radius": 25,
+     "mean": 0.875,
+     "max": 3
+    },
+    {
+     "frame": 2399,
+     "bots": 64,
+     "radius": 50,
+     "mean": 3.875,
+     "max": 9
+    },
+    {
+     "frame": 2399,
+     "bots": 128,
+     "radius": 25,
+     "mean": 1.984375,
+     "max": 6
+    },
+    {
+     "frame": 2399,
+     "bots": 128,
+     "radius": 50,
+     "mean": 7.65625,
+     "max": 17
+    },
+    {
+     "frame": 2399,
+     "bots": 256,
+     "radius": 25,
+     "mean": 3.7265625,
+     "max": 10
+    },
+    {
+     "frame": 2399,
+     "bots": 256,
+     "radius": 50,
+     "mean": 15.2265625,
+     "max": 28
+    },
+    {
+     "frame": 2399,
+     "bots": 512,
+     "radius": 25,
+     "mean": 7.390625,
+     "max": 16
+    },
+    {
+     "frame": 2399,
+     "bots": 512,
+     "radius": 50,
+     "mean": 29.390625,
+     "max": 52
+    },
+    {
+     "frame": 2399,
+     "bots": 1000,
+     "radius": 25,
+     "mean": 14.994,
+     "max": 34
+    },
+    {
+     "frame": 2399,
+     "bots": 1000,
+     "radius": 50,
+     "mean": 58.046,
+     "max": 98
+    },
+    {
+     "frame": 2399,
+     "bots": 2000,
+     "radius": 25,
+     "mean": 30.559,
+     "max": 57
+    },
+    {
+     "frame": 2399,
+     "bots": 2000,
+     "radius": 50,
+     "mean": 119.003,
+     "max": 202
+    }
+   ]
+  },
+  {
+   "name": "track-hotspot.bcltrk",
+   "hotspots": [
+    [
+     -95.95829431249379,
+     -72.42984405485296
+    ],
+    [
+     91.80621841580655,
+     -55.940394267472556
+    ],
+    [
+     59.78600349598002,
+     71.48898987041035
+    ],
+    [
+     126.09814831245136,
+     11.897191623955958
+    ]
+   ],
+   "idle_intent_share": 0.11955666666666667,
+   "neighbours_within_radius": [
+    {
+     "frame": 600,
+     "bots": 64,
+     "radius": 25,
+     "mean": 3,
+     "max": 10
+    },
+    {
+     "frame": 600,
+     "bots": 64,
+     "radius": 50,
+     "mean": 9.65625,
+     "max": 21
+    },
+    {
+     "frame": 600,
+     "bots": 128,
+     "radius": 25,
+     "mean": 7.625,
+     "max": 19
+    },
+    {
+     "frame": 600,
+     "bots": 128,
+     "radius": 50,
+     "mean": 22.3125,
+     "max": 47
+    },
+    {
+     "frame": 600,
+     "bots": 256,
+     "radius": 25,
+     "mean": 12.21875,
+     "max": 29
+    },
+    {
+     "frame": 600,
+     "bots": 256,
+     "radius": 50,
+     "mean": 38.046875,
+     "max": 72
+    },
+    {
+     "frame": 600,
+     "bots": 512,
+     "radius": 25,
+     "mean": 24.00390625,
+     "max": 49
+    },
+    {
+     "frame": 600,
+     "bots": 512,
+     "radius": 50,
+     "mean": 74.4375,
+     "max": 134
+    },
+    {
+     "frame": 600,
+     "bots": 1000,
+     "radius": 25,
+     "mean": 46.878,
+     "max": 91
+    },
+    {
+     "frame": 600,
+     "bots": 1000,
+     "radius": 50,
+     "mean": 144.618,
+     "max": 251
+    },
+    {
+     "frame": 600,
+     "bots": 2000,
+     "radius": 25,
+     "mean": 90.379,
+     "max": 176
+    },
+    {
+     "frame": 600,
+     "bots": 2000,
+     "radius": 50,
+     "mean": 281.994,
+     "max": 480
+    },
+    {
+     "frame": 1200,
+     "bots": 64,
+     "radius": 25,
+     "mean": 2.96875,
+     "max": 7
+    },
+    {
+     "frame": 1200,
+     "bots": 64,
+     "radius": 50,
+     "mean": 9.375,
+     "max": 17
+    },
+    {
+     "frame": 1200,
+     "bots": 128,
+     "radius": 25,
+     "mean": 5.875,
+     "max": 13
+    },
+    {
+     "frame": 1200,
+     "bots": 128,
+     "radius": 50,
+     "mean": 18.796875,
+     "max": 35
+    },
+    {
+     "frame": 1200,
+     "bots": 256,
+     "radius": 25,
+     "mean": 12.3984375,
+     "max": 31
+    },
+    {
+     "frame": 1200,
+     "bots": 256,
+     "radius": 50,
+     "mean": 37.640625,
+     "max": 80
+    },
+    {
+     "frame": 1200,
+     "bots": 512,
+     "radius": 25,
+     "mean": 23.46875,
+     "max": 58
+    },
+    {
+     "frame": 1200,
+     "bots": 512,
+     "radius": 50,
+     "mean": 73.875,
+     "max": 151
+    },
+    {
+     "frame": 1200,
+     "bots": 1000,
+     "radius": 25,
+     "mean": 45.786,
+     "max": 99
+    },
+    {
+     "frame": 1200,
+     "bots": 1000,
+     "radius": 50,
+     "mean": 143.098,
+     "max": 279
+    },
+    {
+     "frame": 1200,
+     "bots": 2000,
+     "radius": 25,
+     "mean": 90.843,
+     "max": 189
+    },
+    {
+     "frame": 1200,
+     "bots": 2000,
+     "radius": 50,
+     "mean": 282.29,
+     "max": 529
+    },
+    {
+     "frame": 1800,
+     "bots": 64,
+     "radius": 25,
+     "mean": 2.46875,
+     "max": 6
+    },
+    {
+     "frame": 1800,
+     "bots": 64,
+     "radius": 50,
+     "mean": 7.78125,
+     "max": 15
+    },
+    {
+     "frame": 1800,
+     "bots": 128,
+     "radius": 25,
+     "mean": 5.234375,
+     "max": 15
+    },
+    {
+     "frame": 1800,
+     "bots": 128,
+     "radius": 50,
+     "mean": 16.453125,
+     "max": 29
+    },
+    {
+     "frame": 1800,
+     "bots": 256,
+     "radius": 25,
+     "mean": 10.46875,
+     "max": 27
+    },
+    {
+     "frame": 1800,
+     "bots": 256,
+     "radius": 50,
+     "mean": 32.984375,
+     "max": 61
+    },
+    {
+     "frame": 1800,
+     "bots": 512,
+     "radius": 25,
+     "mean": 22.828125,
+     "max": 54
+    },
+    {
+     "frame": 1800,
+     "bots": 512,
+     "radius": 50,
+     "mean": 72.09765625,
+     "max": 138
+    },
+    {
+     "frame": 1800,
+     "bots": 1000,
+     "radius": 25,
+     "mean": 45.34,
+     "max": 97
+    },
+    {
+     "frame": 1800,
+     "bots": 1000,
+     "radius": 50,
+     "mean": 142.688,
+     "max": 266
+    },
+    {
+     "frame": 1800,
+     "bots": 2000,
+     "radius": 25,
+     "mean": 90.807,
+     "max": 189
+    },
+    {
+     "frame": 1800,
+     "bots": 2000,
+     "radius": 50,
+     "mean": 286.736,
+     "max": 536
+    },
+    {
+     "frame": 2399,
+     "bots": 64,
+     "radius": 25,
+     "mean": 3.09375,
+     "max": 8
+    },
+    {
+     "frame": 2399,
+     "bots": 64,
+     "radius": 50,
+     "mean": 8.625,
+     "max": 18
+    },
+    {
+     "frame": 2399,
+     "bots": 128,
+     "radius": 25,
+     "mean": 5.5,
+     "max": 14
+    },
+    {
+     "frame": 2399,
+     "bots": 128,
+     "radius": 50,
+     "mean": 17.40625,
+     "max": 36
+    },
+    {
+     "frame": 2399,
+     "bots": 256,
+     "radius": 25,
+     "mean": 11.9140625,
+     "max": 25
+    },
+    {
+     "frame": 2399,
+     "bots": 256,
+     "radius": 50,
+     "mean": 37.625,
+     "max": 68
+    },
+    {
+     "frame": 2399,
+     "bots": 512,
+     "radius": 25,
+     "mean": 23.51953125,
+     "max": 48
+    },
+    {
+     "frame": 2399,
+     "bots": 512,
+     "radius": 50,
+     "mean": 74.4609375,
+     "max": 133
+    },
+    {
+     "frame": 2399,
+     "bots": 1000,
+     "radius": 25,
+     "mean": 47.126,
+     "max": 105
+    },
+    {
+     "frame": 2399,
+     "bots": 1000,
+     "radius": 50,
+     "mean": 145.314,
+     "max": 243
+    },
+    {
+     "frame": 2399,
+     "bots": 2000,
+     "radius": 25,
+     "mean": 93.036,
+     "max": 197
+    },
+    {
+     "frame": 2399,
+     "bots": 2000,
+     "radius": 50,
+     "mean": 287.683,
+     "max": 498
+    }
+   ]
+  }
+ ],
+ "data_version": "tracks/b0e5aba50106/seed-20261023/590279fb967c",
+ "notes": [
+  "synthetic bot movement; does not represent real player behaviour",
+  "tiers 64..2000 are prefixes of the same file: bot b draws only from its own stream",
+  "rows in artifacts count frames; 50 ms per frame"
+ ]
+}

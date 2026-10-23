@@ -1,0 +1,220 @@
+{
+ "dataset": "cmdb",
+ "source": "synthetic(shape: alibaba callgraph degrees)",
+ "generator": "tools/datapipe/cmd/datagen",
+ "generator_commit": "b0e5aba5010641ce02d89180c9b609973e6a79ec",
+ "working_tree_modified": false,
+ "seed": 20261023,
+ "inputs": [
+  {
+   "path": "graph-degree.json",
+   "sha256": "6564cac75270ca13e5e61dcbe90fa3b76048e67f2b6fe4b83df2164dca979972"
+  }
+ ],
+ "params": [
+  {
+   "cis": 10000,
+   "tenants": 10,
+   "host_share": 0.12,
+   "service_share": 0.12,
+   "datastore_share": 0.35793571751923947
+  },
+  {
+   "cis": 100000,
+   "tenants": 10,
+   "host_share": 0.12,
+   "service_share": 0.12,
+   "datastore_share": 0.35793571751923947
+  },
+  {
+   "cis": 1000000,
+   "tenants": 10,
+   "host_share": 0.12,
+   "service_share": 0.12,
+   "datastore_share": 0.35793571751923947
+  }
+ ],
+ "artifacts": [
+  {
+   "path": "cmdb-10000-cis.jsonl",
+   "bytes": 1067106,
+   "sha256": "c6b373c8f838843c17425a57e73dedd351ed01aecefc51b55cdc3f688387ca01",
+   "rows": 10000
+  },
+  {
+   "path": "cmdb-10000-relations.jsonl",
+   "bytes": 1228442,
+   "sha256": "0ec9b1e4af46575f6b6c501408622e62784e59a5c40f363e29694eeea99f5b75",
+   "rows": 21911
+  },
+  {
+   "path": "cmdb-100000-cis.jsonl",
+   "bytes": 10771350,
+   "sha256": "c1eb66e8117ce243e99d84c489b1795211660ddfa053aba0bd48871bd915336b",
+   "rows": 100000
+  },
+  {
+   "path": "cmdb-100000-relations.jsonl",
+   "bytes": 13186182,
+   "sha256": "e38c7e3a0da33cb8366475ee22e41aa5737e5a6782c9d4b1a346b598ba28629b",
+   "rows": 227398
+  },
+  {
+   "path": "cmdb-1000000-cis.jsonl",
+   "bytes": 108712863,
+   "sha256": "8426544cb2af1fc89f2a23c06c64185d4c597305d3a942dc9aa305875a1b657d",
+   "rows": 1000000
+  },
+  {
+   "path": "cmdb-1000000-relations.jsonl",
+   "bytes": 136659634,
+   "sha256": "bfacf4610dce3fe088291aff30ee976f0441c2717331b6c0e8dd814c783ccbea",
+   "rows": 2276631
+  }
+ ],
+ "stats": {
+  "10000": {
+   "cis_per_kind": {
+    "container": 4030,
+    "datastore": 3570,
+    "host": 1200,
+    "service": 1200
+   },
+   "relations_per_kind": {
+    "depends_on": 3419,
+    "instance_of": 4030,
+    "runs_on": 7600,
+    "uses": 6862
+   },
+   "relations_per_ci": 2.1911,
+   "depends_on_out": {
+    "n": 1200,
+    "mean": 2.8491666666666666,
+    "p50": 1,
+    "p90": 6,
+    "p99": 36,
+    "max": 117,
+    "zero": 492
+   },
+   "depends_on_in": {
+    "n": 1200,
+    "mean": 2.8491666666666666,
+    "p50": 2,
+    "p90": 6,
+    "p99": 20,
+    "max": 34,
+    "zero": 204
+   },
+   "uses_out": {
+    "n": 1200,
+    "mean": 5.718333333333334,
+    "p50": 1,
+    "p90": 11,
+    "p99": 133,
+    "max": 268,
+    "zero": 478
+   },
+   "source_service_out_mean": 3.210049796287913,
+   "source_storage_out_mean": 6.118605703938433,
+   "capped_degree_draws": 1,
+   "capped_edges_lost": 42
+  },
+  "100000": {
+   "cis_per_kind": {
+    "container": 40210,
+    "datastore": 35790,
+    "host": 12000,
+    "service": 12000
+   },
+   "relations_per_kind": {
+    "depends_on": 37546,
+    "instance_of": 40210,
+    "runs_on": 76000,
+    "uses": 73642
+   },
+   "relations_per_ci": 2.27398,
+   "depends_on_out": {
+    "n": 12000,
+    "mean": 3.128833333333333,
+    "p50": 1,
+    "p90": 7,
+    "p99": 33,
+    "max": 205,
+    "zero": 4900
+   },
+   "depends_on_in": {
+    "n": 12000,
+    "mean": 3.128833333333333,
+    "p50": 2,
+    "p90": 6,
+    "p99": 28,
+    "max": 146,
+    "zero": 2792
+   },
+   "uses_out": {
+    "n": 12000,
+    "mean": 6.136833333333334,
+    "p50": 1,
+    "p90": 12,
+    "p99": 133,
+    "max": 369,
+    "zero": 4564
+   },
+   "source_service_out_mean": 3.210049796287913,
+   "source_storage_out_mean": 6.118605703938433,
+   "capped_degree_draws": 0,
+   "capped_edges_lost": 0
+  },
+  "1000000": {
+   "cis_per_kind": {
+    "container": 402070,
+    "datastore": 357930,
+    "host": 120000,
+    "service": 120000
+   },
+   "relations_per_kind": {
+    "depends_on": 385525,
+    "instance_of": 402070,
+    "runs_on": 760000,
+    "uses": 729036
+   },
+   "relations_per_ci": 2.276631,
+   "depends_on_out": {
+    "n": 120000,
+    "mean": 3.2127083333333335,
+    "p50": 1,
+    "p90": 7,
+    "p99": 40,
+    "max": 205,
+    "zero": 48842
+   },
+   "depends_on_in": {
+    "n": 120000,
+    "mean": 3.2127083333333335,
+    "p50": 2,
+    "p90": 6,
+    "p99": 33,
+    "max": 216,
+    "zero": 28040
+   },
+   "uses_out": {
+    "n": 120000,
+    "mean": 6.0753,
+    "p50": 1,
+    "p90": 11,
+    "p99": 133,
+    "max": 369,
+    "zero": 46037
+   },
+   "source_service_out_mean": 3.210049796287913,
+   "source_storage_out_mean": 6.118605703938433,
+   "capped_degree_draws": 0,
+   "capped_edges_lost": 0
+  }
+ },
+ "data_version": "cmdb/b0e5aba50106/seed-20261023/b06a6881cf5b",
+ "notes": [
+  "degree shapes come from the Alibaba microservice call graph; layering, tenants and attributes are invented",
+  "conclusions apply to this layered dependency graph only, not to real CMDBs"
+ ]
+}
