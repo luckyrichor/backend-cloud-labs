@@ -149,16 +149,19 @@ python3 scripts/with-p0-env.py go -C tools/datapipe run ./cmd/dbmigrate --dir ..
 
 ## 11. 待确认事项
 
-- **飞书同步位置**（2026-10-24 已在群聊询问，等待回复）：在「我的文档库 › WorkPlan › backend-cloud-labs：后端服务与云平台五个实验」（现有节点，由 Codex 写的项目概览）下新建「backend-cloud-labs 开发记录」与「backend-cloud-labs 面试级完善方案」，以用户身份写入。
-- 当前假设：CP1 已由“按方案开始”放行；P1 之后直接做 P2，到 CP2 再停。
+- 暂无待用户决定的事项。当前假设：CP1 已由“按方案开始”放行；P1 之后直接做 P2，到 CP2 再停。
 
 ## 12. 飞书文档
 
-- 项目节点：我的文档库 › WorkPlan › [backend-cloud-labs：后端服务与云平台五个实验](https://my.feishu.cn/wiki/PgE6wzqFbiUa6lktbhHcPqP0nDi)（项目概览，Codex 2026-10-13，来源 b98f225）。
-- 开发记录：**飞书待同步：2026-10-24 P1 数据流水线与 CMDB 决定**（等用户确认位置后创建，创建后删除本条标注并填上链接）。
+位置：我的文档库 › WorkPlan › backend-cloud-labs（2026-10-24 用户确认），以用户身份、lark-cli profile `claude` 写入。
+
+- 项目概览（节点本身，Codex 2026-10-13，来源 b98f225）：https://kcn0pbn0hwo0.feishu.cn/wiki/PgE6wzqFbiUa6lktbhHcPqP0nDi
+- backend-cloud-labs 方案（用户方案原文同步）：https://kcn0pbn0hwo0.feishu.cn/wiki/BnIcwD3TUiLXNHkEs9qcCxgdng6
+- backend-cloud-labs 开发记录（每个阶段在文末追加一节，只追加不改旧内容）：https://kcn0pbn0hwo0.feishu.cn/wiki/AkEQwOqXTiyhbiklUqPcjUKfnXg
 
 ## 13. 更新日志
 
+- 2026-10-24 · Claude Code：飞书新建「backend-cloud-labs 方案」「backend-cloud-labs 开发记录」并回查位置。
 - 2026-10-24 · Claude Code：按全局交接规范重写本文件（补概述、快速上手、目录、架构、进度、下一步、已知问题、待确认、飞书、日志）；记录 P1 完成、CMDB 密度定案、P2 开始。
 - 2026-10-24 · Claude Code：P1 数据流水线完成并推送（b0e5aba、3cebe71），暂停交接见 docs/暂停交接-2026-10-24.md。
 - 2026-10-20 · Codex：P0 完成，停在 CP1。
