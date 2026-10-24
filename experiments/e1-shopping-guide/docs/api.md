@@ -8,7 +8,7 @@
 | GET /items/{id} | 路径 ID | item、source=store/cache_validated/cache_unvalidated、degraded |
 | POST /recommendations | ids（1..100）、budget_cent>=0 | 候选ID去重，库存>0且价格<=预算；价格升序、同价ID字典序排序的 Result 数组 |
 
-JSON 未知字段、尾随 JSON、超过 1MB 或参数非法返回 400。不存在商品 GET 返回 404；实际访问 source 时故障返回 503；cache-first 热命中不访问 source，因此不会探测其故障。推荐忽略不存在候选，源错误仍返回 503。服务只绑定 127.0.0.1:8086，无认证，供本地实验。
+JSON 未知字段、尾随 JSON、超过 1MB 或参数非法返回 400。不存在商品 GET 返回 404；实际访问 source 时故障返回 503；cache-first 热命中不访问 source，因此不会探测其故障。推荐忽略不存在候选，源错误仍返回 503。服务默认只绑定 127.0.0.1:8086，无认证，供本地实验。
 
 写入线性化点在 source Put。默认 strict（或未设置 CACHE_READ_MODE）每次读都访问 source 校验版本；并发读可以观察重叠写之前的版本，已完成的写之后开始的读不会把恢复前旧缓存作为最新值。cache-first 热命中返回 source=cache_unvalidated，不做源版本校验，可能读到未被共享本地队列跟踪的更新（例如其他实例写入）留下的旧值；不能沿用 strict 的新鲜度保证。写后缓存失败依然 HTTP 200 + degraded=true，源写入已经成功；PUT 没有幂等 key，不应把网络未知结果自动重试为 exactly-once。
 
@@ -27,3 +27,12 @@ HTTP Handler 自动持有共享的本地修复队列。源写成功、缓存填�
 每个共享Repairs拥有随机source生命周期命名空间。每次Get/Put捕获固定generation；队列1024容量溢出时换代、清空标记，旧请求只向旧代回填；跨代完成的源写重新标记当前代，旧读者无法清掉新标记。新的source/队列不会复用旧Redis高版本。此协议不需要知道旧条目何时过期，但旧条目仍占存储直到Redis TTL或内存过期回收。新代可能冷启动，没有跨实例同步或持久source保证。
 
 推荐最多8个并发读，去重与结果排序不变；错误按去重后输入顺序选择，所有工作协程完成才返回。调用方取消通过同一个context传给每次Get；source/cache实现仍必须响应context。
+
+
+## 2026-10-24 · MySQL 数据源与写令牌（P2-1，Claude Code）
+
+- `GUIDE_SOURCE=memory|mysql`（默认 memory，行为不变）；`GUIDE_MYSQL_DSN` 指定库。选 mysql 时**必须**设置 `GUIDE_WRITE_TOKEN`，否则拒绝启动：共享的真实数据源不接受匿名写。
+- 设置 `GUIDE_WRITE_TOKEN` 后，PUT 必须带 `Authorization: Bearer <令牌>`，缺失或不符返回 401 并带 `WWW-Authenticate: Bearer`；GET 与推荐保持开放（方案 B.1：E1 只对写接口做不记名共享令牌）。未设置令牌时与原契约一致。令牌按 SHA-256 摘要做常量时间比较。
+- MySQL 源下 id 必须是规范的无符号十进制：PUT 非法 id 返回 400，GET 返回 404（与不存在一致）。内存源仍接受任意字符串 id。
+- 写返回的 `version` 就是 MySQL 中已提交的版本，压测程序以此建立真值日志。PUT 新 id 时 category_id 为 0；更新时保留导入数据的类目。
+- 线性化点仍是数据源写入；缓存失败返回 200 + degraded 的契约不变。

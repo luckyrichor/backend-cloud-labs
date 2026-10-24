@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/cache"
 	"github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/catalog"
+	"github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/catalogtest"
 	"github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/guide"
 	"sync/atomic"
 	"testing"
@@ -33,12 +34,12 @@ func (g *gatedStore) Get(ctx context.Context, id string) (catalog.Item, error) {
 func TestLateSourceReadFillsOnlyCapturedGeneration(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	store := &gatedStore{Store: catalog.NewMemoryStore(), entered: make(chan struct{}), release: make(chan struct{})}
-	_, _ = store.Put(ctx, catalog.Item{ID: "a", PriceCent: 100})
+	store := &gatedStore{Store: catalogtest.NewStore(t), entered: make(chan struct{}), release: make(chan struct{})}
+	_, _ = store.Put(ctx, catalog.Item{ID: "1", PriceCent: 100})
 	c := cache.NewMemory(time.Hour)
 	s := guide.Service{Store: store, Cache: c, Mode: guide.CacheFirst, Repairs: guide.NewRepairQueue(1)}
 	done := make(chan error, 1)
-	go func() { _, err := s.Get(ctx, "a"); done <- err }()
+	go func() { _, err := s.Get(ctx, "1"); done <- err }()
 	select {
 	case <-store.entered:
 	case <-ctx.Done():
@@ -46,14 +47,14 @@ func TestLateSourceReadFillsOnlyCapturedGeneration(t *testing.T) {
 	}
 	fault := s
 	fault.Cache = &switchCache{Cache: c, offline: true}
-	_, _ = fault.Put(ctx, catalog.Item{ID: "a", PriceCent: 200})
-	_, _ = fault.Put(ctx, catalog.Item{ID: "b", PriceCent: 300})
+	_, _ = fault.Put(ctx, catalog.Item{ID: "1", PriceCent: 200})
+	_, _ = fault.Put(ctx, catalog.Item{ID: "2", PriceCent: 300})
 	close(store.release)
 	if err := <-done; err != nil {
 		t.Fatal(err)
 	}
 	for i := 0; i < 2; i++ {
-		r, err := s.Get(ctx, "a")
+		r, err := s.Get(ctx, "1")
 		if err != nil || r.Item.PriceCent != 200 {
 			t.Fatal("late fill polluted new generation", r, err)
 		}
@@ -89,10 +90,10 @@ func TestRecommendationsBoundConcurrencyAndJoinOnCancellation(t *testing.T) {
 		t.Run(fmt.Sprint(cancelled), func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 			defer cancel()
-			store := &parallelStore{Store: catalog.NewMemoryStore(), entered: make(chan struct{}, 100), release: make(chan struct{})}
+			store := &parallelStore{Store: catalogtest.NewStore(t), entered: make(chan struct{}, 100), release: make(chan struct{})}
 			ids := []string{}
 			for i := 0; i < 20; i++ {
-				id := fmt.Sprintf("%02d", i)
+				id := fmt.Sprintf("%d", 10+i)
 				ids = append(ids, id)
 				_, _ = store.Put(ctx, catalog.Item{ID: id, PriceCent: int64(20 - i), Stock: 1})
 			}
@@ -101,7 +102,7 @@ func TestRecommendationsBoundConcurrencyAndJoinOnCancellation(t *testing.T) {
 			done := make(chan error, 1)
 			go func() {
 				rows, err := s.Recommend(ctx, ids, 100)
-				if err == nil && (len(rows) != 20 || rows[0].Item.ID != "19") {
+				if err == nil && (len(rows) != 20 || rows[0].Item.ID != "29") {
 					err = fmt.Errorf("bad ordered rows: %v", rows)
 				}
 				done <- err
@@ -154,13 +155,13 @@ func (s *gatedPutStore) Put(ctx context.Context, item catalog.Item) (catalog.Ite
 func TestSourceWriteAcrossRotationInvalidatesNewGenerationEvenIfOldFillSucceeded(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	base := catalog.NewMemoryStore()
-	_, _ = base.Put(ctx, catalog.Item{ID: "x", PriceCent: 100})
+	base := catalogtest.NewStore(t)
+	_, _ = base.Put(ctx, catalog.Item{ID: "24", PriceCent: 100})
 	blocked := &gatedPutStore{Store: base, entered: make(chan struct{}), release: make(chan struct{})}
 	c := cache.NewMemory(time.Hour)
 	s := guide.Service{Store: blocked, Cache: c, Mode: guide.CacheFirst, Repairs: guide.NewRepairQueue(1)}
 	done := make(chan error, 1)
-	go func() { _, err := s.Put(ctx, catalog.Item{ID: "x", PriceCent: 200}); done <- err }()
+	go func() { _, err := s.Put(ctx, catalog.Item{ID: "24", PriceCent: 200}); done <- err }()
 	select {
 	case <-blocked.entered:
 	case <-ctx.Done():
@@ -169,9 +170,9 @@ func TestSourceWriteAcrossRotationInvalidatesNewGenerationEvenIfOldFillSucceeded
 	fault := s
 	fault.Store = base
 	fault.Cache = &switchCache{Cache: c, offline: true}
-	_, _ = fault.Put(ctx, catalog.Item{ID: "a", PriceCent: 300})
-	_, _ = fault.Put(ctx, catalog.Item{ID: "b", PriceCent: 400})
-	r, err := s.Get(ctx, "x")
+	_, _ = fault.Put(ctx, catalog.Item{ID: "1", PriceCent: 300})
+	_, _ = fault.Put(ctx, catalog.Item{ID: "2", PriceCent: 400})
+	r, err := s.Get(ctx, "24")
 	if err != nil || r.Item.PriceCent != 100 {
 		t.Fatal(r, err)
 	}
@@ -179,11 +180,11 @@ func TestSourceWriteAcrossRotationInvalidatesNewGenerationEvenIfOldFillSucceeded
 	if err := <-done; err != nil {
 		t.Fatal(err)
 	}
-	r, err = s.Get(ctx, "x")
+	r, err = s.Get(ctx, "24")
 	if err != nil || r.Item.PriceCent != 200 || r.Source != "store" {
 		t.Fatal("old writer missed current invalidation", r, err)
 	}
-	r, err = s.Get(ctx, "x")
+	r, err = s.Get(ctx, "24")
 	if err != nil || r.Item.PriceCent != 200 || r.Source != "cache_unvalidated" {
 		t.Fatal("repair did not restore hits", r, err)
 	}

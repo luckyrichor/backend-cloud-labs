@@ -155,3 +155,11 @@ P0 干净源码 5e1efd8 的验证：全量 race/vet 与 CTest 通过；回显与
 - **迁移与导入**：4 个迁移依次执行 up → 全部 down → 全部 up，指纹一致（3ae730f3…）。ci 的“仅存活行唯一”约束已在真实 MySQL 上验证，验证用的事务已回滚。导入 2,000,000 行用时 41.5 秒，行数、最大 id、价格总和、库存总和与清单全部一致（itemload.json）。items 表数据 310 MiB，超过 MySQL buffer pool 的 256 MiB，S1 的读延迟里会包含磁盘读，P2 定位时需要考虑。
 - **测试**：datapipe 新增 7 项测试（race 与 vet 通过）：可复现性、克隆价格范围、热度排列、列式头部与对齐、CMDB 不变量（无自环、无重边、不跨租户、关系种类与端点合法、截断有计数）、轨迹前缀与速度上限、迁移成对。开发中有一项截断测试的前提写错（误以为 60 个服务里只有 7 个有入度权重），修正测试后通过。
 - **收尾回归**：在源码 `b0e5aba` 上运行 scripts/check.sh，退出码 0。Go 顶层 70 项 race 测试通过（P0 的 63 项加 datapipe 7 项），无跳过，vet 通过，含真实 Redis；CTest 7/7。摘要见 check-summary.json。
+
+### 2026-10-24 · P2-1 MySQL 数据源与写令牌（Claude Code）
+
+- E1 新增 `catalog.MySQLStore`：一条 `INSERT … ON DUPLICATE KEY UPDATE` 在行锁内递增版本，经 `LAST_INSERT_ID(expr)` 带回已提交的版本。新增写令牌（`GUIDE_WRITE_TOKEN`，PUT 缺失或错误返回 401）和 `GUIDE_SOURCE=mysql` 的启动接线；MySQL 源缺令牌时拒绝启动。
+- 现有 E1 测试的 id 机械替换为数字串，经 catalogtest 工厂可切换数据源；check.sh 新增一次性 MySQL 容器（同一固定镜像，tmpfs），把 E1 整套测试在 MySQL 源下再跑一遍。
+- 第一次全量回归失败：`TestRedisLegacyPayloadIsNotUsedAfterJSONContractChange`。原因是批量把 "sku" 替换成 "101" 时，清理语句里拼接出的键 `v2:sku` 没有跟着变，内存源那一轮留下了 `v2:101`，MySQL 源那一轮共用同一个临时 Redis，读到残留键，报“legacy hit”。这个测试只测缓存、不涉及数据源，于是把两个纯缓存测试恢复成原来的 id，修正后通过。
+- 结果：check.sh 退出码 0。E1 内存源 29 项通过，另 4 项 MySQL 专项按设计跳过；MySQL 源 33 项全部通过，含 3 项真实 Redis 测试与 4 项专项测试（16 个并发写者各写 25 次，版本恰好为 1..400；大于 2^53 的版本精确加一；非规范 id 被拒）。其他模块与此前一致，CTest 7/7。
+- 用真实的 200 万行 items 表做了只读冒烟：GET /items/1 与 /items/2000000 正常，不存在或非法 id 返回 404，不带令牌的 PUT 返回 401；表行数与最大版本没有变化（2,000,000 行，最大版本 1）。

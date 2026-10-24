@@ -13,7 +13,11 @@ go vet ./...
 go run ./cmd/guide
 CACHE_READ_MODE=cache-first go run ./cmd/guide
 REDIS_ADDR=127.0.0.1:56379 go run ./cmd/guide
+# P2-1：MySQL 作为数据源（items 表见 deploy/mysql/migrations/0001），必须同时给写令牌
+GUIDE_SOURCE=mysql GUIDE_MYSQL_DSN='user:pass@tcp(127.0.0.1:13306)/bcl' GUIDE_WRITE_TOKEN=<随机串> go run ./cmd/guide
 ```
+
+MySQL 数据源（2026-10-24，Claude Code）：`internal/catalog/mysql.go` 实现同一个 Store 接口，内存源保留作测试替身与默认值。写入是一条自动提交的 `INSERT … ON DUPLICATE KEY UPDATE`，版本在这条加行锁的语句里递增，并经 `LAST_INSERT_ID(expr)` 直接带回提交后的版本。商品 id 必须是规范的无符号十进制（不接受 `007`、`+7`），否则写返回 400、读返回 404。现有测试可用 `E1_TEST_STORE=mysql E1_MYSQL_TEST_DSN=<能建库的账号>` 改跑 MySQL 源（每个测试进程一个临时库）；scripts/check.sh 两种源各跑一遍。
 
 实际Redis集成须设置E1_REDIS_TEST_ADDR，不设置明确skip；根目录scripts/check.sh在TX创建独占临时Redis并完整验收。API契约见[docs/api.md](docs/api.md)。默认strict读取source核对版本；cache-first命中返回cache_unvalidated以降低源负载。
 

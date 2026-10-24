@@ -1,15 +1,37 @@
 package httpapi
 
 import (
+	"crypto/sha256"
+	"crypto/subtle"
 	"encoding/json"
 	"errors"
 	"github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/catalog"
 	"github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/guide"
 	"io"
 	"net/http"
+	"strings"
 )
 
-func Handler(service guide.Service) http.Handler {
+// Options configures optional behaviour; the zero value is the original open API.
+type Options struct {
+	// WriteToken, when set, is the shared bearer token PUT requires (plan B.1: E1 writes
+	// use an anonymous shared token). Reads and recommendations stay open.
+	WriteToken string
+}
+
+func Handler(service guide.Service) http.Handler { return HandlerWithOptions(service, Options{}) }
+
+// authorized compares SHA-256 digests in constant time so neither content nor length leaks.
+func authorized(r *http.Request, token string) bool {
+	if token == "" {
+		return true
+	}
+	got, ok := strings.CutPrefix(r.Header.Get("Authorization"), "Bearer ")
+	a, b := sha256.Sum256([]byte(got)), sha256.Sum256([]byte(token))
+	return ok && subtle.ConstantTimeCompare(a[:], b[:]) == 1
+}
+
+func HandlerWithOptions(service guide.Service, opts Options) http.Handler {
 	if service.Repairs == nil {
 		service.Repairs = guide.NewRepairQueue(1024)
 	}
@@ -19,6 +41,11 @@ func Handler(service guide.Service) http.Handler {
 		respond(w, result, err)
 	})
 	mux.HandleFunc("PUT /items/{id}", func(w http.ResponseWriter, r *http.Request) {
+		if !authorized(r, opts.WriteToken) {
+			w.Header().Set("WWW-Authenticate", "Bearer")
+			http.Error(w, http.StatusText(401), 401)
+			return
+		}
 		var body struct {
 			Title     string `json:"title"`
 			PriceCent int64  `json:"price_cent"`
@@ -64,8 +91,11 @@ func decode(w http.ResponseWriter, r *http.Request, v any) bool {
 func respond(w http.ResponseWriter, v any, err error) {
 	if err != nil {
 		code := 503
-		if errors.Is(err, catalog.ErrNotFound) {
+		switch {
+		case errors.Is(err, catalog.ErrNotFound):
 			code = 404
+		case errors.Is(err, catalog.ErrInvalidID): // only the MySQL source restricts ids
+			code = 400
 		}
 		http.Error(w, http.StatusText(code), code)
 		return

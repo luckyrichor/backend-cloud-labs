@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/cache"
 	"github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/catalog"
+	"github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/catalogtest"
 	"github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/guide"
 	"github.com/redis/go-redis/v9"
 	"os"
@@ -71,17 +72,17 @@ func TestRedisNewSourceLifetimeUsesIndependentNamespace(t *testing.T) {
 	defer client.Close()
 	c := &cache.Redis{Client: client, Prefix: "e1-test:lifetime:", TTL: time.Minute}
 	ctx := context.Background()
-	old := guide.NewService(catalog.NewMemoryStore(), c, guide.CacheFirst)
+	old := guide.NewService(catalogtest.NewStore(t), c, guide.CacheFirst)
 	for i := 0; i < 5; i++ {
-		if _, err := old.Put(ctx, catalog.Item{ID: "sku", PriceCent: 900}); err != nil {
+		if _, err := old.Put(ctx, catalog.Item{ID: "101", PriceCent: 900}); err != nil {
 			t.Fatal(err)
 		}
 	}
-	fresh := guide.NewService(catalog.NewMemoryStore(), c, guide.CacheFirst)
-	if _, err := fresh.Put(ctx, catalog.Item{ID: "sku", PriceCent: 100}); err != nil {
+	fresh := guide.NewService(catalogtest.NewStore(t), c, guide.CacheFirst)
+	if _, err := fresh.Put(ctx, catalog.Item{ID: "101", PriceCent: 100}); err != nil {
 		t.Fatal(err)
 	}
-	r, err := fresh.Get(ctx, "sku")
+	r, err := fresh.Get(ctx, "101")
 	if err != nil || r.Item.Version != 1 || r.Item.PriceCent != 100 || r.Source != "cache_unvalidated" {
 		t.Fatal(r, err)
 	}
