@@ -1,3 +1,5 @@
+@AGENTS.md
+
 # CLAUDE.md
 
 本仓库的指引统一写在 **[AGENTS.md](AGENTS.md)**，**请先读那一份**。
