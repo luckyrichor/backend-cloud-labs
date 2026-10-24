@@ -22,6 +22,16 @@ func fatal(err error) {
 	}
 }
 func main() {
+	if len(os.Args) > 1 {
+		switch os.Args[1] {
+		case "s1":
+			s1Main(os.Args[2:])
+			return
+		case "register":
+			registerMain(os.Args[2:])
+			return
+		}
+	}
 	target := flag.String("target", "", "HTTP URL or TCP address")
 	protocol := flag.String("protocol", "http", "http|tcp")
 	rate := flag.Int("rate", 100, "fixed arrivals/second")

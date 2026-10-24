@@ -1,0 +1,18 @@
+# S1/S2 override: E1 reads the MySQL items table through Redis with a selectable strategy.
+#   S1_MODE=versioned docker compose -f deploy/compose.yaml -f deploy/compose.s1.yaml up -d --force-recreate --wait e1
+# Credentials come from the private env file written by scripts/init-deploy.py.
+services:
+  e1:
+    environment:
+      GUIDE_SOURCE: mysql
+      REDIS_ADDR: redis:6379
+      CACHE_READ_MODE: ${S1_MODE:-strict}
+      GUIDE_UNGATED_FILLS: ${S1_UNGATED:-0}
+      GUIDE_CACHE_TTL: ${S1_TTL:-1m}
+      GUIDE_TRACE_ID: ${S1_TRACE_ID:-}
+      GUIDE_TRACE_FILE: /trace/trace.jsonl
+    env_file: [../.local/deploy/e1-s1.env]
+    volumes: ["../.local/s1/trace:/trace"]
+    depends_on:
+      redis: {condition: service_healthy}
+      mysql: {condition: service_healthy}
