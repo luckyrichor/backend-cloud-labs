@@ -77,3 +77,25 @@ func NewMemoryWithReadLock(ttl time.Duration, parallel bool) *Memory {
 	c.parallelReads = parallel
 	return c
 }
+
+// Set stores unconditionally (cache-aside fill, and the ungated reverse-validation arm).
+func (c *Memory) Set(ctx context.Context, item catalog.Item) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.entries[item.ID] = entry{item, c.now().Add(c.TTL)}
+	return nil
+}
+
+// Delete removes an entry (cache-aside invalidation after a source write).
+func (c *Memory) Delete(ctx context.Context, id string) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	delete(c.entries, id)
+	return nil
+}

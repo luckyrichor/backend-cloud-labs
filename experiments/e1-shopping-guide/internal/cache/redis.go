@@ -47,3 +47,22 @@ func (c *Redis) PutIfNewer(ctx context.Context, item catalog.Item) (bool, error)
 		string(raw), c.TTL.Milliseconds()).Int()
 	return result == 1, err
 }
+
+// Set overwrites without the version gate: the plain SET of a textbook cache-aside fill.
+func (c *Redis) Set(ctx context.Context, item catalog.Item) error {
+	raw, err := json.Marshal(item)
+	if err != nil {
+		return err
+	}
+	key := c.Prefix + "v2:" + item.ID
+	_, err = c.Client.TxPipelined(ctx, func(p redis.Pipeliner) error {
+		p.HSet(ctx, key, "version", item.Version, "item", string(raw))
+		p.PExpire(ctx, key, c.TTL)
+		return nil
+	})
+	return err
+}
+
+func (c *Redis) Delete(ctx context.Context, id string) error {
+	return c.Client.Del(ctx, c.Prefix+"v2:"+id).Err()
+}

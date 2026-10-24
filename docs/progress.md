@@ -163,3 +163,11 @@ P0 干净源码 5e1efd8 的验证：全量 race/vet 与 CTest 通过；回显与
 - 第一次全量回归失败：`TestRedisLegacyPayloadIsNotUsedAfterJSONContractChange`。原因是批量把 "sku" 替换成 "101" 时，清理语句里拼接出的键 `v2:sku` 没有跟着变，内存源那一轮留下了 `v2:101`，MySQL 源那一轮共用同一个临时 Redis，读到残留键，报“legacy hit”。这个测试只测缓存、不涉及数据源，于是把两个纯缓存测试恢复成原来的 id，修正后通过。
 - 结果：check.sh 退出码 0。E1 内存源 29 项通过，另 4 项 MySQL 专项按设计跳过；MySQL 源 33 项全部通过，含 3 项真实 Redis 测试与 4 项专项测试（16 个并发写者各写 25 次，版本恰好为 1..400；大于 2^53 的版本精确加一；非规范 id 被拒）。其他模块与此前一致，CTest 7/7。
 - 用真实的 200 万行 items 表做了只读冒烟：GET /items/1 与 /items/2000000 正常，不存在或非法 id 返回 404，不带令牌的 PUT 返回 401；表行数与最大版本没有变化（2,000,000 行，最大版本 1）。
+
+### 2026-10-24 · P2-2 四种读写策略与 S1 观测（Claude Code）
+
+- `CACHE_READ_MODE` 新增 `cache-aside`（A）与 `versioned`（B），原有 strict（C）、cache-first（D）的代码路径不变，默认仍是 strict。`GUIDE_UNGATED_FILLS=1` 用来关闭 B 的版本门控做反向验证。内存缓存和 Redis 缓存都新增了不带门控的 Set/Delete，Redis 侧用 MULTI 保证 TTL 一起写入。
+- 用单测确定性地复现 S1 的竞态：读者取到 v1 后暂停，写者提交 v2，读者恢复后回填。结果：A 留下陈旧的 v1；B 拒绝迟到的回填；B 关掉门控后又陈旧；C、D 都返回 v2。
+- 观测：数据源与缓存的 10 个计数器、服务端 GET/PUT 的 HdrHistogram（`/debug/latency`，可同时重置窗口）、当前策略（`/debug/strategy`）、单个 key 的事件时间线（JSON 行文件）。都只在管理端口上；telemetry 新增了注册计数器与额外管理路由的接口。用二进制做了端到端冒烟：计数器、策略、时间线都符合预期，SIGTERM 时时间线已刷新到文件。
+- 测试：新增 E1 策略测试 8 项、observe 测试 3 项、真实 Redis 的 Set/Delete 测试 1 项、telemetry 测试 1 项。check.sh 退出码 0：E1 内存源 41 项通过、4 项按设计跳过，MySQL 源 45 项全部通过，全仓 Go 顶层测试共 133 次通过、0 失败，CTest 7/7。
+- 开发中的小问题：冒烟时用临时 Python 读直方图快照报 KeyError，原因是 hdr.Snapshot 序列化的字段名是 `Counts`（Go 端反序列化不区分大小写，所以 Go 测试能过）。这不是服务的缺陷，报告脚本要按实际字段名读取。

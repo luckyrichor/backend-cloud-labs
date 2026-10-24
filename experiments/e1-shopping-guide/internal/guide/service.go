@@ -1,4 +1,5 @@
-// Package guide compares strict and cache-first reads with monotonic fills.
+// Package guide compares cache read/write strategies (strict, cache-first, and the S1
+// cache-aside and versioned arms in strategy.go) in front of one source of truth.
 package guide
 
 import (
@@ -29,13 +30,19 @@ const (
 )
 
 // Empty mode preserves strict behavior. CacheFirst trades freshness for source load.
-func ValidReadMode(mode ReadMode) bool { return mode == "" || mode == Strict || mode == CacheFirst }
+func ValidReadMode(mode ReadMode) bool {
+	return mode == "" || mode == Strict || mode == CacheFirst || mode == CacheAside || mode == Versioned
+}
 
 type Service struct {
-	Mode       ReadMode
-	Store      catalog.Store
-	Cache      Cache
-	Repairs    *RepairQueue
+	Mode    ReadMode
+	Store   catalog.Store
+	Cache   Cache
+	Repairs *RepairQueue
+	// UngatedFills replaces Versioned's gated fills with plain SETs (S1 reverse validation).
+	UngatedFills bool
+	// Trace, when set, records the timeline of traced keys.
+	Trace      Tracer
 	generation uint64
 }
 
@@ -52,16 +59,24 @@ func (s Service) Get(ctx context.Context, id string) (Result, error) {
 	if !ValidReadMode(s.Mode) {
 		return Result{}, errors.New("invalid cache read mode")
 	}
+	op := s.begin(id, "read")
+	s.event(op, id, "read_start", 0)
+	if s.Mode == CacheAside || s.Mode == Versioned {
+		return s.getStrategy(ctx, op, id)
+	}
 	if s.Mode == CacheFirst && !s.Repairs.pending(id) {
 		cached, err := s.Cache.Get(ctx, id)
 		if err == nil {
+			s.event(op, id, "cache_hit", cached.Version)
 			return Result{cached, "cache_unvalidated", false}, nil
 		}
 		authoritative, sourceErr := s.Store.Get(ctx, id)
 		if sourceErr != nil {
 			return Result{}, sourceErr
 		}
+		s.event(op, id, "store_read", authoritative.Version)
 		_, fillErr := s.Cache.PutIfNewer(ctx, authoritative)
+		s.event(op, id, "fill", authoritative.Version)
 		return Result{authoritative, "store", !errors.Is(err, ErrCacheMiss) || fillErr != nil}, nil
 	}
 	// Strict mode validates source revision even on hits, trading DB load for correctness.
@@ -69,12 +84,15 @@ func (s Service) Get(ctx context.Context, id string) (Result, error) {
 	if err != nil {
 		return Result{}, err
 	}
+	s.event(op, id, "store_read", authoritative.Version)
 	cached, cacheErr := s.Cache.Get(ctx, id)
 	if cacheErr == nil && cached.Version == authoritative.Version {
 		s.Repairs.clearFor(s.generation, id, authoritative.Version)
+		s.event(op, id, "cache_validated", cached.Version)
 		return Result{cached, "cache_validated", false}, nil
 	}
 	_, fillErr := s.Cache.PutIfNewer(ctx, authoritative)
+	s.event(op, id, "fill", authoritative.Version)
 	if fillErr == nil {
 		s.Repairs.clearFor(s.generation, id, authoritative.Version)
 	}
@@ -86,11 +104,17 @@ func (s Service) Put(ctx context.Context, item catalog.Item) (Result, error) {
 	if s.Mode == CacheFirst && s.Repairs == nil {
 		return Result{}, ErrRepairQueueRequired
 	}
+	op := s.begin(item.ID, "write")
+	if s.Mode == CacheAside || s.Mode == Versioned {
+		return s.putStrategy(ctx, op, item)
+	}
 	authoritative, err := s.Store.Put(ctx, item)
 	if err != nil {
 		return Result{}, err
 	}
+	s.event(op, item.ID, "write_commit", authoritative.Version)
 	_, err = s.Cache.PutIfNewer(ctx, authoritative)
+	s.event(op, item.ID, "fill", authoritative.Version)
 	s.Repairs.finishWrite(s.generation, authoritative.ID, authoritative.Version, err == nil)
 	// Cache errors never disguise an already-committed source write as a failed write.
 	return Result{authoritative, "store", err != nil}, nil

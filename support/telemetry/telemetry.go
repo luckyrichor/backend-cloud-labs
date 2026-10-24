@@ -10,6 +10,7 @@ import (
 	"os"
 	"strconv"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -24,6 +25,34 @@ type Metrics struct {
 	mu          sync.Mutex
 	http, frame histogram
 	sent        uint64
+	counters    []namedCounter
+	routes      []route
+}
+
+type namedCounter struct {
+	name  string
+	value *atomic.Uint64
+}
+type route struct {
+	pattern string
+	handler http.Handler
+}
+
+// Counter registers a monotonically increasing counter exported on /metrics. Names are
+// fixed by code (no user-derived labels); register before Start.
+func (m *Metrics) Counter(name string) *atomic.Uint64 {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	c := namedCounter{name, &atomic.Uint64{}}
+	m.counters = append(m.counters, c)
+	return c.value
+}
+
+// Route adds an extra handler to the admin listener (never the business port); register before Start.
+func (m *Metrics) Route(pattern string, h http.Handler) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.routes = append(m.routes, route{pattern, h})
 }
 
 func (m *Metrics) observe(h *histogram, duration time.Duration) {
@@ -63,13 +92,21 @@ func (m *Metrics) Handler() http.Handler {
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(200); _, _ = w.Write([]byte("ok\n")) })
 	mux.HandleFunc("GET /metrics", func(w http.ResponseWriter, r *http.Request) {
 		m.mu.Lock()
-		h, f, s := m.http, m.frame, m.sent
+		h, f, s, counters := m.http, m.frame, m.sent, m.counters
 		m.mu.Unlock()
 		w.Header().Set("Content-Type", "text/plain; version=0.0.4; charset=utf-8")
 		writeHistogram(w, "bcl_http_request_duration_seconds", h)
 		writeHistogram(w, "bcl_room_frame_duration_seconds", f)
 		fmt.Fprintf(w, "# TYPE bcl_room_sent_bytes_total counter\nbcl_room_sent_bytes_total %d\n", s)
+		for _, c := range counters {
+			fmt.Fprintf(w, "# TYPE %s counter\n%s %d\n", c.name, c.name, c.value.Load())
+		}
 	})
+	m.mu.Lock()
+	for _, r := range m.routes {
+		mux.Handle(r.pattern, r.handler)
+	}
+	m.mu.Unlock()
 	mux.HandleFunc("GET /debug/pprof/", pprof.Index)
 	mux.HandleFunc("GET /debug/pprof/cmdline", pprof.Cmdline)
 	mux.HandleFunc("GET /debug/pprof/profile", pprof.Profile)

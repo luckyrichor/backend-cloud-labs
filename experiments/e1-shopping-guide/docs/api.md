@@ -36,3 +36,26 @@ HTTP Handler 自动持有共享的本地修复队列。源写成功、缓存填�
 - MySQL 源下 id 必须是规范的无符号十进制：PUT 非法 id 返回 400，GET 返回 404（与不存在一致）。内存源仍接受任意字符串 id。
 - 写返回的 `version` 就是 MySQL 中已提交的版本，压测程序以此建立真值日志。PUT 新 id 时 category_id 为 0；更新时保留导入数据的类目。
 - 线性化点仍是数据源写入；缓存失败返回 200 + degraded 的契约不变。
+
+## 2026-10-24 · 四种读写策略与 S1 观测（P2-2，Claude Code）
+
+`CACHE_READ_MODE` 取值（默认 strict，原有两种的行为不变）：
+
+| 取值 | 方案代号 | 读 | 写 |
+|---|---|---|---|
+| `cache-aside` | A 基线 | 命中直接返回（cache_unvalidated）；未命中读源，**普通 SET** 回填 | 写源后**删除**缓存 |
+| `versioned` | B 版本门控 | 同 A，但回填走“只接受更大版本”的门控 | 写源后用门控**更新**缓存 |
+| `strict` | C 严格校验 | 每次先读源版本，相等才用缓存（cache_validated） | 写源后门控更新 |
+| `cache-first` | D 缓存优先 | B 的读写，外加本地修复队列与缓存代际 | 同左 |
+
+- B 与 D 只在缓存写失败时不同：D 会标记该 key，让后续读绕过旧条目；B 不标记，要等 TTL 过期。缓存不出错时二者应表现相近。
+- `GUIDE_UNGATED_FILLS=1` 只对 versioned 生效：把门控回填换成普通 SET，用于 S1 反向验证；配在其他模式上会拒绝启动。
+- cache-aside 与关闭门控的 versioned 需要缓存支持普通 Set/Delete（内存与 Redis 都支持）；缺少时源写照常提交，结果标 degraded。
+- `GUIDE_CACHE_TTL` 设置缓存寿命，默认 1 分钟（方案 S1 基线）。
+
+管理端口新增（仅管理端口，不在业务端口）：
+
+- `/metrics` 增加计数器：`bcl_e1_source_reads_total`（S1 的“MySQL 读 QPS”由此求差得到）、`bcl_e1_source_writes_total`、`bcl_e1_source_errors_total`、`bcl_e1_cache_hits_total`、`bcl_e1_cache_misses_total`、`bcl_e1_cache_errors_total`、`bcl_e1_cache_fills_applied_total`、`bcl_e1_cache_fills_rejected_total`、`bcl_e1_cache_sets_total`、`bcl_e1_cache_deletes_total`。
+- `GET /debug/latency[?reset=1]`：服务端 GET 与 PUT 延迟的 HdrHistogram 快照（微秒，1 µs–600 s，3 位有效数字，与 loadgen 相同），`reset=1` 在读取的同时开始新窗口。
+- `GET /debug/strategy`：当前策略、是否关闭门控、TTL。
+- `GUIDE_TRACE_ID` + `GUIDE_TRACE_FILE`：把一个 key 的事件按 JSON 行追加到文件。事件有 begin、read_start、store_read、cache_hit、cache_validated、fill、write_commit、delete，`t_ns` 为进程内单调时间。文件每 200 ms 刷新一次，收到 SIGTERM 时最后刷新。

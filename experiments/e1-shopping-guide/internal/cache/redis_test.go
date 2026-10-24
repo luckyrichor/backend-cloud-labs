@@ -87,3 +87,40 @@ func TestRedisNewSourceLifetimeUsesIndependentNamespace(t *testing.T) {
 		t.Fatal(r, err)
 	}
 }
+
+// Set is deliberately ungated (cache-aside fills and the reverse-validation arm): it must
+// overwrite a newer version, and Delete must leave a miss.
+func TestRedisSetOverwritesAndDeleteMisses(t *testing.T) {
+	address := os.Getenv("E1_REDIS_TEST_ADDR")
+	if address == "" {
+		t.Skip("set E1_REDIS_TEST_ADDR")
+	}
+	client := redis.NewClient(&redis.Options{Addr: address})
+	defer client.Close()
+	ctx := context.Background()
+	key := "e1-test:" + t.Name() + ":"
+	defer client.Del(ctx, key+"v2:sku")
+	c := cache.Redis{Client: client, Prefix: key, TTL: time.Minute}
+	if _, err := c.PutIfNewer(ctx, catalog.Item{ID: "sku", Version: 5}); err != nil {
+		t.Fatal(err)
+	}
+	if err := c.Set(ctx, catalog.Item{ID: "sku", Version: 3}); err != nil {
+		t.Fatal(err)
+	}
+	if got, err := c.Get(ctx, "sku"); err != nil || got.Version != 3 {
+		t.Fatal("Set must overwrite regardless of version", got, err)
+	}
+	if ttl := client.PTTL(ctx, key+"v2:sku").Val(); ttl <= 0 || ttl > time.Minute {
+		t.Fatal("Set must apply the TTL", ttl)
+	}
+	// The gate still compares against what Set wrote.
+	if ok, _ := c.PutIfNewer(ctx, catalog.Item{ID: "sku", Version: 2}); ok {
+		t.Fatal("gated fill accepted an older version after Set")
+	}
+	if err := c.Delete(ctx, "sku"); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := c.Get(ctx, "sku"); !errors.Is(err, guide.ErrCacheMiss) {
+		t.Fatal("Delete left the entry", err)
+	}
+}

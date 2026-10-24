@@ -48,3 +48,21 @@ func TestConfigRejectsInvalidLimits(t *testing.T) {
 		}
 	}
 }
+
+func TestCountersAndRoutesAppearOnAdminHandler(t *testing.T) {
+	m := &Metrics{}
+	hits := m.Counter("bcl_test_hits_total")
+	hits.Add(3)
+	m.Route("GET /debug/extra", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { w.Write([]byte("extra")) }))
+	h := m.Handler()
+	w := httptest.NewRecorder()
+	h.ServeHTTP(w, httptest.NewRequest("GET", "/metrics", nil))
+	if !strings.Contains(w.Body.String(), "bcl_test_hits_total 3\n") {
+		t.Fatalf("counter missing: %s", w.Body.String())
+	}
+	w = httptest.NewRecorder()
+	h.ServeHTTP(w, httptest.NewRequest("GET", "/debug/extra", nil))
+	if w.Body.String() != "extra" {
+		t.Fatalf("route missing: %q", w.Body.String())
+	}
+}

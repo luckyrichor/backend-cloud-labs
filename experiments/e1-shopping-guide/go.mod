@@ -10,6 +10,7 @@ require (
 )
 
 require (
+	github.com/HdrHistogram/hdrhistogram-go v1.4.0
 	github.com/go-sql-driver/mysql v1.10.1
 	github.com/luckyrichor/backend-cloud-labs/support/telemetry v0.0.0
 	github.com/redis/go-redis/v9 v9.22.0
