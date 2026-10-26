@@ -205,7 +205,7 @@ def start_e1(arm,stem,profile=False):
     command(['docker','exec','bcl-s1-redis','redis-cli','FLUSHDB'],capture_output=True)
     command(['docker','run','-d','--name','bcl-s1-e1','--label',LABEL,'--network','bcl-p0_default',
              '--cpuset-cpus','2','--memory','192m','--env-file',str(envfile),
-             '-e','GUIDE_ADDRESS=0.0.0.0:8086','-e','ADMIN_ADDRESS=0.0.0.0:9086',
+             '-e','GUIDE_SOURCE=mysql','-e','GUIDE_ADDRESS=0.0.0.0:8086','-e','ADMIN_ADDRESS=0.0.0.0:9086',
              '-e','REDIS_ADDR=bcl-s1-redis:6379','-e',f'CACHE_READ_MODE={mode}',
              '-e',f'GUIDE_UNGATED_FILLS={int(off)}','-e',f'GUIDE_PROFILE_MUTEX={int(profile)}','-e',f'GUIDE_TRACE_ID={hot}',
              '-e','GUIDE_TRACE_FILE=/trace/events.jsonl','-v',str(trace)+':/trace',
@@ -213,7 +213,11 @@ def start_e1(arm,stem,profile=False):
     for _ in range(100):
         try:
             with urllib.request.urlopen('http://127.0.0.1:19096/debug/strategy',timeout=1) as r:d=json.load(r)
-            if d['mode']==mode and d['ungated_fills']==off:return
+            if d['mode']==mode and d['ungated_fills']==off and d.get('source')=='mysql':
+                with urllib.request.urlopen('http://127.0.0.1:18096/items/'+str(hot),timeout=2) as r:
+                    item=json.load(r)['item']
+                if item['version']!=1:raise RuntimeError('baseline key version is not one')
+                return
             raise RuntimeError('unexpected strategy')
         except OSError:time.sleep(.1)
     raise RuntimeError('experiment E1 not ready')
@@ -229,6 +233,10 @@ def one(mac,commit,manifest,out,arm,ratio,rate,repeat,window,warmup,story,bypass
     completed = out/(stem+'.done.json')
     if completed.exists():
         return json.loads((out/(stem+'.json')).read_text())
+    partial=list(out.glob(stem+'.*'))
+    if partial:
+        archive=out/'incomplete'/str(time.time_ns());archive.mkdir(parents=True)
+        for f in partial:shutil.move(str(f),archive/f.name)
     stop_e1()
     # Last complete run's dirty keys are restored at its end. Full restore is done
     # at controller startup to cover a previously interrupted run.
@@ -262,6 +270,10 @@ def one(mac,commit,manifest,out,arm,ratio,rate,repeat,window,warmup,story,bypass
     doc = json.loads((out/(stem+'.json')).read_text())
     if doc['git_commit']!=commit:
         raise RuntimeError('client source version mismatch')
+    state=subprocess.check_output(['docker','inspect','--type','container','--format','{{json .State}}','bcl-s1-e1'],text=True)
+    save(out/(stem+'.container.json'),json.loads(state))
+    log=command(['docker','logs','--tail','50','bcl-s1-e1'],capture_output=True,text=True)
+    (out/(stem+'.service.log')).write_text(log.stdout+log.stderr)
     stop_e1()  # flush trace before archiving
     trace = STATE/'traces'/stem/'events.jsonl'
     if trace.exists():

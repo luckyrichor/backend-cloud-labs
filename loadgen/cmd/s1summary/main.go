@@ -46,7 +46,7 @@ func main() {
 	}
 	sort.Strings(files)
 	for _, p := range files {
-		if strings.Contains(filepath.Base(p), ".done.") || strings.Contains(filepath.Base(p), ".network.") || strings.Contains(filepath.Base(p), ".worker-error.") {
+		if strings.Contains(filepath.Base(p), ".done.") || strings.Contains(filepath.Base(p), ".network.") || strings.Contains(filepath.Base(p), ".worker-error.") || strings.Contains(filepath.Base(p), ".container.") {
 			continue
 		}
 		raw, err := os.ReadFile(p)
@@ -69,11 +69,11 @@ func main() {
 			panic(err)
 		}
 		get, err := quantiles(snapshots.Get)
-		if err != nil {
+		if err != nil && d.Result.Valid {
 			panic(err)
 		}
 		put, err := quantiles(snapshots.Put)
-		if err != nil {
+		if err != nil && d.Result.Valid {
 			panic(err)
 		}
 		rows = append(rows, map[string]any{"file": filepath.Base(p), "story": d.Story, "arm": d.Arm, "repeat": d.Repeat,

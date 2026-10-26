@@ -57,7 +57,11 @@ func main() {
 	writeToken := os.Getenv("GUIDE_WRITE_TOKEN")
 
 	var store catalog.Store
-	switch os.Getenv("GUIDE_SOURCE") {
+	sourceName := os.Getenv("GUIDE_SOURCE")
+	if sourceName == "" {
+		sourceName = "memory"
+	}
+	switch sourceName {
 	case "", "memory":
 		memory := catalog.NewMemoryStore()
 		_, _ = memory.Put(context.Background(), catalog.Item{ID: "kettle", Title: "水壶", PriceCent: 4990, Stock: 10})
@@ -105,7 +109,7 @@ func main() {
 	}
 	latency := observe.NewLatency()
 	metrics.Route("GET /debug/latency", latency.Handler())
-	strategy := []byte(`{"mode":"` + string(service.Mode) + `","ungated_fills":` + map[bool]string{true: "true", false: "false"}[service.UngatedFills] + `,"ttl":"` + ttl.String() + `"}`)
+	strategy := []byte(`{"source":"` + sourceName + `","mode":"` + string(service.Mode) + `","ungated_fills":` + map[bool]string{true: "true", false: "false"}[service.UngatedFills] + `,"ttl":"` + ttl.String() + `"}`)
 	metrics.Route("GET /debug/strategy", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(strategy)
