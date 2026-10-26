@@ -84,15 +84,21 @@ def prepare(manifest):
     expected = manifest['stats']['items']
     want = [2000000,2000000,expected['sum_price_cent'],expected['sum_stock'],1,1]
     got = [int(x) for x in sql('SELECT COUNT(*),MAX(id),SUM(price_cent),SUM(stock),MIN(version),MAX(version) FROM bcl.items;').split('\t')]
-    if got != want:
-        raise SystemExit('P1 source fingerprint differs from catalog manifest')
-    event('prepare-start',source_fingerprint=got)
+    # Shared table may contain prior development writes. Preserve it and import
+    # the immutable P1 catalog rather than silently treating that table as pristine.
+    event('prepare-start',shared_fingerprint=got,expected_fingerprint=want)
     sql("CREATE DATABASE bcl_s1; GRANT ALL ON bcl_s1.* TO 'bcl'@'%'; "
-        'CREATE TABLE bcl_s1.items_base LIKE bcl.items; '
-        'INSERT INTO bcl_s1.items_base SELECT * FROM bcl.items; '
-        'CREATE TABLE bcl_s1.items LIKE bcl.items; '
-        'INSERT INTO bcl_s1.items SELECT * FROM bcl_s1.items_base;')
-    save(STATE/'prepared.json',dict(data_version=manifest['data_version'],source_fingerprint=got,
+        'CREATE TABLE bcl_s1.items LIKE bcl.items;')
+    client=json.loads((ROOT/'.local/deploy/client-env.json').read_text())
+    dsn=client['LOADGEN_MYSQL_DSN'].replace('/bcl?','/bcl_s1?')
+    command(['go','-C','tools/datapipe','run','./cmd/itemload',
+             '--catalog','/home/ubuntu/datasets/backend-cloud-labs/p1/catalog',
+             '--output',str(STATE/'import.json')],env={**os.environ,'LOADGEN_MYSQL_DSN':dsn})
+    sql('CREATE TABLE bcl_s1.items_base LIKE bcl_s1.items; '
+        'INSERT INTO bcl_s1.items_base SELECT * FROM bcl_s1.items;')
+    actual=[int(x) for x in sql('SELECT COUNT(*),MAX(id),SUM(price_cent),SUM(stock),MIN(version),MAX(version) FROM bcl_s1.items;').split('\t')]
+    if actual!=want:raise RuntimeError('isolated baseline fingerprint mismatch')
+    save(STATE/'prepared.json',dict(data_version=manifest['data_version'],source_fingerprint=want,shared_fingerprint_before=got,
                                    database=DB,created_at=datetime.datetime.now(datetime.timezone.utc).isoformat()))
     event('prepare-complete',rows=2000000)
 
