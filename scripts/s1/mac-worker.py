@@ -73,7 +73,7 @@ try:
                 '--admin',f'http://127.0.0.1:{admin}','--popularity',str(root/'popularity.u32'),
                 '--read-ratio',str(c['ratio']),'--rate',str(c['rate']),
                 '--warmup',f"{c['warmup']}s",'--window',f"{c['window']}s",'--seed',str(c['seed']),
-                '--max-inflight','256','--timeout','3s','--story',c['story'],
+                '--prime-connections','128','--max-inflight','256','--timeout','3s','--story',c['story'],
                 '--arm',c['arm'],'--repeat',str(c['repeat']),'--data-version',c['data_version'],
                 '--output',str(root/(stem+'.json')),'--raw',str(root/(stem+'.csv.gz'))]
         if c.get('bypass'):

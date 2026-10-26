@@ -96,7 +96,7 @@ python3 scripts/with-p0-env.py go -C tools/datapipe run ./cmd/dbmigrate --dir ..
 **进行中**
 
 - **P2（E1 · S1/S2）**：P2-1（MySQL 源、写令牌，`7bc669f`）、P2-2（四策略及观测，`2b49e7d`）已完成；原交接文档落后于群聊与代码，2026-10-26 已核对。
-- **P2-3 / S1**：基础压测负载已由 Claude 实现（`c0c5df8`）。Codex 在 `3b6f980` 修复测量门禁与预热边界，新增 `scripts/calibrate-s1-mac.py`；真实 Mac 只读校准已完成：三档 50/200/500 req/s，共 7500 个正式窗口读请求，全部成功，无丢到达；证据见 `docs/measurements/2026-10-26-s1-calibration/README.md`。全仓回归 136 次 Go 顶层通过、4 次内存源下预期跳过、vet 与 CTest 7/7。S1 正式矩阵、反向验证、绕过服务直写、定位与最终报告尚未完成；续接正在实现 `scripts/s1-suite.py`（独立数据库/带标签实验容器、固定版本构建、逐轮恢复、真实 Mac 编排）和 `loadgen/cmd/s1summary`。
+- **P2-3 / S1**：基础压测负载已由 Claude 实现（`c0c5df8`）。Codex 在 `3b6f980` 修复测量门禁与预热边界，新增 `scripts/calibrate-s1-mac.py`；真实 Mac 只读校准已完成：三档 50/200/500 req/s，共 7500 个正式窗口读请求，全部成功，无丢到达；证据见 `docs/measurements/2026-10-26-s1-calibration/README.md`。全仓回归 136 次 Go 顶层通过、4 次内存源下预期跳过、vet 与 CTest 7/7。S1 正式矩阵、反向验证、绕过服务直写、定位与最终报告尚未完成；续接已实现 `scripts/s1-suite.py`（独立数据库/带标签实验容器、固定版本构建、逐轮恢复、最终写版本/字段审计、真实 Mac 编排）和 `loadgen/cmd/s1summary`。独立数据已从哈希校验的 P1 TSV 导入并对账；真实链路探测仍在排查 SSH 连接建立/并发问题，正式矩阵尚未启动。只读 HTTP 预建连接代码已通过 loadgen race/vet，真实效果待验证。
 
 **未开始**
 
@@ -116,6 +116,22 @@ python3 scripts/calibrate-s1-mac.py --output .local/s1-calibration-<日期>
 ```
 
 此脚本从 tx 交叉构建带提交版本的 Darwin 发压器，复制到真实 `luomac`，由 Mac 临时建立到 `tx` 的 SSH 转发。验证 popularity 哈希并临时提高子进程 nofile，退出时关闭隧道。不恢复表、不切策略、不清缓存、不写商品；标记故事 `S1-calibration`，结果只能用于联调。正式测量不要与全仓测试、构建或其他压测同时运行。
+
+正式 S1 控制器状态（2026-10-26 续接）：
+
+- 私有运行状态：`.local/s1-suite/`（凭据勿外传）；`prepared.json`/`import.json` 已完成；`events.jsonl` 为追加事件日志，`probe*` 为全部探测原始结果，`provenance.json` 为每次构建版本。失败探测不进入性能比较；不要覆盖或删除。
+- `bcl_s1.items`/`bcl_s1.items_base` 是独立实验副本。原 `bcl.items` 初检有 176 行版本不为 1，价格/库存汇总与 P1 不同，未动原表；独立副本按 P1 TSV 原始哈希导入、对账。
+- 带 `bcl.experiment=s1` 标签的 `bcl-s1-redis`、`bcl-s1-e1` 是实验容器，后者由控制器停止/重建。共享栈保持不变。只对这台专用 Redis FLUSHDB。
+- 控制器要求源码干净。首次准备已完成，**不要再次 --prepare**。使用新的输出目录跑探测，成功后才进入 matrix：
+
+```bash
+python3 scripts/s1-suite.py --phase probe --output .local/s1-suite/probe-<新名字>
+python3 scripts/s1-suite.py --phase matrix --output .local/s1-suite/matrix
+```
+
+- `design.json` 绑定源提交，变更源码后必须重新探测。Mac 是 `scripts/s1/mac-worker.py`，通过 stdin 接收控制指令，保持临时 SSH 转发，结束删除客户端凭据并关闭隧道。
+- SSH 客户端曾在约 1024 通道时报 `poll: Invalid argument` 并退出；当前连接上限 256，HTTP 连接预建 128。控制器保留 `.worker.json` 隧道日志尾部、`.container.json` 与服务日志；门禁不允许失败/丢到达进入正式结果。
+- 服务 `/debug/strategy` 新增 `source` 字段；控制器要求 source=mysql，并读热点确认初始 version=1，避免漏配时测成内存源。
 
 ## 9. 已知问题与坑
 

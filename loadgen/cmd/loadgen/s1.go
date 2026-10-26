@@ -36,6 +36,7 @@ func s1Main(args []string) {
 	window := fs.Duration("window", 60*time.Second, "measured window")
 	seed := fs.Uint64("seed", 1, "request-plan seed (same seed = same request sequence)")
 	limit := fs.Int("max-inflight", 512, "client concurrency bound")
+	prime := fs.Int("prime-connections", 0, "read-only HTTP connection priming before timed arrivals")
 	timeout := fs.Duration("timeout", 2*time.Second, "per-request timeout")
 	output := fs.String("output", "", "result JSON path")
 	raw := fs.String("raw", "", "per-request gzip CSV path")
@@ -62,7 +63,7 @@ func s1Main(args []string) {
 	fatal(err)
 	auth := os.Getenv("LOADGEN_AUTHORIZATION")
 	cfg := lg.S1Config{Target: strings.TrimRight(*target, "/"), Admin: strings.TrimRight(*admin, "/"), Popularity: pop, ZipfS: *zipfS,
-		ReadRatio: *readRatio, Rate: *rate, Warmup: *warmup, Window: *window, Seed: *seed, MaxInflight: *limit, Timeout: *timeout, Authorization: auth}
+		ReadRatio: *readRatio, PrimeConnections: *prime, Rate: *rate, Warmup: *warmup, Window: *window, Seed: *seed, MaxInflight: *limit, Timeout: *timeout, Authorization: auth}
 	if *bypassDSN != "" {
 		text, err := os.ReadFile(*bypassDSN)
 		fatal(err)
@@ -98,7 +99,7 @@ func s1Main(args []string) {
 		"generated_at": time.Now().UTC(),
 		"config": map[string]any{"zipf_s": *zipfS, "read_ratio": *readRatio, "rate": *rate, "warmup": warmup.String(),
 			"window": window.String(), "seed": *seed, "max_inflight": *limit, "timeout": timeout.String(), "bypass_writes": cfg.Bypass != nil,
-			"popularity_ids": len(pop)},
+			"popularity_ids": len(pop), "prime_connections": *prime},
 		"client": map[string]any{"host": host, "goos": runtime.GOOS, "goarch": runtime.GOARCH, "cpus": runtime.NumCPU(), "nofile_soft": nofile.Cur},
 		"result": res,
 	}

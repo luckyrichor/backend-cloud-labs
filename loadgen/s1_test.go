@@ -11,6 +11,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 )
@@ -251,5 +252,25 @@ func TestS1RejectsNonfiniteAndEmptyWindows(t *testing.T) {
 				t.Fatal("invalid config accepted")
 			}
 		})
+	}
+}
+
+func TestS1ReadOnlyPrimingIsOutsideMeasuredRecords(t *testing.T) {
+	var count atomic.Int64
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			t.Error("priming must not write")
+		}
+		count.Add(1)
+		fmt.Fprint(w, `{"item":{"version":1}}`)
+	}))
+	defer server.Close()
+	res, recs, err := RunS1(context.Background(), S1Config{Target: server.URL, Popularity: []uint32{1}, ReadRatio: 1,
+		Rate: 100, Window: 100 * time.Millisecond, MaxInflight: 16, PrimeConnections: 8, Timeout: time.Second})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if count.Load() != 18 || len(recs) != 10 || res.Reads.Count != 10 || !res.Valid {
+		t.Fatalf("priming leaked into measured records: total=%d records=%d count=%d valid=%t", count.Load(), len(recs), res.Reads.Count, res.Valid)
 	}
 }

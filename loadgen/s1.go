@@ -29,17 +29,18 @@ import (
 // identical request sequence. Every request is recorded; stale reads are judged against the
 // writes this same process saw acknowledged, so no cross-machine clock is involved.
 type S1Config struct {
-	Target, Admin string // business and admin base URLs, e.g. http://127.0.0.1:18086
-	Popularity    []uint32
-	ZipfS         float64
-	ReadRatio     float64
-	Rate          int
-	Warmup        time.Duration
-	Window        time.Duration
-	Seed          uint64
-	MaxInflight   int
-	Timeout       time.Duration
-	Authorization string
+	Target, Admin    string // business and admin base URLs, e.g. http://127.0.0.1:18086
+	Popularity       []uint32
+	ZipfS            float64
+	ReadRatio        float64
+	Rate             int
+	Warmup           time.Duration
+	Window           time.Duration
+	Seed             uint64
+	PrimeConnections int // optional read-only connection priming before timed arrivals
+	MaxInflight      int
+	Timeout          time.Duration
+	Authorization    string
 	// Bypass, when set, sends writes straight to MySQL instead of through the service
 	// (the plan's separate "direct MySQL writes" group).
 	Bypass *sql.DB
@@ -212,7 +213,7 @@ func RunS1(ctx context.Context, c S1Config) (S1Result, []S1Record, error) {
 	if c.Rate <= 0 || c.Window <= 0 || c.Warmup < 0 || c.MaxInflight <= 0 || c.Timeout <= 0 || len(c.Popularity) == 0 ||
 		c.ReadRatio < 0 || c.ReadRatio > 1 || c.ZipfS < 0 ||
 		math.IsNaN(c.ReadRatio) || math.IsInf(c.ReadRatio, 0) || math.IsNaN(c.ZipfS) || math.IsInf(c.ZipfS, 0) ||
-		c.Rate > 100000 || c.MaxInflight > 100000 {
+		c.Rate > 100000 || c.MaxInflight > 100000 || c.PrimeConnections < 0 || c.PrimeConnections > c.MaxInflight {
 		return S1Result{}, nil, errors.New("invalid S1 configuration")
 	}
 	warmCount := float64(c.Rate) * c.Warmup.Seconds()
@@ -227,6 +228,31 @@ func RunS1(ctx context.Context, c S1Config) (S1Result, []S1Record, error) {
 	transport := &http.Transport{MaxIdleConns: c.MaxInflight, MaxIdleConnsPerHost: c.MaxInflight, MaxConnsPerHost: c.MaxInflight, IdleConnTimeout: time.Minute}
 	defer transport.CloseIdleConnections()
 	clients := s1Clients{&http.Client{Transport: transport, Timeout: c.Timeout}, c}
+	if c.PrimeConnections > 0 {
+		// Establish SSH-forwarded HTTP channels before timed arrivals. Only GETs of
+		// a known catalog item are issued; no source writes can become ambiguous.
+		primeClient := s1Clients{&http.Client{Transport: transport, Timeout: 15 * time.Second}, c}
+		failed := make(chan bool, c.PrimeConnections)
+		var primes sync.WaitGroup
+		for range c.PrimeConnections {
+			primes.Add(1)
+			go func() {
+				defer primes.Done()
+				var r S1Record
+				primeCtx, cancel := context.WithTimeout(ctx, 15*time.Second)
+				defer cancel()
+				primeClient.do(primeCtx, s1Op{id: c.Popularity[0]}, 0, &r)
+				failed <- r.Err != "" || r.Status != 200
+			}()
+		}
+		primes.Wait()
+		close(failed)
+		for bad := range failed {
+			if bad {
+				return S1Result{}, nil, errors.New("read-only HTTP connection priming failed")
+			}
+		}
+	}
 	admin := &http.Client{Timeout: 10 * time.Second}
 	res := S1Result{Scheduled: total - warm, WarmupScheduled: warm, Server: map[string]any{}}
 
