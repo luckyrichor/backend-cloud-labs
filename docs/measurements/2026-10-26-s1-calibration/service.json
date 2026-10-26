@@ -1,0 +1,5 @@
+{
+  "image_id": "sha256:d14c9740d65b961f90952b8f41e648ec52acc51c81ce6f7539e5a20884b154ad",
+  "binary_sha256": "46465aadac51b287de25802a3d04d2d2aa10a6abb2568a54c4995b7e2d51c59b",
+  "note": "Existing deployed E1 was not rebuilt or recreated for this read-only calibration; its exact source commit is unverified. Load generator source is 3b6f980. Formal S1 requires verified service provenance."
+}

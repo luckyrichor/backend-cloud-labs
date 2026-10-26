@@ -1,0 +1,30 @@
+{
+  "source_commit": "3b6f980760634d6a17b9c0493cb7d3ba0dfa436a",
+  "command": "bash scripts/check.sh",
+  "exit_code": 0,
+  "top_level": {
+    "pass": 136,
+    "skip": 4
+  },
+  "including_subtests": {
+    "pass": 151,
+    "skip": 4
+  },
+  "top_level_pass_by_package": {
+    "github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/cache": 12,
+    "github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/catalog": 14,
+    "github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/guide": 48,
+    "github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/httpapi": 6,
+    "github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/observe": 6,
+    "github.com/luckyrichor/backend-cloud-labs/experiments/e2-room-sync/room": 12,
+    "github.com/luckyrichor/backend-cloud-labs/experiments/e4-scheduler": 11,
+    "github.com/luckyrichor/backend-cloud-labs/e5-cmdb": 5,
+    "github.com/luckyrichor/backend-cloud-labs/support/telemetry": 3,
+    "github.com/luckyrichor/backend-cloud-labs/loadgen": 10,
+    "github.com/luckyrichor/backend-cloud-labs/experiments/e3-rule-engine/httpdemo": 2,
+    "github.com/luckyrichor/backend-cloud-labs/tools/datapipe": 7
+  },
+  "ctest_pass": 7,
+  "ctest_total": 7,
+  "skip_scope": "4 MySQL-only tests skip in memory-store run; all 4 pass in real MySQL run"
+}

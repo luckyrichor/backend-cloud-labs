@@ -1,6 +1,6 @@
 # AGENTS.md
 
-最后更新：2026-10-24（北京时间）· Claude Code
+最后更新：2026-10-26（北京时间）· Codex
 
 本文件是本仓库唯一的交接正文（Claude Code 经 `CLAUDE.md` 的 `@AGENTS.md` 导入，Codex 直接读）。没参与过的人只读这一份，应能知道项目是什么、做到哪、怎么继续。
 
@@ -95,24 +95,32 @@ python3 scripts/with-p0-env.py go -C tools/datapipe run ./cmd/dbmigrate --dir ..
 
 **进行中**
 
-- **P2（E1 · S1/S2）**：2026-10-24 恢复后开始，正在做 P2-1（MySQL 适配器）。
+- **P2（E1 · S1/S2）**：P2-1（MySQL 源、写令牌，`7bc669f`）、P2-2（四策略及观测，`2b49e7d`）已完成；原交接文档落后于群聊与代码，2026-10-26 已核对。
+- **P2-3 / S1**：基础压测负载已由 Claude 实现（`c0c5df8`）。Codex 在 `3b6f980` 修复测量门禁与预热边界，新增 `scripts/calibrate-s1-mac.py`；真实 Mac 只读校准已完成：三档 50/200/500 req/s，共 7500 个正式窗口读请求，全部成功，无丢到达；证据见 `docs/measurements/2026-10-26-s1-calibration/README.md`。全仓回归 136 次 Go 顶层通过、4 次内存源下预期跳过、vet 与 CTest 7/7。S1 正式矩阵、反向验证、绕过服务直写、定位与最终报告尚未完成。
 
 **未开始**
 
-- P2-2 … P2-5，CP2；P3（E3 · S4/S5）、P4（E4 · S6）、P5（E5 · S7）、P6（E2 · S3）、P7（控制台与收口）、CP3。
+- P2-4/P2-5，CP2；P3（E3 · S4/S5）、P4（E4 · S6）、P5（E5 · S7）、P6（E2 · S3）、P7（控制台与收口）、CP3。
 
 ## 8. 下一步计划（按优先级）
 
-1. **P2-1**：在 E1 里实现 MySQL 版 `catalog.Store`（版本在同一事务内由 UPDATE 递增，写接口返回提交版本），保留 MemoryStore 作测试替身；写接口加共享令牌鉴权；现有 E1 测试与真实 Redis 测试在适配器下全部通过。
-2. **P2-2**：把读写策略抽成四种可配置的策略（A cache-aside 删缓存 / B 版本门控回填 / C 严格校验 / D 缓存优先），默认策略与现有契约一致。
-3. **P2-3**：按方案 S1 跑对照、反向验证并出报告（loadgen 从 Mac 经 SSH 转发发压）。
-4. **P2-4/P2-5**：binlog 消费进程 + Redis Stream + 双实例 + 故障注入，然后跑 S2 并出报告。
-5. P2 收尾后在 **CP2 停下**，提交 S1/S2 报告等用户审阅。
+1. **P2-3**：阅读本轮校准证据，按基线空载延迟与明确的 SLO 定出三个到达率档，补实验编排。四策略 × 两档读写比 × 三档到达率 × 至少五次交替重复，另做 B 关门控与直写 MySQL 对照；不能用只读校准替代正式结论。
+2. 正式实验每轮须恢复相同商品基底、清理本项目缓存并固定服务/发压二进制版本；先实现安全、可复现的恢复步骤，不能对共享 Redis 做 FLUSHALL。记录热点事件时间线、服务端直方图和 pprof，完成 S1 报告。
+3. **P2-4/P2-5**：binlog 消费进程 + Redis Stream + 双实例 + 故障注入，然后跑 S2 并出报告。
+4. P2 收尾后在 **CP2 停下**，提交 S1/S2 报告等用户审阅。
+
+Mac 校准命令（在 tx 的本仓库运行，要求工作区干净，输出路径不可已存在）：
+
+```bash
+python3 scripts/calibrate-s1-mac.py --output .local/s1-calibration-<日期>
+```
+
+此脚本从 tx 交叉构建带提交版本的 Darwin 发压器，复制到真实 `luomac`，由 Mac 临时建立到 `tx` 的 SSH 转发。验证 popularity 哈希并临时提高子进程 nofile，退出时关闭隧道。不恢复表、不切策略、不清缓存、不写商品；标记故事 `S1-calibration`，结果只能用于联调。正式测量不要与全仓测试、构建或其他压测同时运行。
 
 ## 9. 已知问题与坑
 
 - items 表数据 310 MiB，超过 MySQL buffer pool（256 MiB），S1 读延迟会包含磁盘读，定位时要考虑。
-- Mac 的 Go 是 1.27.0（模块要求 1.27.1），nofile 默认 256，Docker daemon 不常驻；正式发压前要处理并记录。
+- Mac 历史 Go 是 1.27.0（模块要求 1.27.1），nofile 默认 256，Docker daemon 不常驻。本轮校准用 tx 交叉构建的 Darwin 二进制，临时提高子进程 nofile，不改变 Mac 系统设置；正式实验仍需采集实际客户端环境。
 - Mac→tx 当前路径经 utun5，公网 TCP connect 成功不代表服务可达；只用 SSH 转发，转发本地接入时间不能当作往返时延。
 - tx 上非交互 ssh 没有代理环境变量；从 tx 下载 GitHub 等资源要显式带 `--proxy http://127.0.0.1:7890`。
 - `datagen`/`loadgen`/镜像构建都拒绝脏工作区：生成后要先提交统计文件，重跑请用独立 `git worktree`。
@@ -153,13 +161,17 @@ python3 scripts/with-p0-env.py go -C tools/datapipe run ./cmd/dbmigrate --dir ..
 
 ## 12. 飞书文档
 
-位置：我的文档库 › WorkPlan › backend-cloud-labs（2026-10-24 用户确认），以用户身份、lark-cli profile `claude` 写入。
+位置：我的文档库 › WorkPlan › backend-cloud-labs（2026-10-24 用户确认），原由 Claude 使用 profile `claude` 以用户身份写入；Codex 续写使用 profile `codex`、`--as user`，保留原创建来源。
 
 - 项目概览（节点本身，Codex 2026-10-13，来源 b98f225）：https://kcn0pbn0hwo0.feishu.cn/wiki/PgE6wzqFbiUa6lktbhHcPqP0nDi
 - backend-cloud-labs 方案（用户方案原文同步）：https://kcn0pbn0hwo0.feishu.cn/wiki/BnIcwD3TUiLXNHkEs9qcCxgdng6
 - backend-cloud-labs 开发记录（每个阶段在文末追加一节，只追加不改旧内容）：https://kcn0pbn0hwo0.feishu.cn/wiki/AkEQwOqXTiyhbiklUqPcjUKfnXg
 
+2026-10-26：Codex 已将本轮测量修复、136 次 Go 顶层回归/CTest、真实 Mac 校准及后续计划追加到上述开发记录（revision 4），并回查确认仍在本项目节点下。
+
 ## 13. 更新日志
+
+- 2026-10-26 · Codex：核对全部群历史与实际提交，纠正 P2-1/P2-2 的过期状态；修复 S1 采样/有效性门禁，补回归和真实 Mac 校准脚本。
 
 - 2026-10-24 · Claude Code：飞书新建「backend-cloud-labs 方案」「backend-cloud-labs 开发记录」并回查位置。
 - 2026-10-24 · Claude Code：按全局交接规范重写本文件（补概述、快速上手、目录、架构、进度、下一步、已知问题、待确认、飞书、日志）；记录 P1 完成、CMDB 密度定案、P2 开始。

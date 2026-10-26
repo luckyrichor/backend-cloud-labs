@@ -1,0 +1,74 @@
+[
+  {
+    "cache_hit_ratio": 0.392,
+    "client_latency_us": {
+      "count": 2000,
+      "max_us": 492287,
+      "p50_us": 35775,
+      "p95_us": 121023,
+      "p99_us": 407551
+    },
+    "dropped": 0,
+    "failed": 0,
+    "observed_rate": 200,
+    "rate": 200,
+    "reads": 2000,
+    "server_latency_us": {
+      "count": 2000,
+      "p50": 637,
+      "p95": 3735,
+      "p99": 10703
+    },
+    "source_reads_per_second": 120.65814053995416,
+    "success": 2000,
+    "valid": true
+  },
+  {
+    "cache_hit_ratio": 0.256,
+    "client_latency_us": {
+      "count": 500,
+      "max_us": 241919,
+      "p50_us": 30287,
+      "p95_us": 151807,
+      "p99_us": 216447
+    },
+    "dropped": 0,
+    "failed": 0,
+    "observed_rate": 50,
+    "rate": 50,
+    "reads": 500,
+    "server_latency_us": {
+      "count": 500,
+      "p50": 729,
+      "p95": 1695,
+      "p99": 3035
+    },
+    "source_reads_per_second": 36.933161754757336,
+    "success": 500,
+    "valid": true
+  },
+  {
+    "cache_hit_ratio": 0.5566,
+    "client_latency_us": {
+      "count": 5000,
+      "max_us": 167679,
+      "p50_us": 19231,
+      "p95_us": 58175,
+      "p99_us": 103359
+    },
+    "dropped": 0,
+    "failed": 0,
+    "observed_rate": 500,
+    "rate": 500,
+    "reads": 5000,
+    "server_latency_us": {
+      "count": 5000,
+      "p50": 458,
+      "p95": 3793,
+      "p99": 13167
+    },
+    "source_reads_per_second": 220.05096738322408,
+    "success": 5000,
+    "valid": true
+  }
+]

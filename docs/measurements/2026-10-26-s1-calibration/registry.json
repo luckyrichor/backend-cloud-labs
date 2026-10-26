@@ -1,0 +1,14 @@
+[
+  {
+    "file": "read-only-200.json.gz",
+    "registry": "7b7bb892318146318c1ae524 completed"
+  },
+  {
+    "file": "read-only-50.json.gz",
+    "registry": "2c18dcbca97db76eb1b5fb21 completed"
+  },
+  {
+    "file": "read-only-500.json.gz",
+    "registry": "09d10d70189eb0b8d98cb910 completed"
+  }
+]
