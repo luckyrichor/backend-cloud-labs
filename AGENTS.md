@@ -96,7 +96,7 @@ python3 scripts/with-p0-env.py go -C tools/datapipe run ./cmd/dbmigrate --dir ..
 **进行中**
 
 - **P2（E1 · S1/S2）**：P2-1（MySQL 源、写令牌，`7bc669f`）、P2-2（四策略及观测，`2b49e7d`）已完成；原交接文档落后于群聊与代码，2026-10-26 已核对。
-- **P2-3 / S1**：基础压测负载已由 Claude 实现（`c0c5df8`）。Codex 在 `3b6f980` 修复测量门禁与预热边界，新增 `scripts/calibrate-s1-mac.py`；真实 Mac 只读校准已完成：三档 50/200/500 req/s，共 7500 个正式窗口读请求，全部成功，无丢到达；证据见 `docs/measurements/2026-10-26-s1-calibration/README.md`。全仓回归 136 次 Go 顶层通过、4 次内存源下预期跳过、vet 与 CTest 7/7。S1 正式矩阵、反向验证、绕过服务直写、定位与最终报告尚未完成；续接已实现 `scripts/s1-suite.py`（独立数据库/带标签实验容器、固定版本构建、逐轮恢复、最终写版本/字段审计、真实 Mac 编排）和 `loadgen/cmd/s1summary`。独立数据已从哈希校验的 P1 TSV 导入并对账；真实链路探测仍在排查 SSH 连接建立/并发问题，正式矩阵尚未启动。只读 HTTP 预建连接代码已通过 loadgen race/vet，真实效果待验证。
+- **P2-3 / S1**：基础压测负载已由 Claude 实现（`c0c5df8`）。Codex 在 `3b6f980` 修复测量门禁与预热边界，新增 `scripts/calibrate-s1-mac.py`；真实 Mac 只读校准已完成：三档 50/200/500 req/s，共 7500 个正式窗口读请求，全部成功，无丢到达；证据见 `docs/measurements/2026-10-26-s1-calibration/README.md`。全仓回归 136 次 Go 顶层通过、4 次内存源下预期跳过、vet 与 CTest 7/7。S1 正式矩阵、反向验证、绕过服务直写、定位与最终报告尚未完成；续接已实现 `scripts/s1-suite.py`（独立数据库/带标签实验容器、固定版本构建、逐轮恢复、最终写版本/字段审计、真实 Mac 编排）和 `loadgen/cmd/s1summary`。独立数据已从哈希校验的 P1 TSV 导入并对账；固定热度前缀的只读 HTTP/数据源连接预建后，500/1500 req/s 的探测通过门禁；3000 不通过。由预定义规则确定正式率档 350/750/1200 req/s，源 `b0edac1` 的矩阵试跑发现预热/正式丢弃计数混用，已在完成并恢复的轮次边界停止；七轮先导数据保留 `.local/s1-suite/matrix/`，不作最终比较。已修复计数范围，准备从统一新版本重跑至 `.local/s1-suite/matrix-v2/`；运行中不要同时启动其他测试/构建/压测。
 
 **未开始**
 
@@ -126,11 +126,11 @@ python3 scripts/calibrate-s1-mac.py --output .local/s1-calibration-<日期>
 
 ```bash
 python3 scripts/s1-suite.py --phase probe --output .local/s1-suite/probe-<新名字>
-python3 scripts/s1-suite.py --phase matrix --output .local/s1-suite/matrix
+python3 scripts/s1-suite.py --phase matrix --output .local/s1-suite/matrix-v2
 ```
 
 - `design.json` 绑定源提交，变更源码后必须重新探测。Mac 是 `scripts/s1/mac-worker.py`，通过 stdin 接收控制指令，保持临时 SSH 转发，结束删除客户端凭据并关闭隧道。
-- SSH 客户端曾在约 1024 通道时报 `poll: Invalid argument` 并退出；当前连接上限 256，HTTP 连接预建 128。控制器保留 `.worker.json` 隧道日志尾部、`.container.json` 与服务日志；门禁不允许失败/丢到达进入正式结果。
+- SSH 客户端曾在约 1024 通道时报 `poll: Invalid argument` 并退出；当前连接上限 384（HTTP + MySQL 两个连接池理论上限合计 768，低于 SSH 约 1024 通道的已见故障点），HTTP 连接预建固定热度前缀 128 个不同商品键，同时触达源连接池；只预读一个已缓存热点不足以稳定启动。控制器保留 `.worker.json` 隧道日志尾部、`.container.json` 与服务日志；门禁不允许失败/丢到达进入正式结果。
 - 服务 `/debug/strategy` 新增 `source` 字段；控制器要求 source=mysql，并读热点确认初始 version=1，避免漏配时测成内存源。
 
 ## 9. 已知问题与坑
@@ -183,7 +183,7 @@ python3 scripts/s1-suite.py --phase matrix --output .local/s1-suite/matrix
 - backend-cloud-labs 方案（用户方案原文同步）：https://kcn0pbn0hwo0.feishu.cn/wiki/BnIcwD3TUiLXNHkEs9qcCxgdng6
 - backend-cloud-labs 开发记录（每个阶段在文末追加一节，只追加不改旧内容）：https://kcn0pbn0hwo0.feishu.cn/wiki/AkEQwOqXTiyhbiklUqPcjUKfnXg
 
-2026-10-26：Codex 已将本轮测量修复、136 次 Go 顶层回归/CTest、真实 Mac 校准及后续计划追加到上述开发记录（revision 4），并回查确认仍在本项目节点下。
+2026-10-26：Codex 已同步测量修复/真实 Mac 校准（revision 4）及隔离编排/137 次 Go 顶层回归/启动问题（revision 5），回读署名并回查确认仍在本项目节点下。当前完整矩阵运行进度将在阶段完成后继续追加。
 
 ## 13. 更新日志
 

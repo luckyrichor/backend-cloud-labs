@@ -79,7 +79,7 @@ func main() {
 		rows = append(rows, map[string]any{"file": filepath.Base(p), "story": d.Story, "arm": d.Arm, "repeat": d.Repeat,
 			"source_commit": d.Commit, "data_version": d.DataVersion, "rate": d.Config.Rate, "ratio": d.Config.Ratio,
 			"bypass": d.Config.Bypass, "valid": d.Result.Valid, "invalid_reasons": d.Result.InvalidReasons,
-			"reads": d.Result.Reads.Count, "writes": d.Result.Writes.Count, "read_failed": d.Result.Reads.Failed, "write_failed": d.Result.Writes.Failed,
+			"warmup_dropped": d.Result.WarmupDropped, "measured_dropped": d.Result.Dropped, "reads": d.Result.Reads.Count, "writes": d.Result.Writes.Count, "read_failed": d.Result.Reads.Failed, "write_failed": d.Result.Writes.Failed,
 			"client_get_us": d.Result.Reads.Latency, "client_put_us": d.Result.Writes.Latency,
 			"server_get_us": get, "server_put_us": put, "stale_reads": d.Result.StaleReads, "stale_ratio": d.Result.StaleRatio,
 			"cache_hit_ratio": d.Result.Server["cache_hit_ratio"], "source_reads_per_second": d.Result.Server["source_reads_per_second"],

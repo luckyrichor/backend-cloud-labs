@@ -274,3 +274,25 @@ func TestS1ReadOnlyPrimingIsOutsideMeasuredRecords(t *testing.T) {
 		t.Fatalf("priming leaked into measured records: total=%d records=%d count=%d valid=%t", count.Load(), len(recs), res.Reads.Count, res.Valid)
 	}
 }
+
+func TestS1WarmupDropsDoNotCorruptWindowAccounting(t *testing.T) {
+	var count atomic.Int64
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if count.Add(1) == 1 {
+			time.Sleep(100 * time.Millisecond)
+		}
+		fmt.Fprint(w, `{"item":{"version":1}}`)
+	}))
+	defer server.Close()
+	res, recs, err := RunS1(context.Background(), S1Config{Target: server.URL, Popularity: []uint32{1}, ReadRatio: 1,
+		Rate: 100, Warmup: 30 * time.Millisecond, Window: 100 * time.Millisecond, MaxInflight: 1, Timeout: time.Second})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if res.WarmupDropped != 2 || res.Dropped != 0 || res.Reads.Count != 10 || len(recs) != 13 || !res.Valid {
+		t.Fatalf("warmup/window accounting mismatch: warmdrop=%d drop=%d reads=%d records=%d valid=%t", res.WarmupDropped, res.Dropped, res.Reads.Count, len(recs), res.Valid)
+	}
+	if res.Reads.Count+res.Writes.Count+int64(res.Dropped) != int64(res.Scheduled) {
+		t.Fatal("measured request accounting does not balance")
+	}
+}

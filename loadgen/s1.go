@@ -119,6 +119,7 @@ type S1Result struct {
 	Scheduled         int            `json:"scheduled"`
 	WarmupScheduled   int            `json:"warmup_scheduled"`
 	Dropped           int            `json:"dropped"`
+	WarmupDropped     int            `json:"warmup_dropped"`
 	HistogramOverflow int            `json:"histogram_overflow"`
 	ObservedRate      float64        `json:"observed_window_send_rate"`
 	Reads             S1OpStats      `json:"reads"`
@@ -293,7 +294,12 @@ func RunS1(ctx context.Context, c S1Config) (S1Result, []S1Record, error) {
 		select {
 		case slots <- struct{}{}:
 		default:
-			res.Dropped++ // open loop: a full client is recorded, never silently slowed
+			// Timed window accounting must exclude discarded warmup arrivals.
+			if i >= warm {
+				res.Dropped++
+			} else {
+				res.WarmupDropped++
+			}
 			continue
 		}
 		wg.Add(1)
@@ -504,6 +510,7 @@ func summarizeS1(res *S1Result, recs []S1Record, windowSecs float64) {
 	}
 	res.Definitions = []string{
 		"latency: planned arrival to completion (open loop), microseconds",
+		"dropped: measured-window arrivals not issued; warmup_dropped is reported separately and excluded",
 		"stale read: version below the highest same-id write acknowledged to this process before the read was sent",
 		"stale_ratio: stale reads / successful window reads",
 		"stale_age: read send time minus acknowledgement time of the newer version",
