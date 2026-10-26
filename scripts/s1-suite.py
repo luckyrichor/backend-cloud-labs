@@ -65,7 +65,7 @@ def event(kind,**fields):
 
 
 def owned_container(name):
-    p = subprocess.run(['docker','inspect','--format','{{index .Config.Labels "bcl.experiment"}}',name],capture_output=True,text=True)
+    p = subprocess.run(['docker','inspect','--type','container','--format','{{index .Config.Labels "bcl.experiment"}}',name],capture_output=True,text=True)
     if p.returncode:
         return False
     if p.stdout.strip() != 's1':
