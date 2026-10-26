@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	hdr "github.com/HdrHistogram/hdrhistogram-go"
+	"math"
 	"math/rand/v2"
 	"net/http"
 	"net/http/httptest"
@@ -121,7 +123,9 @@ func runFake(t *testing.T, lag time.Duration) S1Result {
 		scrapes++
 		fmt.Fprintf(w, "bcl_e1_cache_hits_total %d\nbcl_e1_cache_misses_total %d\nbcl_e1_source_reads_total %d\nother 5\n", 9*n, n, 10*n)
 	})
-	admin.HandleFunc("GET /debug/latency", func(w http.ResponseWriter, r *http.Request) { w.Write([]byte(`{"unit":"us"}`)) })
+	admin.HandleFunc("GET /debug/latency", func(w http.ResponseWriter, r *http.Request) {
+		json.NewEncoder(w).Encode(map[string]any{"get": hdr.New(1, 600_000_000, 3).Export(), "put": hdr.New(1, 600_000_000, 3).Export()})
+	})
 	admin.HandleFunc("GET /debug/strategy", func(w http.ResponseWriter, r *http.Request) { w.Write([]byte(`{"mode":"fake"}`)) })
 	biz, adm := httptest.NewServer(fake), httptest.NewServer(admin)
 	defer biz.Close()
@@ -145,5 +149,107 @@ func TestRunS1CountsStaleReadsOnlyWhenTheServerLags(t *testing.T) {
 	lagging := runFake(t, 30*time.Millisecond)
 	if lagging.StaleReads == 0 || lagging.StaleAge.Max > 200_000 {
 		t.Fatalf("lagging server: stale %d, age %+v", lagging.StaleReads, lagging.StaleAge)
+	}
+}
+
+func TestS1RejectsFailedRequestsAndMissingTelemetry(t *testing.T) {
+	for _, tc := range []struct {
+		name   string
+		status int
+		body   string
+		admin  bool
+	}{
+		{"unauthorized", 401, `{}`, false},
+		{"missing item version", 200, `{"item":{}}`, false},
+		{"missing admin", 200, `{"item":{"version":1}}`, true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if strings.HasPrefix(r.URL.Path, "/debug/") || r.URL.Path == "/metrics" {
+					w.WriteHeader(503)
+					return
+				}
+				w.WriteHeader(tc.status)
+				fmt.Fprint(w, tc.body)
+			}))
+			defer server.Close()
+			c := S1Config{Target: server.URL, Popularity: []uint32{1}, ReadRatio: 1, Rate: 100,
+				Window: 100 * time.Millisecond, MaxInflight: 8, Timeout: time.Second}
+			if tc.admin {
+				c.Admin = server.URL
+			}
+			res, _, err := RunS1(context.Background(), c)
+			if err != nil || res.Valid || len(res.InvalidReasons) == 0 {
+				t.Fatalf("invalid run accepted: valid=%t reasons=%v err=%v", res.Valid, res.InvalidReasons, err)
+			}
+			// Missing telemetry must still produce a serializable diagnostic result.
+			if _, err := json.Marshal(res); err != nil {
+				t.Fatal(err)
+			}
+		})
+	}
+}
+
+func TestS1DrainsWarmupBeforeReset(t *testing.T) {
+	var mu sync.Mutex
+	completed, atReset := 0, -1
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/debug/latency":
+			if r.URL.Query().Get("reset") == "1" {
+				mu.Lock()
+				atReset = completed
+				mu.Unlock()
+			}
+			json.NewEncoder(w).Encode(map[string]any{"get": hdr.New(1, 600_000_000, 3).Export(), "put": hdr.New(1, 600_000_000, 3).Export()})
+		case "/debug/strategy":
+			fmt.Fprint(w, `{"mode":"test"}`)
+		case "/metrics":
+			fmt.Fprint(w, "bcl_e1_source_reads_total 0\nbcl_e1_cache_hits_total 0\nbcl_e1_cache_misses_total 0\n")
+		default:
+			// The single warmup request outlives the whole warmup arrival interval.
+			time.Sleep(30 * time.Millisecond)
+			mu.Lock()
+			completed++
+			mu.Unlock()
+			fmt.Fprint(w, `{"item":{"version":1}}`)
+		}
+	}))
+	defer server.Close()
+	res, _, err := RunS1(context.Background(), S1Config{Target: server.URL, Admin: server.URL,
+		Popularity: []uint32{1}, ReadRatio: 1, Rate: 100, Warmup: 10 * time.Millisecond,
+		Window: 100 * time.Millisecond, MaxInflight: 32, Timeout: time.Second})
+	if err != nil {
+		t.Fatal(err)
+	}
+	mu.Lock()
+	n := atReset
+	mu.Unlock()
+	if n != 1 {
+		t.Fatalf("warmup completed at histogram reset: got %d want 1", n)
+	}
+	if res.Reads.Count != 10 || res.WarmupScheduled != 1 {
+		t.Fatalf("wrong window accounting: %+v", res)
+	}
+}
+
+func TestS1RejectsNonfiniteAndEmptyWindows(t *testing.T) {
+	for _, field := range []string{"nan ratio", "infinite zipf", "empty window", "overflow count"} {
+		t.Run(field, func(t *testing.T) {
+			c := S1Config{Popularity: []uint32{1}, ReadRatio: 1, Rate: 1, Window: time.Second, MaxInflight: 1, Timeout: time.Second}
+			switch field {
+			case "nan ratio":
+				c.ReadRatio = math.NaN()
+			case "infinite zipf":
+				c.ZipfS = math.Inf(1)
+			case "empty window":
+				c.Window = time.Nanosecond
+			case "overflow count":
+				c.Warmup = time.Duration(1<<63 - 1)
+			}
+			if _, _, err := RunS1(context.Background(), c); err == nil {
+				t.Fatal("invalid config accepted")
+			}
+		})
 	}
 }

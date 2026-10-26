@@ -130,6 +130,7 @@ type S1Result struct {
 	Server            map[string]any `json:"server"`
 	Valid             bool           `json:"valid"`
 	Definitions       []string       `json:"definitions"`
+	InvalidReasons    []string       `json:"invalid_reasons,omitempty"`
 }
 
 type s1Clients struct {
@@ -145,7 +146,14 @@ func (c s1Clients) do(ctx context.Context, op s1Op, seq int, rec *S1Record) {
 		price, stock := 100+int64(seq%100000), int64(seq%997)
 		res, err := c.cfg.Bypass.ExecContext(ctx, `UPDATE items SET price_cent = ?, stock = ?, version = LAST_INSERT_ID(version + 1), updated_at = UTC_TIMESTAMP(6) WHERE id = ?`, price, stock, op.id)
 		if err == nil {
-			rec.Version, err = res.LastInsertId()
+			var rows int64
+			rows, err = res.RowsAffected()
+			if err == nil && rows != 1 {
+				err = errors.New("write did not update one item")
+			}
+			if err == nil {
+				rec.Version, err = res.LastInsertId()
+			}
 		}
 		if err != nil {
 			rec.Err = "mysql"
@@ -190,23 +198,30 @@ func (c s1Clients) do(ctx context.Context, op s1Op, seq int, rec *S1Record) {
 			return
 		}
 		rec.Version, rec.Source = body.Item.Version, body.Source
+		if rec.Version <= 0 {
+			rec.Err = "version"
+		}
 	} else {
 		io.Copy(io.Discard, io.LimitReader(resp.Body, 1<<20))
 	}
 }
 
 // RunS1 performs warmup then window back to back at one rate. Admin snapshots bracket the
-// window: the server latency histogram is reset at window start and read at window end.
+// window: warmup drains before reset; the measured requests drain before the final snapshot.
 func RunS1(ctx context.Context, c S1Config) (S1Result, []S1Record, error) {
 	if c.Rate <= 0 || c.Window <= 0 || c.Warmup < 0 || c.MaxInflight <= 0 || c.Timeout <= 0 || len(c.Popularity) == 0 ||
-		c.ReadRatio < 0 || c.ReadRatio > 1 || c.ZipfS < 0 {
+		c.ReadRatio < 0 || c.ReadRatio > 1 || c.ZipfS < 0 ||
+		math.IsNaN(c.ReadRatio) || math.IsInf(c.ReadRatio, 0) || math.IsNaN(c.ZipfS) || math.IsInf(c.ZipfS, 0) ||
+		c.Rate > 100000 || c.MaxInflight > 100000 {
 		return S1Result{}, nil, errors.New("invalid S1 configuration")
 	}
-	warm := int(float64(c.Rate) * c.Warmup.Seconds())
-	total := warm + int(float64(c.Rate)*c.Window.Seconds())
-	if total > 20_000_000 {
-		return S1Result{}, nil, errors.New("too many requests for one run")
+	warmCount := float64(c.Rate) * c.Warmup.Seconds()
+	windowCount := float64(c.Rate) * c.Window.Seconds()
+	if windowCount < 1 || warmCount+windowCount > 20_000_000 {
+		return S1Result{}, nil, errors.New("request count outside supported range")
 	}
+	warm := int(warmCount)
+	total := warm + int(windowCount)
 	plan := PlanS1(c.Seed, total, c.Popularity, c.ZipfS, c.ReadRatio)
 	records := make([]S1Record, total)
 	transport := &http.Transport{MaxIdleConns: c.MaxInflight, MaxIdleConnsPerHost: c.MaxInflight, MaxConnsPerHost: c.MaxInflight, IdleConnTimeout: time.Minute}
@@ -221,13 +236,22 @@ func RunS1(ctx context.Context, c S1Config) (S1Result, []S1Record, error) {
 	res.StartedAt = start.UTC()
 	windowStart := start.Add(time.Duration(float64(warm) * float64(time.Second) / float64(c.Rate)))
 	var before map[string]float64
+	telemetryOK := true
 	for i := 0; i < total; i++ {
+		if i == warm {
+			// Drain warmup before resetting the server histogram. No warmup request
+			// can finish inside the measured server window.
+			wg.Wait()
+			if c.Admin != "" {
+				telemetryOK = validLatency(fetch(admin, c.Admin+"/debug/latency?reset=1"))
+				before = counters(admin, c.Admin)
+				telemetryOK = telemetryOK && validCounters(before)
+			}
+			windowStart = time.Now()
+		}
 		planned := start.Add(time.Duration(float64(i) * float64(time.Second) / float64(c.Rate)))
-		if i == warm && c.Admin != "" {
-			// Bracket the window on the server side. These calls happen on the dispatch loop,
-			// so a slow admin endpoint shows up as scheduling lag rather than being hidden.
-			fetch(admin, c.Admin+"/debug/latency?reset=1")
-			before = counters(admin, c.Admin)
+		if i >= warm {
+			planned = windowStart.Add(time.Duration(float64(i-warm) * float64(time.Second) / float64(c.Rate)))
 		}
 		if d := time.Until(planned); d > 0 {
 			select {
@@ -259,11 +283,20 @@ func RunS1(ctx context.Context, c S1Config) (S1Result, []S1Record, error) {
 			rec.Done = time.Since(start).Nanoseconds()
 		}(i)
 	}
-	windowEnd := time.Now()
+	// Use the complete arrival interval, including the final inter-arrival slot.
+	windowEnd := windowStart.Add(c.Window)
+	if d := time.Until(windowEnd); d > 0 {
+		select {
+		case <-time.After(d):
+		case <-ctx.Done():
+			wg.Wait()
+			return res, records, ctx.Err()
+		}
+	}
 	wg.Wait()
 	if c.Admin != "" {
 		var snap json.RawMessage
-		if raw := fetch(admin, c.Admin+"/debug/latency"); raw != nil {
+		if raw := fetch(admin, c.Admin+"/debug/latency"); validLatency(raw) {
 			snap = raw
 		}
 		after := counters(admin, c.Admin)
@@ -274,18 +307,74 @@ func RunS1(ctx context.Context, c S1Config) (S1Result, []S1Record, error) {
 			delta[k] = v - before[k]
 		}
 		res.Server["counters_delta"] = delta
-		secs := windowEnd.Sub(windowStart).Seconds()
+		// Counters include request drain; keep the actual bracket duration explicit.
+		secs := time.Since(windowStart).Seconds()
 		res.Server["window_seconds_approx"] = secs
 		res.Server["source_reads_per_second"] = delta["bcl_e1_source_reads_total"] / secs
 		if lookups := delta["bcl_e1_cache_hits_total"] + delta["bcl_e1_cache_misses_total"]; lookups > 0 {
 			res.Server["cache_hit_ratio"] = delta["bcl_e1_cache_hits_total"] / lookups
 		}
 		strategy := fetch(admin, c.Admin+"/debug/strategy")
-		res.Server["strategy"] = json.RawMessage(strategy)
+		if json.Valid(strategy) {
+			res.Server["strategy"] = json.RawMessage(strategy)
+		}
+		telemetryOK = telemetryOK && json.Valid(snap) && json.Valid(strategy) && validCounters(after)
+		for _, v := range delta {
+			if v < 0 || math.IsNaN(v) || math.IsInf(v, 0) {
+				telemetryOK = false
+			}
+		}
 	}
-	summarizeS1(&res, records, windowEnd.Sub(windowStart).Seconds())
-	res.Valid = ctx.Err() == nil && res.Dropped == 0 && res.HistogramOverflow == 0
+	windowStartNS, windowEndNS := windowStart.Sub(start).Nanoseconds(), windowEnd.Sub(start).Nanoseconds()
+	within := 0
+	for _, r := range records {
+		if r.Window && r.Issued && r.Sent >= windowStartNS && r.Sent < windowEndNS {
+			within++
+		}
+	}
+	summarizeS1(&res, records, c.Window.Seconds())
+	res.ObservedRate = float64(within) / c.Window.Seconds()
+	if !telemetryOK {
+		res.InvalidReasons = append(res.InvalidReasons, "server telemetry unavailable or counters reset")
+	}
+	if res.Dropped != 0 {
+		res.InvalidReasons = append(res.InvalidReasons, "client dropped scheduled arrivals")
+	}
+	if res.Reads.Failed+res.Writes.Failed != 0 {
+		res.InvalidReasons = append(res.InvalidReasons, "measured requests failed")
+	}
+	for _, r := range records[:warm] {
+		if r.Issued && (r.Err != "" || r.Status != 200) {
+			res.InvalidReasons = append(res.InvalidReasons, "warmup requests failed")
+			break
+		}
+	}
+	if res.HistogramOverflow != 0 {
+		res.InvalidReasons = append(res.InvalidReasons, "histogram overflow")
+	}
+	if math.Abs(res.ObservedRate/float64(c.Rate)-1) > 0.05 {
+		res.InvalidReasons = append(res.InvalidReasons, "arrival rate deviated over five percent")
+	}
+	res.Valid = ctx.Err() == nil && len(res.InvalidReasons) == 0
 	return res, records, nil
+}
+
+func validLatency(raw []byte) bool {
+	var snap struct {
+		Get, Put *hdr.Snapshot
+	}
+	return json.Unmarshal(raw, &snap) == nil && snap.Get != nil && snap.Put != nil &&
+		len(snap.Get.Counts) > 0 && len(snap.Put.Counts) > 0
+}
+
+func validCounters(m map[string]float64) bool {
+	for _, k := range []string{"bcl_e1_source_reads_total", "bcl_e1_cache_hits_total", "bcl_e1_cache_misses_total"} {
+		v, ok := m[k]
+		if !ok || v < 0 || math.IsNaN(v) || math.IsInf(v, 0) {
+			return false
+		}
+	}
+	return true
 }
 
 func fetch(c *http.Client, url string) []byte {
@@ -308,7 +397,7 @@ func counters(c *http.Client, admin string) map[string]float64 {
 	for sc.Scan() {
 		name, value, ok := strings.Cut(sc.Text(), " ")
 		if ok && strings.HasPrefix(name, "bcl_e1_") {
-			if v, err := strconv.ParseFloat(value, 64); err == nil {
+			if v, err := strconv.ParseFloat(value, 64); err == nil && !math.IsNaN(v) && !math.IsInf(v, 0) {
 				out[name] = v
 			}
 		}
