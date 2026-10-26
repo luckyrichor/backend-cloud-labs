@@ -230,20 +230,20 @@ func RunS1(ctx context.Context, c S1Config) (S1Result, []S1Record, error) {
 	clients := s1Clients{&http.Client{Transport: transport, Timeout: c.Timeout}, c}
 	if c.PrimeConnections > 0 {
 		// Establish SSH-forwarded HTTP channels before timed arrivals. Only GETs of
-		// a known catalog item are issued; no source writes can become ambiguous.
+		// a fixed popularity prefix are issued; no source writes can become ambiguous.
 		primeClient := s1Clients{&http.Client{Transport: transport, Timeout: 15 * time.Second}, c}
 		failed := make(chan bool, c.PrimeConnections)
 		var primes sync.WaitGroup
-		for range c.PrimeConnections {
+		for i := range c.PrimeConnections {
 			primes.Add(1)
-			go func() {
+			go func(i int) {
 				defer primes.Done()
 				var r S1Record
 				primeCtx, cancel := context.WithTimeout(ctx, 15*time.Second)
 				defer cancel()
-				primeClient.do(primeCtx, s1Op{id: c.Popularity[0]}, 0, &r)
+				primeClient.do(primeCtx, s1Op{id: c.Popularity[i%len(c.Popularity)]}, 0, &r)
 				failed <- r.Err != "" || r.Status != 200
-			}()
+			}(i)
 		}
 		primes.Wait()
 		close(failed)
