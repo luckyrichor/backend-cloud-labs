@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 	"time"
 
@@ -33,6 +34,10 @@ import (
 //	GUIDE_UNGATED_FILLS=1             versioned arm fills with plain SET (S1 reverse validation)
 //	GUIDE_TRACE_ID, GUIDE_TRACE_FILE  append the event timeline of one key as JSON lines
 func main() {
+	// Enabled only in dedicated profiling runs, excluded from performance comparisons.
+	if os.Getenv("GUIDE_PROFILE_MUTEX") == "1" {
+		runtime.SetMutexProfileFraction(1)
+	}
 	adminAddress := telemetry.Address("ADMIN_ADDRESS", "127.0.0.1:9086")
 	telemetry.ExitHealthcheck(adminAddress)
 	metrics := &telemetry.Metrics{}

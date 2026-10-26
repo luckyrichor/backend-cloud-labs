@@ -20,6 +20,7 @@ import shlex
 import shutil
 import subprocess
 import time
+import threading
 import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -192,7 +193,7 @@ def start_redis():
     raise RuntimeError('experiment Redis not ready')
 
 
-def start_e1(arm,stem):
+def start_e1(arm,stem,profile=False):
     mode,off = ARMS[arm]
     # Env file never appears in stdout/argv; only its path is exposed.
     text = (ROOT/'.local/deploy/e1-s1.env').read_text().replace('/bcl?','/bcl_s1?')
@@ -206,7 +207,7 @@ def start_e1(arm,stem):
              '--cpuset-cpus','2','--memory','192m','--env-file',str(envfile),
              '-e','GUIDE_ADDRESS=0.0.0.0:8086','-e','ADMIN_ADDRESS=0.0.0.0:9086',
              '-e','REDIS_ADDR=bcl-s1-redis:6379','-e',f'CACHE_READ_MODE={mode}',
-             '-e',f'GUIDE_UNGATED_FILLS={int(off)}','-e',f'GUIDE_TRACE_ID={hot}',
+             '-e',f'GUIDE_UNGATED_FILLS={int(off)}','-e',f'GUIDE_PROFILE_MUTEX={int(profile)}','-e',f'GUIDE_TRACE_ID={hot}',
              '-e','GUIDE_TRACE_FILE=/trace/events.jsonl','-v',str(trace)+':/trace',
              '-p','127.0.0.1:18096:8086','-p','127.0.0.1:19096:9086','bcl-s1-e1'],capture_output=True)
     for _ in range(100):
@@ -223,7 +224,7 @@ def dirty_ids(raw):
         return sorted({int(r['id']) for r in csv.DictReader(f) if r['write']=='1'})
 
 
-def one(mac,commit,manifest,out,arm,ratio,rate,repeat,window,warmup,story,bypass=False):
+def one(mac,commit,manifest,out,arm,ratio,rate,repeat,window,warmup,story,bypass=False,profile=False):
     stem = f'{story}-{arm}-p{int(ratio*100)}-q{rate}-r{repeat}'
     completed = out/(stem+'.done.json')
     if completed.exists():
@@ -231,14 +232,29 @@ def one(mac,commit,manifest,out,arm,ratio,rate,repeat,window,warmup,story,bypass
     stop_e1()
     # Last complete run's dirty keys are restored at its end. Full restore is done
     # at controller startup to cover a previously interrupted run.
-    start_e1(arm,stem)
+    start_e1(arm,stem,profile)
     event('run-start',stem=stem,window=window,warmup=warmup)
     # Round-trip baseline collected before each run, not concurrently with traffic.
     rtt = mac.ask({'op':'rtt'})
     save(out/(stem+'.network.json'),rtt)
     req = dict(op='run',stem=stem,ratio=ratio,rate=rate,warmup=warmup,window=window,
                seed=20261026+repeat,arm=arm,repeat=repeat,data_version=manifest['data_version'],story=story,bypass=bypass)
+    prof_error=[]
+    def profile_worker():
+        try:
+            time.sleep(warmup+2)
+            for suffix,url in [('cpu.pprof','profile?seconds=5'),('mutex.pprof','mutex'),('goroutine.pprof','goroutine')]:
+                with urllib.request.urlopen('http://127.0.0.1:19096/debug/pprof/'+url,timeout=15) as r:
+                    (out/(stem+'.'+suffix)).write_bytes(r.read())
+        except Exception as e:
+            prof_error.append(type(e).__name__)
+    profiler=None
+    if profile:
+        profiler=threading.Thread(target=profile_worker);profiler.start()
     response = mac.ask(req)
+    if profiler:
+        profiler.join()
+        if prof_error:raise RuntimeError('profile collection failed: '+str(prof_error))
     if response['exit_code']:
         save(out/(stem+'.worker-error.json'),response)
         raise RuntimeError('Mac loadgen failed; see private worker-error diagnostics')
@@ -320,6 +336,8 @@ def main():
                 bypass=['A','B','C','D'] if repeat%2 else ['D','C','B','A']
                 for arm in bypass:
                     one(mac,commit,manifest,out,arm,.95,rate,repeat,window,10,'S1-bypass',True)
+            for arm in ['A','B','C']:
+                one(mac,commit,manifest,out,arm,.95,rates[-1],1,20,10,'S1-profile',profile=True)
             event('matrix-complete')
     finally:
         stop_e1();mac.close()
