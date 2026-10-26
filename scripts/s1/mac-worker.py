@@ -34,9 +34,16 @@ def send(obj):
     print(json.dumps(obj), flush=True)
 
 try:
-    time.sleep(.5)
-    if tunnel.poll() is not None:
-        raise RuntimeError('SSH tunnel failed')
+    for attempt in range(200):
+        if tunnel.poll() is not None:
+            raise RuntimeError('SSH tunnel failed: '+tunnel.stderr.read().decode()[-1000:])
+        try:
+            with socket.create_connection(('127.0.0.1',admin),timeout=.1):
+                break
+        except OSError:
+            time.sleep(.1)
+    else:
+        raise RuntimeError('SSH local forward did not become ready')
     dsn = secret['dsn'].replace('127.0.0.1:13306',f'127.0.0.1:{mysql}')
     (root/'bypass.dsn').write_text(dsn)
     (root/'bypass.dsn').chmod(0o600)
