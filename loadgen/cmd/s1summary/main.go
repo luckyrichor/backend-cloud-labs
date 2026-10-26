@@ -46,7 +46,7 @@ func main() {
 	}
 	sort.Strings(files)
 	for _, p := range files {
-		if strings.Contains(filepath.Base(p), ".done.") || strings.Contains(filepath.Base(p), ".network.") || strings.Contains(filepath.Base(p), ".worker-error.") || strings.Contains(filepath.Base(p), ".container.") {
+		if strings.Contains(filepath.Base(p), ".done.") || strings.Contains(filepath.Base(p), ".network.") || strings.Contains(filepath.Base(p), ".worker-error.") || strings.Contains(filepath.Base(p), ".container.") || strings.Contains(filepath.Base(p), ".correctness.") {
 			continue
 		}
 		raw, err := os.ReadFile(p)

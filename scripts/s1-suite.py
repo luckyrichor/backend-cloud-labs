@@ -228,11 +228,41 @@ def dirty_ids(raw):
         return sorted({int(r['id']) for r in csv.DictReader(f) if r['write']=='1'})
 
 
+def verify_writes(raw):
+    # Audit source state before restoring it. A valid run has no ambiguous writes.
+    by_id=collections.defaultdict(list)
+    with gzip.open(raw,'rt') as f:
+        for seq,r in enumerate(csv.DictReader(f)):
+            if r['write']=='1' and r['sent']=='1' and r['status']=='200' and not r['err']:
+                by_id[int(r['id'])].append((int(r['version']),seq))
+    expected={}
+    for ident,writes in by_id.items():
+        versions=sorted(v for v,_ in writes)
+        if versions!=list(range(2,len(writes)+2)):
+            return dict(ok=False,reason='acknowledged versions not contiguous from baseline',id=ident)
+        version,seq=max(writes)
+        expected[ident]=(version,100+seq%100000,seq%997)
+    keys=sorted(expected)
+    for start in range(0,len(keys),500):
+        text=sql('SELECT id,version,price_cent,stock FROM bcl_s1.items WHERE id IN ('+
+                 ','.join(str(x) for x in keys[start:start+500])+');')
+        found={}
+        for line in text.splitlines():
+            ident,version,price,stock=map(int,line.split('\t'))
+            found[ident]=(version,price,stock)
+        for ident in keys[start:start+500]:
+            if found.get(ident)!=expected[ident]:
+                return dict(ok=False,reason='source final value differs from acknowledged writes',id=ident)
+    return dict(ok=True,keys=len(keys),acknowledged_writes=sum(len(x) for x in by_id.values()))
+
+
 def one(mac,commit,manifest,out,arm,ratio,rate,repeat,window,warmup,story,bypass=False,profile=False):
     stem = f'{story}-{arm}-p{int(ratio*100)}-q{rate}-r{repeat}'
     completed = out/(stem+'.done.json')
     if completed.exists():
-        return json.loads((out/(stem+'.json')).read_text())
+        doc=json.loads((out/(stem+'.json')).read_text())
+        if doc['git_commit']!=commit:raise RuntimeError('completed output belongs to another source commit')
+        return doc
     partial=list(out.glob(stem+'.*'))
     if partial:
         archive=out/'incomplete'/str(time.time_ns());archive.mkdir(parents=True)
@@ -278,6 +308,12 @@ def one(mac,commit,manifest,out,arm,ratio,rate,repeat,window,warmup,story,bypass
     trace = STATE/'traces'/stem/'events.jsonl'
     if trace.exists():
         (out/(stem+'.trace.jsonl.gz')).write_bytes(gzip.compress(trace.read_bytes(),mtime=0))
+    correctness=verify_writes(out/(stem+'.csv.gz'))
+    save(out/(stem+'.correctness.json'),correctness)
+    if not correctness['ok']:
+        # Preserve the exact client result; separate gate is authoritative for comparison.
+        event('correctness-gate-failed',stem=stem,reason=correctness['reason'])
+        raise RuntimeError('source correctness gate failed; preserve run and inspect before resuming')
     ids = dirty_ids(out/(stem+'.csv.gz'))
     restore(ids)
     registry = command(['python3','scripts/with-p0-env.py',str(STATE/'loadgen'),'register',
