@@ -28,7 +28,8 @@ biz, admin, mysql = ports
 args = ['ssh','-N','-o','BatchMode=yes','-o','ExitOnForwardFailure=yes','-o','ServerAliveInterval=10']
 for local, remote in zip(ports, [18096,19096,13306]):
     args += ['-L',f'127.0.0.1:{local}:127.0.0.1:{remote}']
-tunnel = subprocess.Popen(args+['tx'], stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+tunnel_log = (root/'ssh-tunnel.log').open('ab')
+tunnel = subprocess.Popen(args+['tx'], stdout=subprocess.DEVNULL, stderr=tunnel_log)
 opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
 def send(obj):
     print(json.dumps(obj), flush=True)
@@ -36,7 +37,7 @@ def send(obj):
 try:
     for attempt in range(200):
         if tunnel.poll() is not None:
-            raise RuntimeError('SSH tunnel failed: '+tunnel.stderr.read().decode()[-1000:])
+            raise RuntimeError('SSH tunnel failed: '+(root/'ssh-tunnel.log').read_text()[-1000:])
         try:
             with socket.create_connection(('127.0.0.1',admin),timeout=.1):
                 break
@@ -79,7 +80,9 @@ try:
             argv += ['--bypass-dsn-file',str(root/'bypass.dsn')]
         r = subprocess.run(argv,env=env,capture_output=True,text=True)
         # Driver errors are intentionally generic; no private configuration is printed.
-        send({'exit_code':r.returncode,'stdout':r.stdout,'stderr':r.stderr})
+        send({'exit_code':r.returncode,'stdout':r.stdout,'stderr':r.stderr,
+              'tunnel_alive':tunnel.poll() is None,
+              'tunnel_log_tail':(root/'ssh-tunnel.log').read_text()[-6000:]})
 finally:
     tunnel.terminate()
     try:
@@ -87,5 +90,6 @@ finally:
     except subprocess.TimeoutExpired:
         tunnel.kill()
         tunnel.communicate()
+    tunnel_log.close()
     for p in (root/'private.json',root/'bypass.dsn'):
         p.unlink(missing_ok=True)

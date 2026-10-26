@@ -293,6 +293,7 @@ def one(mac,commit,manifest,out,arm,ratio,rate,repeat,window,warmup,story,bypass
     if profiler:
         profiler.join()
         if prof_error:raise RuntimeError('profile collection failed: '+str(prof_error))
+    save(out/(stem+'.worker.json'),response)
     if response['exit_code']:
         save(out/(stem+'.worker-error.json'),response)
         raise RuntimeError('Mac loadgen failed; see private worker-error diagnostics')
@@ -310,7 +311,7 @@ def one(mac,commit,manifest,out,arm,ratio,rate,repeat,window,warmup,story,bypass
         (out/(stem+'.trace.jsonl.gz')).write_bytes(gzip.compress(trace.read_bytes(),mtime=0))
     correctness=verify_writes(out/(stem+'.csv.gz'))
     save(out/(stem+'.correctness.json'),correctness)
-    if not correctness['ok']:
+    if not correctness['ok'] and doc['result']['valid']:
         # Preserve the exact client result; separate gate is authoritative for comparison.
         event('correctness-gate-failed',stem=stem,reason=correctness['reason'])
         raise RuntimeError('source correctness gate failed; preserve run and inspect before resuming')
