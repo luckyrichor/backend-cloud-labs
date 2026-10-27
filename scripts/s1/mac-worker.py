@@ -14,6 +14,8 @@ import urllib.request
 root = Path(sys.argv[1])
 if platform.system() != 'Darwin':
     raise SystemExit('S1 client must run on Darwin')
+awake = subprocess.Popen(['/usr/bin/caffeinate','-i','-w',str(os.getpid())],
+                         stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
 secret = json.loads((root/'private.json').read_text())
 soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
 resource.setrlimit(resource.RLIMIT_NOFILE, (min(8192, hard) if hard != resource.RLIM_INFINITY else 8192, hard))
@@ -48,9 +50,11 @@ try:
     dsn = secret['dsn'].replace('127.0.0.1:13306',f'127.0.0.1:{mysql}')
     (root/'bypass.dsn').write_text(dsn)
     (root/'bypass.dsn').chmod(0o600)
+    if awake.poll() is not None:
+        raise RuntimeError('Mac idle-sleep inhibitor exited')
     send({'ready':True,'host':socket.gethostname(),'platform':platform.platform(),
           'cpus':os.cpu_count(),'nofile':resource.getrlimit(resource.RLIMIT_NOFILE),
-          'machine':platform.machine()})
+          'machine':platform.machine(),'worker_pid':os.getpid(),'idle_sleep_inhibited':True})
     for line in sys.stdin:
         c = json.loads(line)
         if c['op'] == 'bye':
@@ -78,7 +82,7 @@ try:
                 '--output',str(root/(stem+'.json')),'--raw',str(root/(stem+'.csv.gz'))]
         if c.get('bypass'):
             argv += ['--bypass-dsn-file',str(root/'bypass.dsn')]
-        r = subprocess.run(argv,env=env,capture_output=True,text=True)
+        r = subprocess.run(argv,env=env,capture_output=True,text=True,timeout=c['warmup']+c['window']+60)
         # Driver errors are intentionally generic; no private configuration is printed.
         send({'exit_code':r.returncode,'stdout':r.stdout,'stderr':r.stderr,
               'tunnel_alive':tunnel.poll() is None,
@@ -91,5 +95,7 @@ finally:
         tunnel.kill()
         tunnel.communicate()
     tunnel_log.close()
+    awake.terminate()
+    awake.wait(timeout=5)
     for p in (root/'private.json',root/'bypass.dsn'):
         p.unlink(missing_ok=True)

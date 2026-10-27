@@ -1,6 +1,6 @@
 # AGENTS.md
 
-最后更新：2026-10-26（北京时间）· Codex
+最后更新：2026-10-27（北京时间）· Codex
 
 本文件是本仓库唯一的交接正文（Claude Code 经 `CLAUDE.md` 的 `@AGENTS.md` 导入，Codex 直接读）。没参与过的人只读这一份，应能知道项目是什么、做到哪、怎么继续。
 
@@ -96,7 +96,7 @@ python3 scripts/with-p0-env.py go -C tools/datapipe run ./cmd/dbmigrate --dir ..
 **进行中**
 
 - **P2（E1 · S1/S2）**：P2-1（MySQL 源、写令牌，`7bc669f`）、P2-2（四策略及观测，`2b49e7d`）已完成；原交接文档落后于群聊与代码，2026-10-26 已核对。
-- **P2-3 / S1**：基础压测负载已由 Claude 实现（`c0c5df8`）。Codex 在 `3b6f980` 修复测量门禁与预热边界，新增 `scripts/calibrate-s1-mac.py`；真实 Mac 只读校准已完成：三档 50/200/500 req/s，共 7500 个正式窗口读请求，全部成功，无丢到达；证据见 `docs/measurements/2026-10-26-s1-calibration/README.md`。全仓回归 136 次 Go 顶层通过、4 次内存源下预期跳过、vet 与 CTest 7/7。S1 正式矩阵、反向验证、绕过服务直写、定位与最终报告尚未完成；续接已实现 `scripts/s1-suite.py`（独立数据库/带标签实验容器、固定版本构建、逐轮恢复、最终写版本/字段审计、真实 Mac 编排）和 `loadgen/cmd/s1summary`。独立数据已从哈希校验的 P1 TSV 导入并对账；固定热度前缀的只读 HTTP/数据源连接预建后，500/1500 req/s 的探测通过门禁；3000 不通过。由预定义规则确定正式率档 350/750/1200 req/s，源 `b0edac1` 的矩阵试跑发现预热/正式丢弃计数混用，已在完成并恢复的轮次边界停止；七轮先导数据保留 `.local/s1-suite/matrix/`，不作最终比较。已修复计数范围，准备从统一新版本重跑至 `.local/s1-suite/matrix-v2/`；运行中不要同时启动其他测试/构建/压测。
+- **P2-3 / S1**：基础压测负载已由 Claude 实现（`c0c5df8`）。Codex 在 `3b6f980` 修复测量门禁与预热边界，新增 `scripts/calibrate-s1-mac.py`；真实 Mac 只读校准已完成：三档 50/200/500 req/s，共 7500 个正式窗口读请求，全部成功，无丢到达；证据见 `docs/measurements/2026-10-26-s1-calibration/README.md`。全仓回归 136 次 Go 顶层通过、4 次内存源下预期跳过、vet 与 CTest 7/7。S1 正式矩阵、反向验证、绕过服务直写、定位与最终报告尚未完成；续接已实现 `scripts/s1-suite.py`（独立数据库/带标签实验容器、固定版本构建、逐轮恢复、最终写版本/字段审计、真实 Mac 编排）和 `loadgen/cmd/s1summary`。独立数据已从哈希校验的 P1 TSV 导入并对账；固定热度前缀的只读 HTTP/数据源连接预建后，500/1500 req/s 的探测通过门禁；3000 不通过。由预定义规则确定正式率档 350/750/1200 req/s，源 `b0edac1` 的矩阵试跑发现预热/正式丢弃计数混用，已在完成并恢复的轮次边界停止；七轮先导数据保留 `.local/s1-suite/matrix/`，不作最终比较。已修复计数范围，源 `1c3ca2a` 的 matrix-v2 首轮 A 有效（12251 次读，15 次陈旧读），B 遭 Mac 离线中断。2026-10-27 用户恢复 Mac 后已取回 B 文件、登记无效、停止旧实验 E1 并恢复实验数据；旧控制进程/worker 已退出，session 58831 不再有效。跨日结果不混作同一组比较，今天将从新控制器版本重新探测并跑完整矩阵。新 worker 自动 caffeinate -i，退出时解除；SSH/SCP 和单轮 CLI 设超时。
 
 **未开始**
 
@@ -126,7 +126,7 @@ python3 scripts/calibrate-s1-mac.py --output .local/s1-calibration-<日期>
 
 ```bash
 python3 scripts/s1-suite.py --phase probe --output .local/s1-suite/probe-<新名字>
-python3 scripts/s1-suite.py --phase matrix --output .local/s1-suite/matrix-v2
+python3 scripts/s1-suite.py --phase matrix --output .local/s1-suite/matrix-2026-10-27
 ```
 
 - `design.json` 绑定源提交，变更源码后必须重新探测。Mac 是 `scripts/s1/mac-worker.py`，通过 stdin 接收控制指令，保持临时 SSH 转发，结束删除客户端凭据并关闭隧道。
@@ -183,9 +183,11 @@ python3 scripts/s1-suite.py --phase matrix --output .local/s1-suite/matrix-v2
 - backend-cloud-labs 方案（用户方案原文同步）：https://kcn0pbn0hwo0.feishu.cn/wiki/BnIcwD3TUiLXNHkEs9qcCxgdng6
 - backend-cloud-labs 开发记录（每个阶段在文末追加一节，只追加不改旧内容）：https://kcn0pbn0hwo0.feishu.cn/wiki/AkEQwOqXTiyhbiklUqPcjUKfnXg
 
-2026-10-26：Codex 已同步测量修复/真实 Mac 校准（revision 4）及隔离编排/137 次 Go 顶层回归/启动问题（revision 5），回读署名并回查确认仍在本项目节点下。当前完整矩阵运行进度将在阶段完成后继续追加。
+2026-10-26：Codex 已同步测量修复/真实 Mac 校准（revision 4）及隔离编排/137 次 Go 顶层回归/启动问题（revision 5），回读署名并回查确认仍在本项目节点下。连接预建/统计范围修正、138 次 Go 顶层回归已追加至 revision 6，并回查节点。当前完整矩阵运行进度将在阶段完成后继续追加。
 
 ## 13. 更新日志
+
+- 2026-10-27 · Codex：用户恢复 Mac；取回旧 B 中断文件并登记无效，恢复实验基底；新增随任务生命周期的 Mac 保活与控制/传输/单轮超时，准备跨日独立重跑。
 
 - 2026-10-26 · Codex：核对全部群历史与实际提交，纠正 P2-1/P2-2 的过期状态；修复 S1 采样/有效性门禁，补回归和真实 Mac 校准脚本。
 

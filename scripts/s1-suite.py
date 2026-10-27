@@ -28,6 +28,9 @@ os.chdir(ROOT)
 STATE = ROOT/'.local/s1-suite'
 LABEL = 'bcl.experiment=s1'
 DB = 'bcl_s1'
+EVIDENCE_ROOT = Path('docs/measurements')/(datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8))).strftime('%Y-%m-%d')+'-s1')
+SCP = ['scp','-q','-o','BatchMode=yes','-o','ConnectTimeout=10',
+       '-o','ServerAliveInterval=10','-o','ServerAliveCountMax=3']
 ARMS = {'A':('cache-aside',False),'B':('versioned',False),'C':('strict',False),
         'D':('cache-first',False),'B-off':('versioned',True)}
 
@@ -122,7 +125,7 @@ def restore(ids=None):
 class Mac:
     def __init__(self,commit):
         self.host = 'luomac'
-        self.ssh = ['ssh','-o','BatchMode=yes','-o','ConnectTimeout=10',self.host]
+        self.ssh = ['ssh','-o','BatchMode=yes','-o','ConnectTimeout=10','-o','ServerAliveInterval=10','-o','ServerAliveCountMax=3',self.host]
         identity = subprocess.check_output(self.ssh+['uname -s; uname -m'],text=True).splitlines()
         if identity != ['Darwin','arm64']:
             raise RuntimeError('expected the configured real Darwin arm64 Mac')
@@ -133,7 +136,7 @@ class Mac:
         private.chmod(0o600)
         for local,remote in [(STATE/'loadgen-mac','loadgen'),(STATE/'popularity.u32','popularity.u32'),
                              (private,'private.json'),(ROOT/'scripts/s1/mac-worker.py','worker.py')]:
-            command(['scp','-q',str(local),f'{self.host}:{self.remote}/{remote}'])
+            command(SCP+[str(local),f'{self.host}:{self.remote}/{remote}'])
         self.proc = subprocess.Popen(self.ssh+[shlex.join(['python3','-u',self.remote+'/worker.py',self.remote])],
                                      stdin=subprocess.PIPE,stdout=subprocess.PIPE,text=True,bufsize=1)
         self.environment = self.read()
@@ -150,7 +153,7 @@ class Mac:
         return self.read()
     def copy(self,stem,out):
         for suffix in ['.json','.csv.gz']:
-            command(['scp','-q',f'{self.host}:{self.remote}/{stem}{suffix}',str(out/(stem+suffix))])
+            command(SCP+[f'{self.host}:{self.remote}/{stem}{suffix}',str(out/(stem+suffix))])
     def close(self):
         try:
             self.proc.stdin.write('{"op":"bye"}\n');self.proc.stdin.flush()
@@ -318,7 +321,7 @@ def one(mac,commit,manifest,out,arm,ratio,rate,repeat,window,warmup,story,bypass
     ids = dirty_ids(out/(stem+'.csv.gz'))
     restore(ids)
     registry = command(['python3','scripts/with-p0-env.py',str(STATE/'loadgen'),'register',
-        '--result',str(out/(stem+'.json')),'--recorded-path',str(Path('docs/measurements/2026-10-26-s1')/out.name/(stem+'.json.gz'))],capture_output=True,text=True).stdout.strip()
+        '--result',str(out/(stem+'.json')),'--recorded-path',str(EVIDENCE_ROOT/out.name/(stem+'.json.gz'))],capture_output=True,text=True).stdout.strip()
     save(completed,dict(registry=registry,restored_keys=len(ids),source_commit=commit))
     event('run-complete',stem=stem,valid=doc['result']['valid'],stale=doc['result']['stale_reads'],
           reads=doc['result']['reads']['Count'],restored_keys=len(ids))
@@ -326,12 +329,16 @@ def one(mac,commit,manifest,out,arm,ratio,rate,repeat,window,warmup,story,bypass
 
 
 def main():
+    global EVIDENCE_ROOT
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--prepare',action='store_true')
+    p.add_argument('--evidence-root',type=Path,default=EVIDENCE_ROOT)
     p.add_argument('--phase',choices=['probe','matrix'],default='probe')
     p.add_argument('--output',type=Path,default=Path('.local/s1-suite/results'))
     a=p.parse_args()
+    EVIDENCE_ROOT=a.evidence_root.resolve().relative_to(ROOT)
     STATE.mkdir(parents=True,exist_ok=True)
+    STATE.chmod(0o700)
     lock=(STATE/'controller.lock').open('w');fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
     commit=clean_commit()
     manifest=json.loads(Path('datasets/stats/catalog.json').read_text())
@@ -359,7 +366,7 @@ def main():
             capacity=max(good)
             rates=sorted({max(100,int(capacity*f)//50*50) for f in [.25,.5,.8]})
             if len(rates)!=3:raise RuntimeError('rate selection did not produce three tiers')
-            save(STATE/'design.json',dict(source_commit=commit,rates=rates,service_p99_slo_us=50000,
+            save(STATE/'design.json',dict(source_commit=commit,evidence_root=str(EVIDENCE_ROOT),rates=rates,service_p99_slo_us=50000,
                  rate_rule='25%, 50%, 80% of highest valid probed A rate within p99 SLO; floor to 50 req/s',
                  warmup_seconds=10,window_rule='max(20, ceil(12000/(rate*read_ratio))) seconds',
                  repeats=5,read_ratios=[.95,.99],truth='client-acknowledged same-id version lower bound',
@@ -367,6 +374,7 @@ def main():
             event('probe-complete',rates=rates)
         else:
             design=json.loads((STATE/'design.json').read_text())
+            if design.get('evidence_root')!=str(EVIDENCE_ROOT):raise RuntimeError('probe and matrix evidence root differ')
             if design['source_commit']!=commit:raise RuntimeError('design and source version differ; rerun probes')
             rates=design['rates']
             for repeat in range(1,6):

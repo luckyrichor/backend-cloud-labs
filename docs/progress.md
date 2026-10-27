@@ -210,3 +210,17 @@ P0 干净源码 5e1efd8 的验证：全量 race/vet 与 CTest 通过；回显与
 b0edac1 的七轮矩阵试跑中发现口径错误：result.scheduled/reads/writes 仅统计正式窗口，但 dropped 混入预热丢弃，导致原始请求数不平衡。控制器已在一轮写审计/恢复/登记完成的边界停止，七轮及全部失败原因保留 .local/s1-suite/matrix/，不会后改原 JSON 或据它们声称正式完成。
 
 现改为 dropped 只计正式窗口，新增 warmup_dropped 独立保留；正式失败/丢弃/超时门禁不变，已发出但失败的预热请求仍判无效，避免隐藏未确认写。新增回归用受控慢热身触发两次预热丢弃，验证正式请求完整、统计平衡且不会混入正式丢弃；loadgen race/vet 通过。连接上限调整为 384，两连接池上限合计 768，仍低于已见 SSH 约 1024 通道故障点。下一步在统一新版本重做率档探测、完整矩阵至 matrix-v2，不混用不同源版本。
+
+
+### 2026-10-26 · 统一源 1c3ca2a 的正式矩阵运行中（Codex）
+
+完整源 1c3ca2a 全仓回归退出码 0：138 次 Go 顶层通过、4 次预期 MySQL 专项内存源跳过、vet 通过、CTest 7/7。新版本基线探测保留在 .local/s1-suite/probe-window-scope/；500/1500 有效，3000 不通过，按规则仍选择 350/750/1200。正式矩阵已启动至 .local/s1-suite/matrix-v2/；旧 matrix/ 七轮先导不用于新版比较。所有版本/窗口/写审计/每轮恢复继续保留。连接预建和计数范围更正已追加飞书开发记录 revision 6，回查归档位置通过。
+
+
+### 2026-10-27 · Mac 恢复与中断轮次处理（Codex）
+
+用户回复“已恢复，继续”，现场 UTC 2026-10-27 00:48（北京时间 08:48）。核对 luomac.local 恢复可连；旧控制 PID/worker 均已退出，旧 exec session 58831 不可用。取回 /tmp/bcl-s1-suite.FVFHrM 的 B JSON/逐请求 CSV，原客户端标记 valid=false，保存在 .local/s1-suite/matrix-v2/interrupted-2026-10-27/；服务端热点 trace 一并保留。登记 bench_run 为 invalid（f5979f66a1866b1738e1c0ce），不改原 JSON。不混合前一天 A 与今天其他策略来比较。
+
+旧专用 E1 已停止，实验活动表已从 items_base 恢复，原共享商品表保持未动；Mac 上旧 worker 的临时 private.json/bypass.dsn 已清理。新增 worker 的 caffeinate -i -w（随 worker 生命周期结束）、SSH/SCP keepalive 和连接超时、单轮 warmup+window+60 秒总超时；运行状态目录设 0700。证据根目录支持 --evidence-root，默认按北京时间生成，避免新一天仍硬编码到 2026-10-26；探测与矩阵绑定同一根目录。
+
+控制器/worker Python 语法检查通过，caffeinate 已在真实 Mac 核对可执行；Go 服务/采样库相对 1c3ca2a 未变。下一步新版本全仓检查后重新探测、运行 .local/s1-suite/matrix-2026-10-27/，完成 S1 报告；尚未进入 S2。
