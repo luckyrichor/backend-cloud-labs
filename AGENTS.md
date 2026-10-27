@@ -96,7 +96,7 @@ python3 scripts/with-p0-env.py go -C tools/datapipe run ./cmd/dbmigrate --dir ..
 **进行中**
 
 - **P2（E1 · S1/S2）**：P2-1（MySQL 源、写令牌，`7bc669f`）、P2-2（四策略及观测，`2b49e7d`）已完成；原交接文档落后于群聊与代码，2026-10-26 已核对。
-- **P2-3 / S1**：基础压测负载已由 Claude 实现（`c0c5df8`）。Codex 在 `3b6f980` 修复测量门禁与预热边界，新增 `scripts/calibrate-s1-mac.py`；真实 Mac 只读校准已完成：三档 50/200/500 req/s，共 7500 个正式窗口读请求，全部成功，无丢到达；证据见 `docs/measurements/2026-10-26-s1-calibration/README.md`。全仓回归 136 次 Go 顶层通过、4 次内存源下预期跳过、vet 与 CTest 7/7。S1 正式矩阵、反向验证、绕过服务直写、定位与最终报告尚未完成；续接已实现 `scripts/s1-suite.py`（独立数据库/带标签实验容器、固定版本构建、逐轮恢复、最终写版本/字段审计、真实 Mac 编排）和 `loadgen/cmd/s1summary`。独立数据已从哈希校验的 P1 TSV 导入并对账；固定热度前缀的只读 HTTP/数据源连接预建后，500/1500 req/s 的探测通过门禁；3000 不通过。由预定义规则确定正式率档 350/750/1200 req/s，源 `b0edac1` 的矩阵试跑发现预热/正式丢弃计数混用，已在完成并恢复的轮次边界停止；七轮先导数据保留 `.local/s1-suite/matrix/`，不作最终比较。已修复计数范围，源 `1c3ca2a` 的 matrix-v2 首轮 A 有效（12251 次读，15 次陈旧读），B 遭 Mac 离线中断。2026-10-27 用户恢复 Mac 后已取回 B 文件、登记无效、停止旧实验 E1 并恢复实验数据；旧控制进程/worker 已退出，session 58831 不再有效。跨日结果不混作同一组比较，今天源 `11120a1` 的单隧道试跑在 C 等条件出现大量客户端排队/丢到达，已在完成审计和恢复的 C p99/q750/r1 边界停止（旧 session 92819 不再有效）；`.local/s1-suite/matrix-2026-10-27/` 保留为链路诊断，不作为最终五次比较。当前改为四条独立业务 SSH 连接和独立管理/MySQL 控制连接，按相同请求计划序号分流；每业务流最多 256 HTTP 连接、全局 1536 在途、旁路数据库最多 64 连接。新增分流/统计回归、loadgen race/vet 和 Python 归档测试 3 项已通过。正式矩阵尚未完成；下一步在新提交上全仓检查，同时探测 A/C，选择共同有效且服务端 GET p99≤50ms 的最高探测档，再按 25%/50%/80% 得出三个档位，统一重新执行完整矩阵。新输出将使用 multistream 名称，不与旧结果混合。
+- **P2-3 / S1**：基础压测负载已由 Claude 实现（`c0c5df8`）。Codex 在 `3b6f980` 修复测量门禁与预热边界，新增 `scripts/calibrate-s1-mac.py`；真实 Mac 只读校准已完成：三档 50/200/500 req/s，共 7500 个正式窗口读请求，全部成功，无丢到达；证据见 `docs/measurements/2026-10-26-s1-calibration/README.md`。全仓回归 136 次 Go 顶层通过、4 次内存源下预期跳过、vet 与 CTest 7/7。S1 正式矩阵、反向验证、绕过服务直写、定位与最终报告尚未完成；续接已实现 `scripts/s1-suite.py`（独立数据库/带标签实验容器、固定版本构建、逐轮恢复、最终写版本/字段审计、真实 Mac 编排）和 `loadgen/cmd/s1summary`。独立数据已从哈希校验的 P1 TSV 导入并对账；固定热度前缀的只读 HTTP/数据源连接预建后，500/1500 req/s 的探测通过门禁；3000 不通过。由预定义规则确定正式率档 350/750/1200 req/s，源 `b0edac1` 的矩阵试跑发现预热/正式丢弃计数混用，已在完成并恢复的轮次边界停止；七轮先导数据保留 `.local/s1-suite/matrix/`，不作最终比较。已修复计数范围，源 `1c3ca2a` 的 matrix-v2 首轮 A 有效（12251 次读，15 次陈旧读），B 遭 Mac 离线中断。2026-10-27 用户恢复 Mac 后已取回 B 文件、登记无效、停止旧实验 E1 并恢复实验数据；旧控制进程/worker 已退出，session 58831 不再有效。跨日结果不混作同一组比较，今天源 `11120a1` 的单隧道试跑在 C 等条件出现大量客户端排队/丢到达，已在完成审计和恢复的 C p99/q750/r1 边界停止（旧 session 92819 不再有效）；`.local/s1-suite/matrix-2026-10-27/` 保留为链路诊断，不作为最终五次比较。当前改为四条独立业务 SSH 连接和独立管理/MySQL 控制连接，按相同请求计划序号分流；每业务流最多 256 HTTP 连接、全局 1536 在途、旁路数据库最多 64 连接。新增分流/统计回归、loadgen race/vet 和 Python 归档测试 3 项已通过。正式矩阵尚未完成；下一步在新提交上全仓检查，同时探测 A/C，按原方案由基线 A 有效且服务端 GET p99≤50ms 的最高探测档定档（C 的成本单独保留，不用于筛选），再按 25%/50%/80% 得出三个档位，统一重新执行完整矩阵。新输出将使用 multistream 名称，不与旧结果混合。
 
 **未开始**
 
@@ -183,7 +183,7 @@ python3 scripts/s1-suite.py --phase matrix --output .local/s1-suite/matrix-multi
 - backend-cloud-labs 方案（用户方案原文同步）：https://kcn0pbn0hwo0.feishu.cn/wiki/BnIcwD3TUiLXNHkEs9qcCxgdng6
 - backend-cloud-labs 开发记录（每个阶段在文末追加一节，只追加不改旧内容）：https://kcn0pbn0hwo0.feishu.cn/wiki/AkEQwOqXTiyhbiklUqPcjUKfnXg
 
-2026-10-26：Codex 已同步测量修复/真实 Mac 校准（revision 4）及隔离编排/137 次 Go 顶层回归/启动问题（revision 5），回读署名并回查确认仍在本项目节点下。连接预建/统计范围修正、138 次 Go 顶层回归已追加至 revision 6，并回查节点。revision 7 已同步恢复与启动；后续单隧道停止/多隧道调整待本轮检查后追加。
+2026-10-26：Codex 已同步测量修复/真实 Mac 校准（revision 4）及隔离编排/137 次 Go 顶层回归/启动问题（revision 5），回读署名并回查确认仍在本项目节点下。连接预建/统计范围修正、138 次 Go 顶层回归已追加至 revision 6，并回查节点。revision 7 已同步恢复与启动；revision 8 已追加单隧道停止/多隧道调整并回读 139ac9f 署名、回查项目节点。共同门槛撤回及后续实验待同步。
 
 ## 13. 更新日志
 
@@ -199,3 +199,5 @@ python3 scripts/s1-suite.py --phase matrix --output .local/s1-suite/matrix-multi
 - 2026-10-09 · Codex：E1–E4 第五轮评审（缓存代际、E2 移动合并、E3 十进制语法、E4 未服务需求量）；证据 docs/measurements/2026-10-09-fifth-review.json。
 
 2026-10-27 多隧道版本全仓验证：scripts/check.sh 退出 0，139 次 Go 顶层通过、4 次内存源下 MySQL 专项预期跳过，vet 通过、CTest 7/7；Python 归档测试 3 项通过。新链路真实探测待执行。
+
+2026-10-27 探测补充：139ac9f 四流探测 A500/A1500、C500/C1500/C3000 有效；A3000 有丢到达/失败，不用于定档。C500 服务端 p99 68.5ms，C1500 为119.5ms，额外共同50ms门槛无达标点。核对原方案“由基线空载延迟与SLO定义”后撤回共同门槛，恢复原A基线规则；保留C负面证据，不放宽有效性。新提交重新探测，五次正式比较尚未完成。

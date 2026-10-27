@@ -375,15 +375,15 @@ def main():
             good=[]
             for rate in [500,1500,3000]:
                 arms={x['arm']:x for x in summaries if x['rate']==rate}
-                if all(arm in arms and arms[arm]['valid'] and arms[arm]['server_get_us']['p99_us']<=50000 for arm in ['A','C']):
+                if 'A' in arms and arms['A']['valid'] and arms['A']['server_get_us']['p99_us']<=50000:
                     good.append(rate)
-            if not good:raise RuntimeError('no common A/C rate satisfies delivery and experimental service p99 SLO 50ms')
+            if not good:raise RuntimeError('no baseline A rate satisfies delivery and experimental service p99 SLO 50ms')
             capacity=max(good)
             rates=sorted({max(100,int(capacity*f)//50*50) for f in [.25,.5,.8]})
             if len(rates)!=3:raise RuntimeError('rate selection did not produce three tiers')
             save(STATE/'design.json',dict(source_commit=commit,evidence_root=str(EVIDENCE_ROOT),rates=rates,service_p99_slo_us=50000,
-                 rate_rule='25%, 50%, 80% of highest common valid probed A/C rate within p99 SLO; floor to 50 req/s',
-                 calibration_arms=['A','C'],business_streams=4,max_inflight=1536,http_connections_per_stream=256,
+                 rate_rule='25%, 50%, 80% of highest valid probed baseline A rate within p99 SLO; floor to 50 req/s',
+                 calibration_arms=['A','C'],rate_selection_arm='A',business_streams=4,max_inflight=1536,http_connections_per_stream=256,
                  warmup_seconds=10,window_rule='max(20, ceil(12000/(rate*read_ratio))) seconds',
                  repeats=5,read_ratios=[.95,.99],truth='client-acknowledged same-id version lower bound',
                  planned_at=datetime.datetime.now(datetime.timezone.utc).isoformat()))
