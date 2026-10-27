@@ -224,3 +224,6 @@ b0edac1 的七轮矩阵试跑中发现口径错误：result.scheduled/reads/writ
 旧专用 E1 已停止，实验活动表已从 items_base 恢复，原共享商品表保持未动；Mac 上旧 worker 的临时 private.json/bypass.dsn 已清理。新增 worker 的 caffeinate -i -w（随 worker 生命周期结束）、SSH/SCP keepalive 和连接超时、单轮 warmup+window+60 秒总超时；运行状态目录设 0700。证据根目录支持 --evidence-root，默认按北京时间生成，避免新一天仍硬编码到 2026-10-26；探测与矩阵绑定同一根目录。
 
 控制器/worker Python 语法检查通过，caffeinate 已在真实 Mac 核对可执行；Go 服务/采样库相对 1c3ca2a 未变。下一步新版本全仓检查后重新探测、运行 .local/s1-suite/matrix-2026-10-27/，完成 S1 报告；尚未进入 S2。
+
+
+恢复后的证据检查补充：旧 `start_e1` 只按轮次名放 trace，多个输出目录/重试复用相同文件，FileTracer 的 append 导致旧 probe 时间线出现 11 次 op=1 begin。历史 trace 不用于竞态定位。控制器改为“输出目录 + 轮次 + 唯一尝试时间戳”的独立 trace 路径，并在归档前核对恰有一个实例起点；JSON/直方图/逐请求 CSV 未经过该共享 trace 路径，不受此文件混合影响。今天的正式矩阵要在此修复后的统一版本上重跑，历史原文件保持不变。

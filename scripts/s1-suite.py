@@ -196,12 +196,12 @@ def start_redis():
     raise RuntimeError('experiment Redis not ready')
 
 
-def start_e1(arm,stem,profile=False):
+def start_e1(arm,stem,profile=False,trace_dir=None):
     mode,off = ARMS[arm]
     # Env file never appears in stdout/argv; only its path is exposed.
     text = (ROOT/'.local/deploy/e1-s1.env').read_text().replace('/bcl?','/bcl_s1?')
     envfile = STATE/'service.env';envfile.write_text(text);envfile.chmod(0o600)
-    trace = STATE/'traces'/stem
+    trace = trace_dir or STATE/'traces'/(stem+'-'+str(time.time_ns()))
     trace.mkdir(parents=True,exist_ok=True);trace.chmod(0o777)
     pop = (STATE/'popularity.u32').read_bytes()
     hot = int.from_bytes(pop[:4],'little')
@@ -273,7 +273,8 @@ def one(mac,commit,manifest,out,arm,ratio,rate,repeat,window,warmup,story,bypass
     stop_e1()
     # Last complete run's dirty keys are restored at its end. Full restore is done
     # at controller startup to cover a previously interrupted run.
-    start_e1(arm,stem,profile)
+    trace_dir=STATE/'traces'/out.name/(stem+'-'+str(time.time_ns()))
+    start_e1(arm,stem,profile,trace_dir)
     event('run-start',stem=stem,window=window,warmup=warmup)
     # Round-trip baseline collected before each run, not concurrently with traffic.
     rtt = mac.ask({'op':'rtt'})
@@ -309,9 +310,13 @@ def one(mac,commit,manifest,out,arm,ratio,rate,repeat,window,warmup,story,bypass
     log=command(['docker','logs','--tail','50','bcl-s1-e1'],capture_output=True,text=True)
     (out/(stem+'.service.log')).write_text(log.stdout+log.stderr)
     stop_e1()  # flush trace before archiving
-    trace = STATE/'traces'/stem/'events.jsonl'
+    trace = trace_dir or STATE/'traces'/(stem+'-'+str(time.time_ns()))/'events.jsonl'
     if trace.exists():
-        (out/(stem+'.trace.jsonl.gz')).write_bytes(gzip.compress(trace.read_bytes(),mtime=0))
+        trace_bytes=trace.read_bytes()
+        starts=sum(json.loads(line).get('op')==1 and json.loads(line).get('event')=='begin'
+                   for line in trace_bytes.splitlines())
+        if starts!=1:raise RuntimeError('trace is missing its single instance boundary')
+        (out/(stem+'.trace.jsonl.gz')).write_bytes(gzip.compress(trace_bytes,mtime=0))
     correctness=verify_writes(out/(stem+'.csv.gz'))
     save(out/(stem+'.correctness.json'),correctness)
     if not correctness['ok'] and doc['result']['valid']:
