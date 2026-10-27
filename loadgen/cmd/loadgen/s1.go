@@ -27,6 +27,8 @@ var sourceCommit = ""
 func s1Main(args []string) {
 	fs := flag.NewFlagSet("s1", flag.ExitOnError)
 	target := fs.String("target", "http://127.0.0.1:18086", "E1 business base URL")
+	targets := fs.String("targets", "", "equivalent business base URLs separated by commas; round-robin arrivals")
+	perTarget := fs.Int("connections-per-target", 0, "HTTP connection cap per target (zero uses max-inflight)")
 	admin := fs.String("admin", "http://127.0.0.1:19086", "E1 admin base URL ('' to skip server snapshots)")
 	popularity := fs.String("popularity", "", "datagen catalog/popularity.u32")
 	zipfS := fs.Float64("zipf-s", 0.99, "Zipf exponent over popularity ranks")
@@ -64,6 +66,13 @@ func s1Main(args []string) {
 	auth := os.Getenv("LOADGEN_AUTHORIZATION")
 	cfg := lg.S1Config{Target: strings.TrimRight(*target, "/"), Admin: strings.TrimRight(*admin, "/"), Popularity: pop, ZipfS: *zipfS,
 		ReadRatio: *readRatio, PrimeConnections: *prime, Rate: *rate, Warmup: *warmup, Window: *window, Seed: *seed, MaxInflight: *limit, Timeout: *timeout, Authorization: auth}
+	if *targets != "" {
+		for _, target := range strings.Split(*targets, ",") {
+			cfg.Targets = append(cfg.Targets, strings.TrimRight(strings.TrimSpace(target), "/"))
+		}
+		cfg.Target = cfg.Targets[0]
+	}
+	cfg.PerTargetConnections = *perTarget
 	if *bypassDSN != "" {
 		text, err := os.ReadFile(*bypassDSN)
 		fatal(err)
@@ -75,8 +84,8 @@ func s1Main(args []string) {
 		if err != nil || db.Ping() != nil {
 			fatal(errors.New("bypass MySQL connection failed"))
 		}
-		db.SetMaxOpenConns(*limit)
-		db.SetMaxIdleConns(*limit)
+		db.SetMaxOpenConns(min(*limit, 64))
+		db.SetMaxIdleConns(min(*limit, 64))
 		defer db.Close()
 		cfg.Bypass = db
 	} else if *readRatio < 1 && auth == "" {
@@ -99,7 +108,7 @@ func s1Main(args []string) {
 		"generated_at": time.Now().UTC(),
 		"config": map[string]any{"zipf_s": *zipfS, "read_ratio": *readRatio, "rate": *rate, "warmup": warmup.String(),
 			"window": window.String(), "seed": *seed, "max_inflight": *limit, "timeout": timeout.String(), "bypass_writes": cfg.Bypass != nil,
-			"popularity_ids": len(pop), "prime_connections": *prime},
+			"popularity_ids": len(pop), "prime_connections": *prime, "targets": cfg.Targets, "connections_per_target": *perTarget, "bypass_pool_limit": min(*limit, 64)},
 		"client": map[string]any{"host": host, "goos": runtime.GOOS, "goarch": runtime.GOARCH, "cpus": runtime.NumCPU(), "nofile_soft": nofile.Cur},
 		"result": res,
 	}

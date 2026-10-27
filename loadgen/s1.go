@@ -14,6 +14,7 @@ import (
 	"math"
 	"math/rand/v2"
 	"net/http"
+	"net/url"
 	"os"
 	"sort"
 	"strconv"
@@ -29,18 +30,20 @@ import (
 // identical request sequence. Every request is recorded; stale reads are judged against the
 // writes this same process saw acknowledged, so no cross-machine clock is involved.
 type S1Config struct {
-	Target, Admin    string // business and admin base URLs, e.g. http://127.0.0.1:18086
-	Popularity       []uint32
-	ZipfS            float64
-	ReadRatio        float64
-	Rate             int
-	Warmup           time.Duration
-	Window           time.Duration
-	Seed             uint64
-	PrimeConnections int // optional read-only connection priming before timed arrivals
-	MaxInflight      int
-	Timeout          time.Duration
-	Authorization    string
+	Target, Admin        string   // business and admin base URLs, e.g. http://127.0.0.1:18086
+	Targets              []string // equivalent business URLs, round-robin by planned request index
+	PerTargetConnections int      // cap each forwarding transport independently (zero uses MaxInflight)
+	Popularity           []uint32
+	ZipfS                float64
+	ReadRatio            float64
+	Rate                 int
+	Warmup               time.Duration
+	Window               time.Duration
+	Seed                 uint64
+	PrimeConnections     int // optional read-only connection priming before timed arrivals
+	MaxInflight          int
+	Timeout              time.Duration
+	Authorization        string
 	// Bypass, when set, sends writes straight to MySQL instead of through the service
 	// (the plan's separate "direct MySQL writes" group).
 	Bypass *sql.DB
@@ -164,18 +167,22 @@ func (c s1Clients) do(ctx context.Context, op s1Op, seq int, rec *S1Record) {
 		rec.Status = 200
 		return
 	}
+	base := c.cfg.Target
+	if len(c.cfg.Targets) > 0 {
+		base = c.cfg.Targets[seq%len(c.cfg.Targets)]
+	}
 	var req *http.Request
 	var err error
 	if op.write {
 		// Fixed-width title keeps written rows near the catalogue's typical payload size.
 		body := fmt.Sprintf(`{"title":"s1 write %d %s","price_cent":%d,"stock":%d}`, seq, writeTitlePad, 100+seq%100000, seq%997)
-		req, err = http.NewRequestWithContext(ctx, http.MethodPut, c.cfg.Target+"/items/"+id, strings.NewReader(body))
+		req, err = http.NewRequestWithContext(ctx, http.MethodPut, base+"/items/"+id, strings.NewReader(body))
 		if err == nil {
 			req.Header.Set("Content-Type", "application/json")
 			req.Header.Set("Authorization", c.cfg.Authorization)
 		}
 	} else {
-		req, err = http.NewRequestWithContext(ctx, http.MethodGet, c.cfg.Target+"/items/"+id, nil)
+		req, err = http.NewRequestWithContext(ctx, http.MethodGet, base+"/items/"+id, nil)
 	}
 	if err != nil {
 		rec.Err = "request"
@@ -214,9 +221,20 @@ func RunS1(ctx context.Context, c S1Config) (S1Result, []S1Record, error) {
 	if c.Rate <= 0 || c.Window <= 0 || c.Warmup < 0 || c.MaxInflight <= 0 || c.Timeout <= 0 || len(c.Popularity) == 0 ||
 		c.ReadRatio < 0 || c.ReadRatio > 1 || c.ZipfS < 0 ||
 		math.IsNaN(c.ReadRatio) || math.IsInf(c.ReadRatio, 0) || math.IsNaN(c.ZipfS) || math.IsInf(c.ZipfS, 0) ||
-		c.Rate > 100000 || c.MaxInflight > 100000 || c.PrimeConnections < 0 || c.PrimeConnections > c.MaxInflight {
+		c.Rate > 100000 || c.MaxInflight > 100000 || c.PrimeConnections < 0 || c.PrimeConnections > c.MaxInflight || c.PerTargetConnections < 0 || c.PerTargetConnections > c.MaxInflight {
 		return S1Result{}, nil, errors.New("invalid S1 configuration")
 	}
+	targets := append([]string(nil), c.Targets...)
+	if len(targets) == 0 {
+		targets = []string{c.Target}
+	}
+	for _, target := range targets {
+		u, err := url.Parse(target)
+		if err != nil || u.Host == "" || (u.Scheme != "http" && u.Scheme != "https") || u.User != nil || u.RawQuery != "" || u.Fragment != "" {
+			return S1Result{}, nil, errors.New("invalid S1 business target")
+		}
+	}
+	c.Targets = targets
 	warmCount := float64(c.Rate) * c.Warmup.Seconds()
 	windowCount := float64(c.Rate) * c.Window.Seconds()
 	if windowCount < 1 || warmCount+windowCount > 20_000_000 {
@@ -226,7 +244,11 @@ func RunS1(ctx context.Context, c S1Config) (S1Result, []S1Record, error) {
 	total := warm + int(windowCount)
 	plan := PlanS1(c.Seed, total, c.Popularity, c.ZipfS, c.ReadRatio)
 	records := make([]S1Record, total)
-	transport := &http.Transport{MaxIdleConns: c.MaxInflight, MaxIdleConnsPerHost: c.MaxInflight, MaxConnsPerHost: c.MaxInflight, IdleConnTimeout: time.Minute}
+	perTarget := c.PerTargetConnections
+	if perTarget == 0 {
+		perTarget = c.MaxInflight
+	}
+	transport := &http.Transport{MaxIdleConns: c.MaxInflight, MaxIdleConnsPerHost: perTarget, MaxConnsPerHost: perTarget, IdleConnTimeout: time.Minute}
 	defer transport.CloseIdleConnections()
 	clients := s1Clients{&http.Client{Transport: transport, Timeout: c.Timeout}, c}
 	if c.PrimeConnections > 0 {
@@ -242,7 +264,7 @@ func RunS1(ctx context.Context, c S1Config) (S1Result, []S1Record, error) {
 				var r S1Record
 				primeCtx, cancel := context.WithTimeout(ctx, 15*time.Second)
 				defer cancel()
-				primeClient.do(primeCtx, s1Op{id: c.Popularity[i%len(c.Popularity)]}, 0, &r)
+				primeClient.do(primeCtx, s1Op{id: c.Popularity[i%len(c.Popularity)]}, i, &r)
 				failed <- r.Err != "" || r.Status != 200
 			}(i)
 		}

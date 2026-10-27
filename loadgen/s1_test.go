@@ -296,3 +296,23 @@ func TestS1WarmupDropsDoNotCorruptWindowAccounting(t *testing.T) {
 		t.Fatal("measured request accounting does not balance")
 	}
 }
+
+func TestS1EquivalentTargetsDistributePrimingAndTimedArrivals(t *testing.T) {
+	var hits [2]atomic.Int64
+	servers := make([]*httptest.Server, 2)
+	for i := range servers {
+		servers[i] = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			hits[i].Add(1)
+			fmt.Fprint(w, `{"item":{"version":1}}`)
+		}))
+		defer servers[i].Close()
+	}
+	res, recs, err := RunS1(context.Background(), S1Config{Targets: []string{servers[0].URL, servers[1].URL}, Popularity: []uint32{1}, ReadRatio: 1,
+		Rate: 100, Window: 100 * time.Millisecond, MaxInflight: 16, PerTargetConnections: 4, PrimeConnections: 4, Timeout: time.Second})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if hits[0].Load() != 7 || hits[1].Load() != 7 || res.Reads.Count != 10 || len(recs) != 10 || !res.Valid {
+		t.Fatalf("target routing/accounting: hits=%d/%d reads=%d records=%d valid=%t", hits[0].Load(), hits[1].Load(), res.Reads.Count, len(recs), res.Valid)
+	}
+}
