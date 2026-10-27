@@ -201,3 +201,6 @@ python3 scripts/s1-suite.py --phase matrix --output .local/s1-suite/matrix-multi
 2026-10-27 多隧道版本全仓验证：scripts/check.sh 退出 0，139 次 Go 顶层通过、4 次内存源下 MySQL 专项预期跳过，vet 通过、CTest 7/7；Python 归档测试 3 项通过。新链路真实探测待执行。
 
 2026-10-27 探测补充：139ac9f 四流探测 A500/A1500、C500/C1500/C3000 有效；A3000 有丢到达/失败，不用于定档。C500 服务端 p99 68.5ms，C1500 为119.5ms，额外共同50ms门槛无达标点。核对原方案“由基线空载延迟与SLO定义”后撤回共同门槛，恢复原A基线规则；保留C负面证据，不放宽有效性。新提交重新探测，五次正式比较尚未完成。
+
+
+2026-10-27 连接复用排查：2e8a460 多隧道正式试跑 A/B 的 350 req/s 首轮均出现写请求 transport 失败，已在两轮完成审计/恢复后停止，原始文件保留 matrix-multistream-2026-10-27，不能当有效重复。服务端 ReadTimeout=5s 且未指定 IdleTimeout，客户端旧 IdleConnTimeout=60s；空闲回收复用存在竞态是待验证假设，并非已确认根因。发压器空闲连接寿命缩短为2s（所有组一致），传输错误改为不含地址/凭据的固定分类 EOF/reset/closed/timeout/other，以支持下一轮诊断；不重试未确认写入，不放宽有效性门禁。

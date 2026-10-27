@@ -13,6 +13,7 @@ import (
 	"io"
 	"math"
 	"math/rand/v2"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
@@ -20,6 +21,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 
 	hdr "github.com/HdrHistogram/hdrhistogram-go"
@@ -190,7 +192,19 @@ func (c s1Clients) do(ctx context.Context, op s1Op, seq int, rec *S1Record) {
 	}
 	resp, err := c.http.Do(req)
 	if err != nil {
-		rec.Err = "transport"
+		rec.Err = "transport_other"
+		switch {
+		case errors.Is(err, context.DeadlineExceeded):
+			rec.Err = "transport_timeout"
+		case errors.Is(err, io.EOF):
+			rec.Err = "transport_eof"
+		case errors.Is(err, io.ErrUnexpectedEOF):
+			rec.Err = "transport_unexpected_eof"
+		case errors.Is(err, syscall.ECONNRESET):
+			rec.Err = "transport_reset"
+		case errors.Is(err, syscall.EPIPE), errors.Is(err, net.ErrClosed):
+			rec.Err = "transport_closed"
+		}
 		return
 	}
 	defer resp.Body.Close()
@@ -248,7 +262,7 @@ func RunS1(ctx context.Context, c S1Config) (S1Result, []S1Record, error) {
 	if perTarget == 0 {
 		perTarget = c.MaxInflight
 	}
-	transport := &http.Transport{MaxIdleConns: c.MaxInflight, MaxIdleConnsPerHost: perTarget, MaxConnsPerHost: perTarget, IdleConnTimeout: time.Minute}
+	transport := &http.Transport{MaxIdleConns: c.MaxInflight, MaxIdleConnsPerHost: perTarget, MaxConnsPerHost: perTarget, IdleConnTimeout: 2 * time.Second}
 	defer transport.CloseIdleConnections()
 	clients := s1Clients{&http.Client{Transport: transport, Timeout: c.Timeout}, c}
 	if c.PrimeConnections > 0 {
