@@ -259,6 +259,17 @@ def verify_writes(raw):
     return dict(ok=True,keys=len(keys),acknowledged_writes=sum(len(x) for x in by_id.values()))
 
 
+def archive_trace(trace_dir,target):
+    trace=(Path(trace_dir)/'events.jsonl').read_bytes()
+    rows=[json.loads(line) for line in trace.splitlines()]
+    starts=sum(row.get('op')==1 and row.get('event')=='begin' for row in rows)
+    if starts!=1:
+        raise RuntimeError('trace is missing its single instance boundary')
+    if Path(target).exists():
+        raise FileExistsError('preserve existing trace evidence')
+    Path(target).write_bytes(gzip.compress(trace,mtime=0))
+
+
 def one(mac,commit,manifest,out,arm,ratio,rate,repeat,window,warmup,story,bypass=False,profile=False):
     stem = f'{story}-{arm}-p{int(ratio*100)}-q{rate}-r{repeat}'
     completed = out/(stem+'.done.json')
@@ -310,13 +321,7 @@ def one(mac,commit,manifest,out,arm,ratio,rate,repeat,window,warmup,story,bypass
     log=command(['docker','logs','--tail','50','bcl-s1-e1'],capture_output=True,text=True)
     (out/(stem+'.service.log')).write_text(log.stdout+log.stderr)
     stop_e1()  # flush trace before archiving
-    trace = trace_dir or STATE/'traces'/(stem+'-'+str(time.time_ns()))/'events.jsonl'
-    if trace.exists():
-        trace_bytes=trace.read_bytes()
-        starts=sum(json.loads(line).get('op')==1 and json.loads(line).get('event')=='begin'
-                   for line in trace_bytes.splitlines())
-        if starts!=1:raise RuntimeError('trace is missing its single instance boundary')
-        (out/(stem+'.trace.jsonl.gz')).write_bytes(gzip.compress(trace_bytes,mtime=0))
+    archive_trace(trace_dir,out/(stem+'.trace.jsonl.gz'))
     correctness=verify_writes(out/(stem+'.csv.gz'))
     save(out/(stem+'.correctness.json'),correctness)
     if not correctness['ok'] and doc['result']['valid']:
