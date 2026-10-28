@@ -283,7 +283,7 @@ fb069dd4afb8ed02c9a61bcaa5e3517d3b7be59b2cf1774deb2d730bd3ab21b1  docs/measureme
 22a20b1b97ff17c9d3262bd4cc3b0b9fcfea436fd05a26844d9e5246ea644ba7  docs/measurements/2026-10-27-s1/control/tracehdr.go
 b078d66427af184e024d80b9770f0b6d43e8cfc85cc530de1c91dfc46b45204e  docs/measurements/2026-10-27-s1/control/tx-calibration.py
 27eb3b98ed1ba8f27a8221e1833491bfed407ace94e140a1d57895a89b60d1f4  docs/measurements/2026-10-27-s1/control/write-report.py
-4b15534c5b10cd8666643ffe8efad96aa3ff543f1da1b7a100159e36849e9cd5  docs/measurements/2026-10-27-s1/groups.csv
+90b3d6aa4b0ef71d1e63e7d52707efa10276aac630f120a1dcdef6f9984f9f0b  docs/measurements/2026-10-27-s1/groups.csv
 1565fa6f8136816005ece180639cfb59c3699c65f741ff628a20cb29c36e763f  docs/measurements/2026-10-27-s1/matrix-2026-10-27/S1-A-p95-q1500-r1.container.json
 07986e60dcf2e577114c04836a334885c916e07beadf4b2d87a53f7e23a58fb8  docs/measurements/2026-10-27-s1/matrix-2026-10-27/S1-A-p95-q1500-r1.correctness.json
 318fa0d0bf9ab66452d80e0584a36e7383d514835f95684ab7942848004d4665  docs/measurements/2026-10-27-s1/matrix-2026-10-27/S1-A-p95-q1500-r1.csv.gz
@@ -2363,7 +2363,7 @@ af550de95d520930198e98a2c9c847adb908819ce89de0c319f7fea480ebf98c  docs/measureme
 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  docs/measurements/2026-10-27-s1/probe-multistream-2026-10-27/S1-probe-C-p95-q500-r0.service.log
 d92d5753c56667e4b3c6f5a3641b0e42b1d52cef52de839d6ec99af40d38d26f  docs/measurements/2026-10-27-s1/probe-multistream-2026-10-27/S1-probe-C-p95-q500-r0.trace.jsonl.gz
 5efa8170de8fdf8bcd1814bde2a2efe6979e6d1efa5640853749d52790d713af  docs/measurements/2026-10-27-s1/probe-multistream-2026-10-27/S1-probe-C-p95-q500-r0.worker.json
-9d1403888b0250d5413697450e0aa6fbea6f87129d25431be54bffe892911c81  docs/measurements/2026-10-27-s1/quality.csv
+a351db9a21172cad9c8472da9cb22e4e3b6f48f83b4413f69c47c28851e82d6a  docs/measurements/2026-10-27-s1/quality.csv
 e4861f885f0f64649dd06636f252be48665631044dc204f886704d8fd9465fb4  docs/measurements/2026-10-27-s1/recompute.py
 f3bee1dcf9aa8bb3dd63bb429d646b6225ac3c59147c7f88854567781dda38bd  docs/measurements/2026-10-27-s1/registry.json
 2d4583732881eb23061b542849b8a7fc04298847d61d70dcb50b726dd9a680a4  docs/measurements/2026-10-27-s1/trace-histograms.json.gz
