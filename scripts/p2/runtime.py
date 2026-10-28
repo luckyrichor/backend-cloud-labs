@@ -15,7 +15,7 @@ def decode_chunked(raw):
 
 class Runtime:
  def __init__(self,out,arm,local_ttl='500ms',delay='3ms'):
-  self.out=Path(out);self.out.mkdir(parents=True,exist_ok=False);self.arm=arm;self.run=self.out.name;self.processes=[];self.logs=[];self.peers={};self.bridge=None;self.redis_info={}
+  self.out=Path(out);self.out.mkdir(parents=True,exist_ok=False);self.arm=arm;self.run=self.out.name+"-t"+str(time.time_ns());self.processes=[];self.logs=[];self.peers={};self.bridge=None;self.redis_info={}
   self.client=json.loads((ROOT/'.local/deploy/client-env.json').read_text());self.env=dict(os.environ)
   for line in (ROOT/'.local/deploy/e1-s1.env').read_text().splitlines():
    if '=' in line and not line.startswith('#'):
@@ -103,4 +103,4 @@ class Runtime:
   for f in self.logs:f.close()
   spec=importlib.util.spec_from_file_location('restore',ROOT/'scripts/s1-suite.py');module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
   module.restore(sorted(self.changed))
-  (self.out/'runtime.json').write_text(json.dumps({'arm':self.arm,'local_ttl':self.env['GUIDE_LOCAL_TTL'],'double_delete_delay':self.env.get('GUIDE_DOUBLE_DELETE_DELAY','0s'),'shared_ttl':'1m','cache_prefix':self.env['GUIDE_CACHE_PREFIX'],'redis':self.redis_info,'restored_ids':sorted(self.changed),'exit_codes':[p.returncode for p in self.processes],'clock':'host CLOCK_MONOTONIC','cpu_affinity':{'mysql':0,'redis':1,'both_E1_instances':2,'bridge':3}},indent=2))
+  (self.out/'runtime.json').write_text(json.dumps({'arm':self.arm,'local_ttl':self.env['GUIDE_LOCAL_TTL'],'double_delete_delay':self.env.get('GUIDE_DOUBLE_DELETE_DELAY','0s'),'shared_ttl':'1m','stream':self.run,'cache_prefix':self.env['GUIDE_CACHE_PREFIX'],'redis':self.redis_info,'restored_ids':sorted(self.changed),'exit_codes':[p.returncode for p in self.processes],'clock':'host CLOCK_MONOTONIC','cpu_affinity':{'mysql':0,'redis':1,'both_E1_instances':2,'bridge':3}},indent=2))

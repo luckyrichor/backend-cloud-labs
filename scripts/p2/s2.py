@@ -61,11 +61,12 @@ async def matrix_trial(out,arm,rate,repeat,seconds,poll_ms,delay,reverse=False):
  actual_in_window=sum(1 for row in flows if 'write' in row and start<=row['write']['call_begin_ns']<start+int(seconds*1e9))
  if actual_in_window < .98*math.ceil(rate*seconds):failures.append('fewer than 98% scheduled writes started in arrival window')
  # Retain failures verbatim as typed, credential-free classifications; no performance-based rejection.
- doc={'source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'data_version':json.loads((ROOT/'datasets/stats/catalog.json').read_text())['data_version'],'arm':arm,'rate':rate,'repeat':repeat,'seconds':seconds,'poll_ms':poll_ms,'reverse':reverse,'valid':not failures,'invalid_reasons':failures,'observations':observations,'flows':flows,'actual_writes_in_window':actual_in_window,'audit_events':len(audit),'states':states,'telemetry':telemetry,'clock':'same Linux CLOCK_MONOTONIC boot for server+coordinator','coordinator_pid':os.getpid(),'coordinator_cpu_affinity':sorted(os.sched_getaffinity(0))}
+ doc={'source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'data_version':json.loads((ROOT/'datasets/stats/catalog.json').read_text())['data_version'],'run':r.run,'arm':arm,'rate':rate,'repeat':repeat,'seconds':seconds,'poll_ms':poll_ms,'reverse':reverse,'valid':not failures,'invalid_reasons':failures,'observations':observations,'flows':flows,'actual_writes_in_window':actual_in_window,'audit_events':len(audit),'states':states,'telemetry':telemetry,'clock':'same Linux CLOCK_MONOTONIC boot for server+coordinator','coordinator_pid':os.getpid(),'coordinator_cpu_affinity':sorted(os.sched_getaffinity(0))}
  save(Path(out)/'result.json.gz',doc)
  print(json.dumps({'event':'trial-complete','path':str(out),'arm':arm,'rate':rate,'repeat':repeat,'valid':doc['valid'],'observations':len(observations)}),flush=True)
  return doc
 async def main(a):
+ assert 'CLOCK_MONOTONIC' in time.get_clock_info('perf_counter').implementation,'unexpected coordinator clock'
  os.sched_setaffinity(0,{3})
  STATE.mkdir(exist_ok=True,parents=True)
  lock=(STATE/'controller.lock').open('w');fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
@@ -74,6 +75,8 @@ async def main(a):
  provenance=json.loads((STATE/'provenance.json').read_text());assert provenance['source_commit']==subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'binary source mismatch'
  for name,digest in provenance['binaries'].items():assert hashlib.sha256((STATE/name).read_bytes()).hexdigest()==digest,'binary hash mismatch'
  out=Path(a.out).resolve();out.mkdir(exist_ok=True,parents=True)
+ import importlib.util
+ spec=importlib.util.spec_from_file_location('restore',ROOT/'scripts/s1-suite.py');restore=importlib.util.module_from_spec(spec);spec.loader.exec_module(restore);restore.restore()
  design={'rates':[5,20,50],'repeats':5,'seconds':a.seconds,'poll_ms':a.poll_ms,'local_ttl':'500ms','delay':a.delay,'rate_rule':'explicit diagnostic-to-formal write tiers 5/20/50 per second; gate actual delivery/success, do not infer saturation','source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()}
  if not(out/'design.json').exists():save(out/'design.json',design)
  else:assert json.loads((out/'design.json').read_text())==design,'immutable design mismatch'
