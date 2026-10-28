@@ -78,7 +78,8 @@ async def main(a):
  if not(out/'design.json').exists():save(out/'design.json',design)
  else:assert json.loads((out/'design.json').read_text())==design,'immutable design mismatch'
  if a.phase=='smoke':
-  for arm in 'ABC':await matrix_trial(out/f'S2-smoke-{arm}-{time.time_ns()}',arm,5,0,1,a.poll_ms,a.delay)
+  for rate in [5,20,50]:
+   for arm in 'ABC':await matrix_trial(out/f'S2-probe-{arm}-q{rate}-{time.time_ns()}',arm,rate,0,2,a.poll_ms,a.delay)
  else:
   for repeat in range(1,6):
    for rate in design['rates']:

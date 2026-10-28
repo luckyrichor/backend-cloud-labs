@@ -2,6 +2,17 @@
 import asyncio,contextlib,fcntl,importlib.util,json,os,signal,subprocess,time
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2];STATE=ROOT/'.local/p2-suite'
+
+def decode_chunked(raw):
+ output=bytearray();offset=0
+ while True:
+  end=raw.find(b'\r\n',offset)
+  if end<0:raise ValueError('truncated chunk size')
+  length=int(raw[offset:end].split(b';',1)[0],16);offset=end+2
+  if length==0:return bytes(output)
+  if offset+length+2>len(raw) or raw[offset+length:offset+length+2]!=b'\r\n':raise ValueError('truncated chunk data')
+  output.extend(raw[offset:offset+length]);offset+=length+2
+
 class Runtime:
  def __init__(self,out,arm,local_ttl='500ms',delay='3ms'):
   self.out=Path(out);self.out.mkdir(parents=True,exist_ok=False);self.arm=arm;self.run=self.out.name;self.processes=[];self.logs=[];self.peers={};self.bridge=None;self.redis_info={}
@@ -71,8 +82,7 @@ class Runtime:
     writer.write(wire.encode()+data);await writer.drain();head=await reader.readuntil(b'\r\n\r\n');status=int(head.split(b' ',2)[1])
     raw=await reader.read()
     if status!=200:raise RuntimeError('HTTP status '+str(status))
-    # Go emits Content-Length for these small JSON replies; fail rather than silently decoding chunks.
-    if b'transfer-encoding: chunked' in head.lower():raise RuntimeError('unexpected chunked response')
+    if b'transfer-encoding: chunked' in head.lower():raw=decode_chunked(raw)
     return json.loads(raw)
    finally:writer.close();await writer.wait_closed()
   return await asyncio.wait_for(exchange(),3)
