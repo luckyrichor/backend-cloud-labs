@@ -14,6 +14,8 @@ type Redis struct {
 	Client *redis.Client
 	Prefix string
 	TTL    time.Duration
+	// Retain a version watermark across DEL/TTL in the S2 run-scoped namespace.
+	PersistVersionFloor bool
 }
 
 // Compare decimal versions as strings to avoid Lua double's precision loss above 2^53.
@@ -23,6 +25,18 @@ local incoming = ARGV[1]
 if old and (#old > #incoming or (#old == #incoming and old > incoming)) then return 0 end
 redis.call('HSET', KEYS[1], 'version', incoming, 'item', ARGV[2])
 redis.call('PEXPIRE', KEYS[1], ARGV[3])
+return 1
+`)
+
+var fencedFill = redis.NewScript(`
+local incoming=ARGV[1]
+local function newer(old) return old and (#old>#incoming or (#old==#incoming and old>incoming)) end
+local floor=redis.call('GET',KEYS[2])
+local old=redis.call('HGET',KEYS[1],'version')
+if newer(floor) or newer(old) then return 0 end
+redis.call('SET',KEYS[2],incoming)
+redis.call('HSET',KEYS[1],'version',incoming,'item',ARGV[2])
+redis.call('PEXPIRE',KEYS[1],ARGV[3])
 return 1
 `)
 
@@ -43,7 +57,13 @@ func (c *Redis) PutIfNewer(ctx context.Context, item catalog.Item) (bool, error)
 	if err != nil {
 		return false, err
 	}
-	result, err := fill.Run(ctx, c.Client, []string{c.Prefix + "v2:" + item.ID}, item.Version,
+	script := fill
+	keys := []string{c.Prefix + "v2:" + item.ID}
+	if c.PersistVersionFloor {
+		script = fencedFill
+		keys = append(keys, c.Prefix+"floor:"+item.ID)
+	}
+	result, err := script.Run(ctx, c.Client, keys, item.Version,
 		string(raw), c.TTL.Milliseconds()).Int()
 	return result == 1, err
 }

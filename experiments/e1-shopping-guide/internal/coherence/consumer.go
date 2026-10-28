@@ -22,6 +22,7 @@ type Consumer struct {
 	Audit                     *audit.Writer
 	Paused                    atomic.Bool
 	Applied, Errors, Replayed atomic.Uint64
+	SourceReads               atomic.Uint64
 }
 
 func (c *Consumer) apply(ctx context.Context, m redis.XMessage) error {
@@ -34,6 +35,7 @@ func (c *Consumer) apply(ctx context.Context, m redis.XMessage) error {
 		return errors.New("invalid stream version")
 	}
 	// Fetch current primary state; an old/replayed event must never reintroduce an old payload.
+	c.SourceReads.Add(1)
 	item, err := c.Store.Get(ctx, id)
 	if err != nil {
 		return err

@@ -11,6 +11,7 @@ import (
 	"os"
 	"regexp"
 	"runtime"
+	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -38,6 +39,7 @@ func Middleware(next http.Handler) http.Handler {
 }
 
 type Event struct {
+	Session  string `json:"session"`
 	Schema   int    `json:"schema"`
 	Boot     string `json:"boot_id"`
 	Instance string `json:"instance"`
@@ -56,6 +58,7 @@ type Writer struct {
 	f              *os.File
 	b              *bufio.Writer
 	boot, instance string
+	session        string
 	err            error
 	count          uint64
 	closed         bool
@@ -76,7 +79,7 @@ func Open(path, instance string) (*Writer, error) {
 	if err != nil {
 		return nil, err
 	}
-	w := &Writer{f: f, b: bufio.NewWriterSize(f, 256*1024), boot: strings.TrimSpace(string(boot)), instance: instance}
+	w := &Writer{f: f, b: bufio.NewWriterSize(f, 256*1024), boot: strings.TrimSpace(string(boot)), instance: instance, session: strconv.Itoa(os.Getpid()) + "-" + strconv.FormatInt(Now(), 10)}
 	w.RecordAt(context.Background(), "", "start", 0, 0, Now())
 	return w, nil
 }
@@ -94,7 +97,7 @@ func (w *Writer) End(ctx context.Context, id string, op uint64, version int64, e
 }
 func (w *Writer) RecordAt(ctx context.Context, id, name string, op uint64, version, t int64) {
 	l, _ := ctx.Value(labelKey{}).(labels)
-	e := Event{Schema: 1, Boot: w.boot, Instance: w.instance, Op: op, ID: id, Event: name, Version: version, TNS: t, Run: l.Run, Phase: l.Phase, Request: l.Request}
+	e := Event{Session: w.session, Schema: 1, Boot: w.boot, Instance: w.instance, Op: op, ID: id, Event: name, Version: version, TNS: t, Run: l.Run, Phase: l.Phase, Request: l.Request}
 	w.mu.Lock()
 	defer w.mu.Unlock()
 	if w.closed {

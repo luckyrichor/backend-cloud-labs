@@ -35,7 +35,7 @@ local st=redis.call('TYPE',KEYS[1]).ok
 local cp=redis.call('TYPE',KEYS[2]).ok
 if (st~='none' and st~='stream') or (cp~='none' and cp~='string') then return redis.error_reply('bridge key type conflict') end
 for i=2,#ARGV,4 do
- redis.call('XADD',KEYS[1],'*','id',ARGV[i],'version',ARGV[i+1],'observed_ns',ARGV[i+2],'published_ns',ARGV[i+3])
+ redis.call('XADD',KEYS[1],'*','id',ARGV[i],'version',ARGV[i+1],'observed_ns',ARGV[i+2],'publish_begin_ns',ARGV[i+3])
 end
 redis.call('SET',KEYS[2],ARGV[1])
 return (#ARGV-1)/4
@@ -93,8 +93,11 @@ func (h *Handler) OnPosSynced(_ *replication.EventHeader, pos mysql.Position, _ 
 		return errors.New("atomic stream/checkpoint publish failed")
 	}
 	if h.Audit != nil {
+		returned := audit.Now()
 		for _, change := range h.Pending {
-			h.Audit.RecordAt(ctx, change.ID, "stream_published", 0, change.Version, published)
+			h.Audit.RecordAt(ctx, change.ID, "binlog_observed", 0, change.Version, change.Observed)
+			h.Audit.RecordAt(ctx, change.ID, "stream_publish_begin", 0, change.Version, published)
+			h.Audit.RecordAt(ctx, change.ID, "stream_publish_return", 0, change.Version, returned)
 		}
 	}
 	h.Pending = nil

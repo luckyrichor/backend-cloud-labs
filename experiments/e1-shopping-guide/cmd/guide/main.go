@@ -131,7 +131,7 @@ func main() {
 		if prefix == "" {
 			prefix = "guide:"
 		}
-		cached = &cache.Redis{Client: client, Prefix: prefix, TTL: ttl}
+		cached = &cache.Redis{Client: client, Prefix: prefix, TTL: ttl, PersistVersionFloor: os.Getenv("GUIDE_STREAM") != ""}
 	}
 
 	var tier *coherence.Cache
@@ -183,7 +183,7 @@ func main() {
 			}
 		}()
 		status := func(w http.ResponseWriter) {
-			json.NewEncoder(w).Encode(map[string]any{"applied": consumer.Applied.Load(), "errors": consumer.Errors.Load(), "replayed": consumer.Replayed.Load(), "paused": consumer.Paused.Load()})
+			json.NewEncoder(w).Encode(map[string]any{"applied": consumer.Applied.Load(), "errors": consumer.Errors.Load(), "replayed": consumer.Replayed.Load(), "source_reads": consumer.SourceReads.Load(), "paused": consumer.Paused.Load()})
 		}
 		metrics.Route("GET /debug/stream", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { status(w) }))
 		if os.Getenv("GUIDE_EXPERIMENTAL") == "1" {

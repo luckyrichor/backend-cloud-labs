@@ -21,7 +21,7 @@ async def matrix_trial(out,arm,rate,repeat,seconds,poll_ms,delay,reverse=False):
   await r.start()
   if reverse:
    Runtime.stop_process(r.bridge)
-  start=time.perf_counter_ns();n=math.ceil(rate*seconds)
+  start=time.perf_counter_ns();n=math.ceil(rate*seconds);telemetry={}
   async def flow(i):
    id=1000000+repeat*10000+i;row={'id':str(id),'sequence':i,'planned_ns':start+int(i/rate*1e9),'reads':[]};flows.append(row)
    try:
@@ -41,6 +41,9 @@ async def matrix_trial(out,arm,rate,repeat,seconds,poll_ms,delay,reverse=False):
   await asyncio.gather(*tasks)
   states={str(i):await r.request(19096+i,'GET','/debug/audit',rid='quality',phase='control') for i in [0,1]}
   if any(v['failed'] for v in states.values()):failures.append('audit write failure')
+  for i in [0,1]:
+   telemetry[str(i)]={'latency':await r.request(19096+i,'GET','/debug/latency',rid='latency',phase='control')}
+   if arm=='C':telemetry[str(i)]['stream']=await r.request(19096+i,'GET','/debug/stream',rid='stream',phase='control')
  finally:r.close()
  audit=read_audit(out);commits={(e['id'],e.get('request')):e for e in audit if e['event']=='commit_return'};observations=[]
  reads={(e['instance'],e.get('request')):e for e in audit if e['event']=='read_return' and e.get('phase')=='window'}
@@ -49,7 +52,7 @@ async def matrix_trial(out,arm,rate,repeat,seconds,poll_ms,delay,reverse=False):
   commit=commits.get((row['id'],row['write']['request']))
   if commit is None:failures.append('missing commit log');continue
   if not(row['write']['call_begin_ns']<=commit['t_ns']<=row['write']['call_done_ns']):failures.append('commit outside coordinator bracket')
-  if any(('instance-1',read['request']) not in reads for read in row['reads']):failures.append('missing full-key read log')
+  if any(('instance-1',read['request']) not in reads or reads[('instance-1',read['request'])].get('version')!=read['version'] for read in row['reads']):failures.append('missing or mismatched full-key read log')
   fresh=row['reads'][-1];stale=[x for x in row['reads'] if x['version']<row['write']['version']]
   lower=max(0,(stale[-1]['begin_ns']-commit['t_ns'])/1e6) if stale else 0
   upper=max(0,(fresh['done_ns']-commit['t_ns'])/1e6)
@@ -58,11 +61,12 @@ async def matrix_trial(out,arm,rate,repeat,seconds,poll_ms,delay,reverse=False):
  actual_in_window=sum(1 for row in flows if 'write' in row and start<=row['write']['call_begin_ns']<start+int(seconds*1e9))
  if actual_in_window < .98*math.ceil(rate*seconds):failures.append('fewer than 98% scheduled writes started in arrival window')
  # Retain failures verbatim as typed, credential-free classifications; no performance-based rejection.
- doc={'source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'data_version':json.loads((ROOT/'datasets/stats/catalog.json').read_text())['data_version'],'arm':arm,'rate':rate,'repeat':repeat,'seconds':seconds,'poll_ms':poll_ms,'reverse':reverse,'valid':not failures,'invalid_reasons':failures,'observations':observations,'flows':flows,'actual_writes_in_window':actual_in_window,'audit_events':len(audit),'states':states,'clock':'same Linux CLOCK_MONOTONIC boot for server+coordinator','coordinator_pid':os.getpid()}
+ doc={'source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'data_version':json.loads((ROOT/'datasets/stats/catalog.json').read_text())['data_version'],'arm':arm,'rate':rate,'repeat':repeat,'seconds':seconds,'poll_ms':poll_ms,'reverse':reverse,'valid':not failures,'invalid_reasons':failures,'observations':observations,'flows':flows,'actual_writes_in_window':actual_in_window,'audit_events':len(audit),'states':states,'telemetry':telemetry,'clock':'same Linux CLOCK_MONOTONIC boot for server+coordinator','coordinator_pid':os.getpid(),'coordinator_cpu_affinity':sorted(os.sched_getaffinity(0))}
  save(Path(out)/'result.json.gz',doc)
  print(json.dumps({'event':'trial-complete','path':str(out),'arm':arm,'rate':rate,'repeat':repeat,'valid':doc['valid'],'observations':len(observations)}),flush=True)
  return doc
 async def main(a):
+ os.sched_setaffinity(0,{3})
  STATE.mkdir(exist_ok=True,parents=True)
  lock=(STATE/'controller.lock').open('w');fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
  legacy_lock=(ROOT/'.local/s1-suite/controller.lock').open('w');fcntl.flock(legacy_lock,fcntl.LOCK_EX|fcntl.LOCK_NB)

@@ -124,3 +124,31 @@ func TestRedisSetOverwritesAndDeleteMisses(t *testing.T) {
 		t.Fatal("Delete left the entry", err)
 	}
 }
+
+func TestRedisS2WatermarkSurvivesDeleteAndCacheExpiry(t *testing.T) {
+	addr := os.Getenv("E1_REDIS_TEST_ADDR")
+	if addr == "" {
+		t.Skip("requires isolated Redis")
+	}
+	ctx := context.Background()
+	rc := redis.NewClient(&redis.Options{Addr: addr})
+	defer rc.Close()
+	prefix := "test:fenced:" + t.Name() + ":"
+	defer rc.Del(ctx, prefix+"v2:7", prefix+"floor:7")
+	c := &cache.Redis{Client: rc, Prefix: prefix, TTL: time.Millisecond, PersistVersionFloor: true}
+	if ok, err := c.PutIfNewer(ctx, catalog.Item{ID: "7", Version: 9007199254740993}); err != nil || !ok {
+		t.Fatal(err)
+	}
+	c.Delete(ctx, "7")
+	if ok, err := c.PutIfNewer(ctx, catalog.Item{ID: "7", Version: 9007199254740992}); err != nil || ok {
+		t.Fatal("DEL removed version fence", err)
+	}
+	c.PutIfNewer(ctx, catalog.Item{ID: "7", Version: 9007199254740993})
+	time.Sleep(3 * time.Millisecond)
+	if ok, err := c.PutIfNewer(ctx, catalog.Item{ID: "7", Version: 1}); err != nil || ok {
+		t.Fatal("TTL removed version fence", err)
+	}
+	if _, err := c.Get(ctx, "7"); !errors.Is(err, guide.ErrCacheMiss) {
+		t.Fatal("stale payload was refilled", err)
+	}
+}

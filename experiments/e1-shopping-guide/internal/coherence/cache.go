@@ -41,6 +41,10 @@ func (c *Cache) PutIfNewer(ctx context.Context, item catalog.Item) (bool, error)
 	if err != nil {
 		return false, err
 	}
+	if !applied { // Shared cache/floor has already observed a newer version.
+		// Drop any older L1 copy; do not refill it from this now-obsolete source read.
+		return false, c.Local.Delete(ctx, item.ID)
+	}
 	local, err := c.Local.PutIfNewer(ctx, item)
 	return applied || local, err
 }
