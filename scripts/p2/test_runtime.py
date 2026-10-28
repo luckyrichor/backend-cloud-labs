@@ -6,7 +6,6 @@ class ChunkedResponseTests(unittest.TestCase):
   self.assertEqual(decode_chunked(raw),b'{"long":123}')
  def test_truncated_transfer_is_not_silently_accepted(self):
   with self.assertRaises(ValueError):decode_chunked(b'5\r\n123\r\n')
-if __name__=='__main__':unittest.main()
 
 
 import asyncio
@@ -43,3 +42,5 @@ class KeepaliveTests(unittest.IsolatedAsyncioTestCase):
    with self.assertRaises(asyncio.IncompleteReadError):await runtime.request(server.sockets[0].getsockname()[1],'PUT','/',{'x':1})
    self.assertEqual(len(connections),1);self.assertEqual(runtime.http_pool[server.sockets[0].getsockname()[1]],[])
   finally:server.close();await server.wait_closed()
+
+if __name__=='__main__':unittest.main()
