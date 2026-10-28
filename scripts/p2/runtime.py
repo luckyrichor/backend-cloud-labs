@@ -15,7 +15,7 @@ def decode_chunked(raw):
 
 class Runtime:
  def __init__(self,out,arm,local_ttl='500ms',delay='3ms'):
-  self.out=Path(out);self.out.mkdir(parents=True,exist_ok=False);self.arm=arm;self.run=self.out.name+"-t"+str(time.time_ns());self.processes=[];self.logs=[];self.peers={};self.bridge=None;self.redis_info={}
+  self.out=Path(out);self.out.mkdir(parents=True,exist_ok=False);self.arm=arm;self.run=self.out.name+"-t"+str(time.time_ns());self.processes=[];self.logs=[];self.peers={};self.bridge=None;self.redis_info={};self.http_pool={};self.http_connections=0;self.http_reuses=0
   self.client=json.loads((ROOT/'.local/deploy/client-env.json').read_text());self.env=dict(os.environ)
   for line in (ROOT/'.local/deploy/e1-s1.env').read_text().splitlines():
    if '=' in line and not line.startswith('#'):
@@ -46,6 +46,8 @@ class Runtime:
   if initialize:args+=['--initialize']
   self.bridge=self.spawn(args,self.env,'bridge-'+str(self.bridge_generation),3);return self.bridge
  def start_peer(self,i):
+  for port in [18096+i,19096+i]:
+   for _,writer in self.http_pool.pop(port,[]):writer.close()
   self.generations[i]+=1;name=f'instance-{i}-{self.generations[i]}'
   env=self.env|{'GUIDE_ADDRESS':f'127.0.0.1:{18096+i}','ADMIN_ADDRESS':f'127.0.0.1:{19096+i}','GUIDE_INSTANCE':f'instance-{i}','GUIDE_AUDIT_FILE':str(self.out/(name+'.jsonl'))}
   if self.arm=='C':env['GUIDE_STREAM']=self.run
@@ -71,20 +73,48 @@ class Runtime:
    except (OSError,asyncio.TimeoutError):await asyncio.sleep(.03)
   raise RuntimeError('peer readiness timeout')
  async def request(self,port,method,path,body=None,rid='',phase='window'):
-  headers={'Host':'loopback','Connection':'close','X-BCL-Run':self.run,'X-BCL-Phase':phase,'X-BCL-Request':rid}
+  headers={'Host':'loopback','Connection':'keep-alive','X-BCL-Run':self.run,'X-BCL-Phase':phase,'X-BCL-Request':rid}
   data=b''
   if body is not None:
    data=json.dumps(body,separators=(',',':')).encode();headers.update({'Authorization':self.client['LOADGEN_AUTHORIZATION'],'Content-Type':'application/json','Content-Length':str(len(data))})
   async def exchange():
-   reader,writer=await asyncio.open_connection('127.0.0.1',port)
+   pool=self.http_pool.setdefault(port,[]);connection=None
+   while pool:
+    candidate=pool.pop()
+    if candidate[0].at_eof() or candidate[1].is_closing():candidate[1].close()
+    else:connection=candidate;self.http_reuses+=1;break
+   if connection is None:
+    connection=await asyncio.open_connection('127.0.0.1',port);self.http_connections+=1
+   reader,writer=connection;reusable=False
    try:
     wire=f'{method} {path} HTTP/1.1\r\n'+''.join(f'{k}: {v}\r\n' for k,v in headers.items())+'\r\n'
     writer.write(wire.encode()+data);await writer.drain();head=await reader.readuntil(b'\r\n\r\n');status=int(head.split(b' ',2)[1])
-    raw=await reader.read()
+    fields={k.strip().lower():v.strip().lower() for line in head.split(b'\r\n')[1:] if b':' in line for k,v in [line.split(b':',1)]}
+    if fields.get(b'transfer-encoding')==b'chunked':
+     chunks=[];size=0
+     while True:
+      length=int((await reader.readuntil(b'\r\n')).split(b';',1)[0].strip(),16)
+      if length==0:
+       while await reader.readuntil(b'\r\n')!=b'\r\n':pass
+       break
+      size+=length
+      if size>8*1024*1024:raise ValueError('HTTP response too large')
+      chunks.append(await reader.readexactly(length))
+      if await reader.readexactly(2)!=b'\r\n':raise ValueError('invalid chunk terminator')
+     raw=b''.join(chunks)
+    elif b'content-length' in fields:
+     length=int(fields[b'content-length'])
+     if not 0<=length<=8*1024*1024:raise ValueError('invalid response length')
+     raw=await reader.readexactly(length)
+    else:raise ValueError('HTTP response has no reusable framing')
     if status!=200:raise RuntimeError('HTTP status '+str(status))
-    if b'transfer-encoding: chunked' in head.lower():raw=decode_chunked(raw)
-    return json.loads(raw)
-   finally:writer.close();await writer.wait_closed()
+    result=json.loads(raw);reusable=fields.get(b'connection')!=b'close'
+    return result
+   finally:
+    if reusable:pool.append(connection)
+    else:
+     writer.close();await writer.wait_closed()
+  # Never automatically retry a failed write: its commit outcome may be unknown.
   return await asyncio.wait_for(exchange(),3)
  async def get(self,i,id,rid,phase='window'):
   start=time.perf_counter_ns();result=await self.request(18096+i,'GET','/items/'+str(id),rid=rid,phase=phase)
@@ -99,8 +129,11 @@ class Runtime:
    try:p.wait(timeout=10)
    except subprocess.TimeoutExpired:p.kill();p.wait()
  def close(self):
+  for pool in self.http_pool.values():
+   for _,writer in pool:writer.close()
+  self.http_pool.clear()
   for p in reversed(self.processes):self.stop_process(p)
   for f in self.logs:f.close()
   spec=importlib.util.spec_from_file_location('restore',ROOT/'scripts/s1-suite.py');module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
   module.restore(sorted(self.changed))
-  (self.out/'runtime.json').write_text(json.dumps({'arm':self.arm,'local_ttl':self.env['GUIDE_LOCAL_TTL'],'double_delete_delay':self.env.get('GUIDE_DOUBLE_DELETE_DELAY','0s'),'shared_ttl':'1m','stream':self.run,'cache_prefix':self.env['GUIDE_CACHE_PREFIX'],'redis':self.redis_info,'restored_ids':sorted(self.changed),'exit_codes':[p.returncode for p in self.processes],'clock':'host CLOCK_MONOTONIC','cpu_affinity':{'mysql':0,'redis':1,'both_E1_instances':2,'bridge':3}},indent=2))
+  (self.out/'runtime.json').write_text(json.dumps({'http_connections':self.http_connections,'http_reuses':self.http_reuses,'arm':self.arm,'local_ttl':self.env['GUIDE_LOCAL_TTL'],'double_delete_delay':self.env.get('GUIDE_DOUBLE_DELETE_DELAY','0s'),'shared_ttl':'1m','stream':self.run,'cache_prefix':self.env['GUIDE_CACHE_PREFIX'],'redis':self.redis_info,'restored_ids':sorted(self.changed),'exit_codes':[p.returncode for p in self.processes],'clock':'host CLOCK_MONOTONIC','cpu_affinity':{'mysql':0,'redis':1,'both_E1_instances':2,'bridge':3}},indent=2))

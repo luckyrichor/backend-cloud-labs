@@ -95,22 +95,37 @@ async def main(a):
  out=Path(a.out).resolve();out.mkdir(exist_ok=True,parents=True)
  import importlib.util
  spec=importlib.util.spec_from_file_location('restore',ROOT/'scripts/s1-suite.py');restore=importlib.util.module_from_spec(spec);spec.loader.exec_module(restore);restore.restore()
- design={'rates':[2,5,10],'repeats':5,'seconds':a.seconds,'poll_ms':a.poll_ms,'local_ttl':'500ms','observer_horizon_ms':600,'observer':'concurrent write plus fixed probe count','delay':a.delay,'rate_rule':'conservative observer tiers 2/5/10 per second; sustained 20/s and 50/s had observer overload; fixed 120 probes unchanged; preserve prior attempts','source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()}
+ design={'rates':[2,5,10],'repeats':5,'maximum_whole_group_attempts':20,'seconds':a.seconds,'poll_ms':a.poll_ms,'local_ttl':'500ms','observer_horizon_ms':600,'observer':'concurrent write plus fixed probe count','delay':a.delay,'rate_rule':'conservative observer tiers 2/5/10 per second; sustained 20/s and 50/s had observer overload; fixed 120 probes unchanged; preserve prior attempts','source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()}
  if not(out/'design.json').exists():save(out/'design.json',design)
  else:assert json.loads((out/'design.json').read_text())==design,'immutable design mismatch'
  if a.phase=='smoke':
   for rate in design['rates']:
    for arm in 'ABC':await matrix_trial(out/f'S2-probe-{arm}-q{rate}-{time.time_ns()}',arm,rate,0,2,a.poll_ms,a.delay)
  else:
+  quality={'valid':True,'common_valid_repeats':{},'reverse_valid_repeats':[],'rule':'at least five common quality-valid repeats; retain every invalid attempt; no latency threshold selection'}
+  async def existing_or_trial(path,arm,rate,repeat,reverse=False):
+   if (path/'result.json.gz').exists():return json.loads(gzip.decompress((path/'result.json.gz').read_bytes()))
+   return await matrix_trial(path,arm,rate,repeat,a.seconds,a.poll_ms,a.delay,reverse)
+  # The comparison always retries the complete A/B/C group, never a chosen arm.
   for repeat in range(1,6):
    for rate in design['rates']:
     for arm in ('ABC' if repeat%2 else 'CBA'):
-     path=out/f'S2-{arm}-q{rate}-r{repeat}'
-     if(path/'result.json.gz').exists():continue
-     await matrix_trial(path,arm,rate,repeat,a.seconds,a.poll_ms,a.delay)
-  for repeat in range(1,6):
-   path=out/f'S2-reverse-C-q10-r{repeat}'
-   if not(path/'result.json.gz').exists():await matrix_trial(path,'C',10,repeat,a.seconds,a.poll_ms,a.delay,True)
+     await existing_or_trial(out/f'S2-{arm}-q{rate}-r{repeat}',arm,rate,repeat)
+  for rate in design['rates']:
+   good=[]
+   for repeat in range(1,21):
+    docs=[await existing_or_trial(out/f'S2-{arm}-q{rate}-r{repeat}',arm,rate,repeat) for arm in ('ABC' if repeat%2 else 'CBA')]
+    if all(doc['valid'] for doc in docs):good.append(repeat)
+    if len(good)>=5:break
+   if len(good)<5:raise RuntimeError('fewer than five common quality-valid groups')
+   quality['common_valid_repeats'][str(rate)]=good
+  for repeat in range(1,21):
+   doc=await existing_or_trial(out/f'S2-reverse-C-q10-r{repeat}','C',10,repeat,True)
+   if doc['valid']:quality['reverse_valid_repeats'].append(repeat)
+   if len(quality['reverse_valid_repeats'])>=5:break
+  if len(quality['reverse_valid_repeats'])<5:raise RuntimeError('fewer than five quality-valid reverse trials')
+  if not(out/'quality.json').exists():save(out/'quality.json',quality)
+  else:assert json.loads((out/'quality.json').read_text())==quality
 if __name__=='__main__':
  def interrupt(signum,frame):raise KeyboardInterrupt
  signal.signal(signal.SIGTERM,interrupt)
