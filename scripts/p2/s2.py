@@ -36,7 +36,7 @@ async def matrix_trial(out,arm,rate,repeat,seconds,poll_ms,delay,reverse=False):
     try:
      while index<polls or first_fresh is None:
       if writer.done() and writer.exception() is not None:await writer
-      if time.perf_counter_ns()>deadline:raise RuntimeError('convergence timeout')
+      if time.perf_counter_ns()>deadline:raise RuntimeError('observer fixed-count budget timeout' if first_fresh is not None else 'convergence timeout')
       planned=poll_origin+int(index*poll_ms*1e6);await asyncio.sleep(max(0,(planned-time.perf_counter_ns())/1e9))
       read=await r.get(1,id,f'poll-{i}-{index}');read['planned_ns']=planned;row['reads'].append(read)
       if read['version']>=target and first_fresh is None:first_fresh=index
@@ -95,11 +95,11 @@ async def main(a):
  out=Path(a.out).resolve();out.mkdir(exist_ok=True,parents=True)
  import importlib.util
  spec=importlib.util.spec_from_file_location('restore',ROOT/'scripts/s1-suite.py');restore=importlib.util.module_from_spec(spec);spec.loader.exec_module(restore);restore.restore()
- design={'rates':[5,20,50],'repeats':5,'seconds':a.seconds,'poll_ms':a.poll_ms,'local_ttl':'500ms','observer_horizon_ms':600,'observer':'concurrent write plus fixed probe count','delay':a.delay,'rate_rule':'explicit diagnostic-to-formal write tiers 5/20/50 per second; gate actual delivery/success, do not infer saturation','source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()}
+ design={'rates':[5,10,20],'repeats':5,'seconds':a.seconds,'poll_ms':a.poll_ms,'local_ttl':'500ms','observer_horizon_ms':600,'observer':'concurrent write plus fixed probe count','delay':a.delay,'rate_rule':'sustained observer tiers 5/10/20 per second; prior 50/s exceeded fixed-count observer capacity; retain prior failures, do not infer cache failure or saturation','source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()}
  if not(out/'design.json').exists():save(out/'design.json',design)
  else:assert json.loads((out/'design.json').read_text())==design,'immutable design mismatch'
  if a.phase=='smoke':
-  for rate in [5,20,50]:
+  for rate in design['rates']:
    for arm in 'ABC':await matrix_trial(out/f'S2-probe-{arm}-q{rate}-{time.time_ns()}',arm,rate,0,2,a.poll_ms,a.delay)
  else:
   for repeat in range(1,6):
