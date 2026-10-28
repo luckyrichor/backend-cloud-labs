@@ -313,3 +313,6 @@ Claude已实现的MySQL/四策略基础上，Codex完成发压门禁/窗口/连�
 下载用户引用的更新版方案并逐项核对后落库；新增support/telemetry/audit，以Linux CLOCK_MONOTONIC+boot_id记录全key read_begin/read_return/read_error与数据库提交返回；run/phase/request关联CSV，旁路写在tx共用此时钟。增加strict-version（缓存miss不重复点查）、可取消的读回填延迟；增加S2实例L1+共享Redis、事务边界原子Stream/checkpoint、独立消费组固定consumer恢复PEL、成功后ACK。未修改公网绑定。
 
 全仓scripts/check.sh退出0，含真实MySQL提交日志/version-only和真实Redis PEL/乱序/原子发布失败检查，race/vet与CTest7/7通过。尚未完成真实双实例binlog联调及S2正式测量；首轮S1证据/结论保留，后续补做新版A.2全key和故障放大，CP2前修订。详见docs/P2-4全量日志与S2恢复协议-2026-10-28.md。
+
+
+2026-10-28后续：真实双实例诊断发现并修复HTTP自动私有命名空间导致的事件/读路径错位，成功轮次轮询跨度43.527ms（仅诊断，不当正式分位数）；全部失败保留。全仓更新为154通过/6预期跳过，race/vet及CTest7/7通过。飞书开发记录revision17与方案更新revision6回读、项目父节点回查通过。S2正式矩阵和S1补做仍待完成。

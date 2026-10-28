@@ -74,7 +74,7 @@ try:
               '--read-ratio',str(c['ratio']),'--rate',str(c['rate']),'--warmup',f"{c['warmup']}s",
               '--window',f"{c['window']}s",'--seed',str(c['seed']),'--prime-connections','128',
               '--max-inflight','1536','--connections-per-target','256','--timeout','3s','--story',c['story'],
-              '--arm',c['arm'],'--repeat',str(c['repeat']),'--data-version',c['data_version'],
+              '--arm',c['arm'],'--audit-run',stem,'--repeat',str(c['repeat']),'--data-version',c['data_version'],
               '--output',str(root/(stem+'.json')),'--raw',str(root/(stem+'.csv.gz'))]
         if c.get('bypass'):argv+=['--bypass-dsn-file',str(root/'bypass.dsn')]
         r=subprocess.run(argv,env=env,capture_output=True,text=True,timeout=c['warmup']+c['window']+60)
