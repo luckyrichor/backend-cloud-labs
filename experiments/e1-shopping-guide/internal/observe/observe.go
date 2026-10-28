@@ -230,3 +230,21 @@ func (t *FileTracer) Flush() error {
 func (t *FileTracer) Close() error {
 	return errors.Join(t.Flush(), t.f.Close())
 }
+
+// GetVersion counts narrow validation as a source query just like a full Get.
+func (s *Store) GetVersion(ctx context.Context, id string) (int64, error) {
+	s.Reads.Add(1)
+	var version int64
+	var err error
+	if vs, ok := s.Store.(guide.VersionStore); ok {
+		version, err = vs.GetVersion(ctx, id)
+	} else {
+		var item catalog.Item
+		item, err = s.Store.Get(ctx, id)
+		version = item.Version
+	}
+	if err != nil && !errors.Is(err, catalog.ErrNotFound) {
+		s.Errors.Add(1)
+	}
+	return version, err
+}

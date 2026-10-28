@@ -1,0 +1,71 @@
+[
+  {
+    "name": "/bcl-p0-e1-1",
+    "image_id": "sha256:d14c9740d65b961f90952b8f41e648ec52acc51c81ce6f7539e5a20884b154ad",
+    "created": "2026-10-24T13:21:44.978288659Z",
+    "addresses": {
+      "GUIDE_ADDRESS": "0.0.0.0:8086",
+      "ADMIN_ADDRESS": "0.0.0.0:9086"
+    },
+    "ports": {
+      "8086/tcp": [
+        {
+          "HostIp": "127.0.0.1",
+          "HostPort": "18086"
+        }
+      ],
+      "9086/tcp": [
+        {
+          "HostIp": "127.0.0.1",
+          "HostPort": "19086"
+        }
+      ]
+    }
+  },
+  {
+    "name": "/bcl-p0-e2-1",
+    "image_id": "sha256:a4ed35ea61197f13f2b2f00562d9aa095026db4a82717968bdd176d9055c0ea1",
+    "created": "2026-10-20T13:07:56.652768164Z",
+    "addresses": {
+      "ROOM_ADDRESS": "0.0.0.0:8082",
+      "ADMIN_ADDRESS": "0.0.0.0:9082"
+    },
+    "ports": {
+      "8082/tcp": [
+        {
+          "HostIp": "127.0.0.1",
+          "HostPort": "18082"
+        }
+      ],
+      "9082/tcp": [
+        {
+          "HostIp": "127.0.0.1",
+          "HostPort": "19082"
+        }
+      ]
+    }
+  },
+  {
+    "name": "/bcl-p0-e5-1",
+    "image_id": "sha256:45459802fd8ecc9916a4d0118fbf9f6dfb4b0f0117d956259a6ace6478e83ff4",
+    "created": "2026-10-20T13:07:56.675386787Z",
+    "addresses": {
+      "ADMIN_ADDRESS": "0.0.0.0:9085",
+      "CMDB_ADDRESS": "0.0.0.0:8085"
+    },
+    "ports": {
+      "8085/tcp": [
+        {
+          "HostIp": "127.0.0.1",
+          "HostPort": "18085"
+        }
+      ],
+      "9085/tcp": [
+        {
+          "HostIp": "127.0.0.1",
+          "HostPort": "19085"
+        }
+      ]
+    }
+  }
+]

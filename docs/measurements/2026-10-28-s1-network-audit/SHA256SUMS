@@ -1,0 +1,17 @@
+2e8951187de561393250e3376ddc32247deb05c5884537ec850254ad447dda17  docs/measurements/2026-10-28-s1-network-audit/README.md
+25ddd96ae428aa698fea3b128de314000ae7245cd8fbb6304f169ff6b1c1ce1d  docs/measurements/2026-10-28-s1-network-audit/container-listeners.json
+4c01f08a71c5213f2e3144fddd391030ebda3eb0ef220d418941fdf08b0912b7  docs/measurements/2026-10-28-s1-network-audit/hot-trace-recount.json
+295eadda1a8bdfd3c4d4ffd0af183443a9b8b5a2840f6e3f273a276aef50e515  docs/measurements/2026-10-28-s1-network-audit/mac-additional-protocol-probes.json
+f66560dd0c43e33516bccdb87acd976b0417d2e63a1840201238ffe9891938b3  docs/measurements/2026-10-28-s1-network-audit/mac-audit.py
+cab541a0f3cfa2b8cf9770304ef42850e683f579fcc9379fa8e0ae335237a7bd  docs/measurements/2026-10-28-s1-network-audit/mac-historical-local-targets.json
+ef14b0a9c35d830ebd1d03081622592fc95a6015681d64b87d5d048892964a2d  docs/measurements/2026-10-28-s1-network-audit/mac-results.jsonl
+1d4505bc67dbb5cce8762ca782b7cfecd29c169fc24c61b09b3174fcd825231b  docs/measurements/2026-10-28-s1-network-audit/mac-route.txt
+6ded6301052b35f9624117ab3072640c4c993cf5dbfef981dcb004d0ed038d97  docs/measurements/2026-10-28-s1-network-audit/packet-summary.json
+9a9e77d419bbb9393fa90692c5aa572afca9208bea390f62873bf7b490742ade  docs/measurements/2026-10-28-s1-network-audit/recount-hot-trace.py
+35307b5776dd12807480a7fec1cc0bfcca746f2676a9a5a3cea7f8d25732200e  docs/measurements/2026-10-28-s1-network-audit/s1-client-delay.json
+3b6bd8e8173d28e05acd5f9f0784e94c645a6c5e086516df23ce3db95ee81701  docs/measurements/2026-10-28-s1-network-audit/ssh-tcp-state.txt
+ca1f3cf93d4a610aef8a10f4cb56003e3a12f4a6d9aca5fded05d7fff0c652d1  docs/measurements/2026-10-28-s1-network-audit/summary.json
+b6579c0e5831dcad8ee32f63f907516261885bdaf026d0a6c5ed1355daf8c0a0  docs/measurements/2026-10-28-s1-network-audit/tcpdump-status.txt
+efd67568e59acaa62c4676ebc59e0e80d5e64fd8b7f5b96f99c097b7655e742e  docs/measurements/2026-10-28-s1-network-audit/tx-packets.txt
+79d060cff4d526a5d17aae2cba9365f5a37164abd604531dadba252c3131b9f8  docs/measurements/2026-10-28-s1-network-audit/tx-state.json
+90edbcc5f77c919e3fa2adc96c087617e5bee4a7039fa332327faa12ae883b14  docs/measurements/2026-10-28-s1-network-audit/tx-vmstat.txt

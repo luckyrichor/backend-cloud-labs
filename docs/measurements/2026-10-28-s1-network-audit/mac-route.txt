@@ -1,0 +1,30 @@
+   route to: 43.142.37.199
+destination: 43.142.37.199
+    gateway: 198.18.0.1
+  interface: utun5
+      flags: <UP,GATEWAY,HOST,DONE,WASCLONED,IFSCOPE,IFREF>
+ recvpipe  sendpipe  ssthresh  rtt,msec    rttvar  hopcount      mtu     expire
+       0         0         0         1         0         0      9000         0 
+   route to: 10.0.0.15
+destination: 8.0.0.0
+       mask: 248.0.0.0
+    gateway: 198.18.0.1
+  interface: utun5
+      flags: <UP,GATEWAY,DONE,STATIC,PRCLONING>
+ recvpipe  sendpipe  ssthresh  rtt,msec    rttvar  hopcount      mtu     expire
+       0         0         0         0         0         0      9000         0 
+   route to: 100.87.80.92
+destination: 100.87.80.92
+  interface: utun4
+      flags: <UP,HOST,DONE,WASCLONED,IFSCOPE,IFREF>
+ recvpipe  sendpipe  ssthresh  rtt,msec    rttvar  hopcount      mtu     expire
+       0         0         0         0         0         0      1280         0 
+<dictionary> {
+  FTPPassive : 1
+  HTTPEnable : 0
+  HTTPSEnable : 0
+  ProxyAutoConfigEnable : 0
+  SOCKSEnable : 0
+}
+hostname 43.142.37.199
+controlmaster false

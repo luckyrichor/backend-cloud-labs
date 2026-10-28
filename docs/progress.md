@@ -306,3 +306,10 @@ Claude已实现的MySQL/四策略基础上，Codex完成发压门禁/窗口/连�
 ### 2026-10-28 · S1归档与飞书同步核验（Codex）
 
 报告及证据已提交e16e058，随后f56e418对齐Git仓库LF规范下的CSV校验清单；2551个文件已对实际Git归档核验SHA256通过。飞书开发记录追加至revision15，并在revision16追加同步署名日期更正（实际同步日2026-10-28，实验记录日2026-10-27）；关键词回读及项目父节点核查通过。目录：我的文档库/WorkPlan/backend-cloud-labs；链接：https://kcn0pbn0hwo0.feishu.cn/wiki/AkEQwOqXTiyhbiklUqPcjUKfnXg 。
+
+
+### 2026-10-28 · P2-4公共日志与恢复组件（Codex）
+
+下载用户引用的更新版方案并逐项核对后落库；新增support/telemetry/audit，以Linux CLOCK_MONOTONIC+boot_id记录全key read_begin/read_return/read_error与数据库提交返回；run/phase/request关联CSV，旁路写在tx共用此时钟。增加strict-version（缓存miss不重复点查）、可取消的读回填延迟；增加S2实例L1+共享Redis、事务边界原子Stream/checkpoint、独立消费组固定consumer恢复PEL、成功后ACK。未修改公网绑定。
+
+全仓scripts/check.sh退出0，含真实MySQL提交日志/version-only和真实Redis PEL/乱序/原子发布失败检查，race/vet与CTest7/7通过。尚未完成真实双实例binlog联调及S2正式测量；首轮S1证据/结论保留，后续补做新版A.2全key和故障放大，CP2前修订。详见docs/P2-4全量日志与S2恢复协议-2026-10-28.md。

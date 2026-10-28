@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"log"
 	"net/http"
@@ -15,10 +16,12 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/cache"
 	"github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/catalog"
+	"github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/coherence"
 	"github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/guide"
 	"github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/httpapi"
 	"github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/observe"
 	"github.com/luckyrichor/backend-cloud-labs/support/telemetry"
+	"github.com/luckyrichor/backend-cloud-labs/support/telemetry/audit"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -56,6 +59,37 @@ func main() {
 	}
 	writeToken := os.Getenv("GUIDE_WRITE_TOKEN")
 
+	var allKeys *audit.Writer
+	if path := os.Getenv("GUIDE_AUDIT_FILE"); path != "" {
+		var err error
+		allKeys, err = audit.Open(path, os.Getenv("GUIDE_INSTANCE"))
+		if err != nil {
+			log.Fatal("all-key audit setup failed")
+		}
+		defer func() {
+			if allKeys.Close() != nil {
+				log.Print("all-key audit close failed")
+			}
+		}()
+		flush := time.NewTicker(200 * time.Millisecond)
+		defer flush.Stop()
+		done := make(chan struct{})
+		defer close(done)
+		go func() {
+			for {
+				select {
+				case <-flush.C:
+					_ = allKeys.Flush()
+				case <-done:
+					return
+				}
+			}
+		}()
+		metrics.Route("GET /debug/audit", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			count, failed := allKeys.Status()
+			json.NewEncoder(w).Encode(map[string]any{"events": count, "failed": failed, "clock": "linux-CLOCK_MONOTONIC", "all_keys": true})
+		}))
+	}
 	var store catalog.Store
 	sourceName := os.Getenv("GUIDE_SOURCE")
 	if sourceName == "" {
@@ -76,20 +110,78 @@ func main() {
 			log.Fatal(err)
 		}
 		defer db.Close()
-		store = catalog.NewMySQLStore(db)
+		mysqlStore := catalog.NewMySQLStore(db)
+		mysqlStore.Audit = allKeys
+		store = mysqlStore
 	default:
 		log.Fatal("GUIDE_SOURCE must be memory or mysql")
 	}
 
+	var redisClient *redis.Client
 	var cached guide.Cache = cache.NewMemory(ttl)
 	if address := os.Getenv("REDIS_ADDR"); address != "" {
 		client := redis.NewClient(&redis.Options{Addr: address, DialTimeout: 200 * time.Millisecond,
 			ReadTimeout: 200 * time.Millisecond, WriteTimeout: 200 * time.Millisecond, MaxRetries: -1, PoolSize: 64})
 		defer client.Close()
+		redisClient = client
 		cached = &cache.Redis{Client: client, Prefix: "guide:", TTL: ttl}
 	}
 
+	var tier *coherence.Cache
+	if text := os.Getenv("GUIDE_LOCAL_TTL"); text != "" {
+		localTTL, err := time.ParseDuration(text)
+		if err != nil || localTTL <= 0 || redisClient == nil {
+			log.Fatal("GUIDE_LOCAL_TTL requires Redis and positive duration")
+		}
+		tier = &coherence.Cache{Local: cache.NewMemory(localTTL), Shared: cached}
+		if text := os.Getenv("GUIDE_DOUBLE_DELETE_DELAY"); text != "" {
+			delay, err := time.ParseDuration(text)
+			if err != nil || delay <= 0 || delay > 30*time.Second {
+				log.Fatal("double delete delay must be positive and <=30s")
+			}
+			tier.Delay = delay
+		}
+		defer tier.Close()
+		cached = tier
+	}
 	service := guide.NewService(observe.NewStore(store, metrics.Counter), observe.NewCache(cached, metrics.Counter), mode)
+	service.Audit = allKeys
+	if stream := os.Getenv("GUIDE_STREAM"); stream != "" {
+		instance := os.Getenv("GUIDE_INSTANCE")
+		if tier == nil || redisClient == nil || allKeys == nil || mode != guide.CacheAside || instance == "" {
+			log.Fatal("stream experiment requires L1/Redis, all-key audit, instance and cache-aside")
+		}
+		service.GatedAside = true
+		consumer := &coherence.Consumer{Redis: redisClient, Stream: stream, Group: stream + ":" + instance, Name: instance, Store: store, Cache: tier, Audit: allKeys}
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+		done := make(chan struct{})
+		defer func() { cancel(); <-done }()
+		go func() {
+			defer close(done)
+			if err := consumer.Run(ctx); err != nil && ctx.Err() == nil {
+				log.Print("stream consumer stopped")
+				consumer.Errors.Add(1)
+			}
+		}()
+		status := func(w http.ResponseWriter) {
+			json.NewEncoder(w).Encode(map[string]any{"applied": consumer.Applied.Load(), "errors": consumer.Errors.Load(), "replayed": consumer.Replayed.Load(), "paused": consumer.Paused.Load()})
+		}
+		metrics.Route("GET /debug/stream", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { status(w) }))
+		if os.Getenv("GUIDE_EXPERIMENTAL") == "1" {
+			metrics.Route("POST /debug/stream/pause", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				consumer.Paused.Store(r.URL.Query().Get("state") == "true")
+				status(w)
+			}))
+		}
+	}
+	if text := os.Getenv("GUIDE_FILL_DELAY"); text != "" {
+		delay, err := time.ParseDuration(text)
+		if err != nil || delay < 0 || delay > 30*time.Second {
+			log.Fatal("GUIDE_FILL_DELAY must be 0..30s")
+		}
+		service.FillDelay = delay
+	}
 	service.UngatedFills = os.Getenv("GUIDE_UNGATED_FILLS") == "1"
 	if service.UngatedFills && mode != guide.Versioned {
 		log.Fatal("GUIDE_UNGATED_FILLS only applies to CACHE_READ_MODE=versioned")
@@ -109,7 +201,7 @@ func main() {
 	}
 	latency := observe.NewLatency()
 	metrics.Route("GET /debug/latency", latency.Handler())
-	strategy := []byte(`{"source":"` + sourceName + `","mode":"` + string(service.Mode) + `","ungated_fills":` + map[bool]string{true: "true", false: "false"}[service.UngatedFills] + `,"ttl":"` + ttl.String() + `"}`)
+	strategy := []byte(`{"source":"` + sourceName + `","mode":"` + string(service.Mode) + `","ungated_fills":` + map[bool]string{true: "true", false: "false"}[service.UngatedFills] + `,"ttl":"` + ttl.String() + `","fill_delay":"` + service.FillDelay.String() + `"}`)
 	metrics.Route("GET /debug/strategy", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(strategy)
@@ -121,7 +213,7 @@ func main() {
 	defer admin.Close()
 
 	handler := httpapi.HandlerWithOptions(service, httpapi.Options{WriteToken: writeToken})
-	server := &http.Server{Addr: telemetry.Address("GUIDE_ADDRESS", "127.0.0.1:8086"), Handler: metrics.HTTP(latency.Wrap(handler)),
+	server := &http.Server{Addr: telemetry.Address("GUIDE_ADDRESS", "127.0.0.1:8086"), Handler: audit.Middleware(metrics.HTTP(latency.Wrap(handler))),
 		ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 5 * time.Second, WriteTimeout: 5 * time.Second}
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)

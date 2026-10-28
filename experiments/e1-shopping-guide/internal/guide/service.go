@@ -6,8 +6,10 @@ import (
 	"context"
 	"errors"
 	"github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/catalog"
+	"github.com/luckyrichor/backend-cloud-labs/support/telemetry/audit"
 	"sort"
 	"sync"
+	"time"
 )
 
 var ErrCacheMiss = errors.New("cache miss")
@@ -25,20 +27,26 @@ type Result struct {
 type ReadMode string
 
 const (
-	Strict     ReadMode = "strict"
-	CacheFirst ReadMode = "cache-first"
+	StrictVersion ReadMode = "strict-version"
+	Strict        ReadMode = "strict"
+	CacheFirst    ReadMode = "cache-first"
 )
 
 // Empty mode preserves strict behavior. CacheFirst trades freshness for source load.
 func ValidReadMode(mode ReadMode) bool {
-	return mode == "" || mode == Strict || mode == CacheFirst || mode == CacheAside || mode == Versioned
+	return mode == StrictVersion || mode == "" || mode == Strict || mode == CacheFirst || mode == CacheAside || mode == Versioned
 }
 
 type Service struct {
-	Mode    ReadMode
-	Store   catalog.Store
-	Cache   Cache
-	Repairs *RepairQueue
+	Audit *audit.Writer
+	// FillDelay is an explicit fault-injection delay on source-read refill only.
+	FillDelay time.Duration
+	// GatedAside is used only by S2 event-driven invalidation, including all refill paths.
+	GatedAside bool
+	Mode       ReadMode
+	Store      catalog.Store
+	Cache      Cache
+	Repairs    *RepairQueue
 	// UngatedFills replaces Versioned's gated fills with plain SETs (S1 reverse validation).
 	UngatedFills bool
 	// Trace, when set, records the timeline of traced keys.
@@ -51,7 +59,12 @@ func NewService(store catalog.Store, cache Cache, mode ReadMode) Service {
 	return Service{Store: store, Cache: cache, Mode: mode, Repairs: NewRepairQueue(1024)}
 }
 
-func (s Service) Get(ctx context.Context, id string) (Result, error) {
+func (s Service) Get(ctx context.Context, id string) (result Result, returnedErr error) {
+	if s.Audit != nil {
+		op := s.Audit.Begin(ctx, id)
+		defer func() { s.Audit.End(ctx, id, op, result.Item.Version, returnedErr) }()
+	}
+
 	s = s.snapshotCache()
 	if s.Mode == CacheFirst && s.Repairs == nil {
 		return Result{}, ErrRepairQueueRequired
@@ -75,9 +88,15 @@ func (s Service) Get(ctx context.Context, id string) (Result, error) {
 			return Result{}, sourceErr
 		}
 		s.event(op, id, "store_read", authoritative.Version)
+		if err := s.delayFill(ctx); err != nil {
+			return Result{}, err
+		}
 		_, fillErr := s.Cache.PutIfNewer(ctx, authoritative)
 		s.event(op, id, "fill", authoritative.Version)
 		return Result{authoritative, "store", !errors.Is(err, ErrCacheMiss) || fillErr != nil}, nil
+	}
+	if s.Mode == StrictVersion {
+		return s.getStrictVersion(ctx, op, id)
 	}
 	// Strict mode validates source revision even on hits, trading DB load for correctness.
 	authoritative, err := s.Store.Get(ctx, id)
@@ -90,6 +109,9 @@ func (s Service) Get(ctx context.Context, id string) (Result, error) {
 		s.Repairs.clearFor(s.generation, id, authoritative.Version)
 		s.event(op, id, "cache_validated", cached.Version)
 		return Result{cached, "cache_validated", false}, nil
+	}
+	if err := s.delayFill(ctx); err != nil {
+		return Result{}, err
 	}
 	_, fillErr := s.Cache.PutIfNewer(ctx, authoritative)
 	s.event(op, id, "fill", authoritative.Version)

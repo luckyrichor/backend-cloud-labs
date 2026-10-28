@@ -1,0 +1,44 @@
+[
+  {
+    "host": "43.142.37.199",
+    "port": 443,
+    "tls": "TLSv1.2",
+    "response": "HTTP/1.1 401 Unauthorized"
+  },
+  {
+    "host": "43.142.37.199",
+    "port": 16379,
+    "error": "timeout"
+  },
+  {
+    "host": "10.0.0.15",
+    "port": 443,
+    "error": "timeout"
+  },
+  {
+    "host": "10.0.0.15",
+    "port": 16379,
+    "error": "timeout"
+  },
+  {
+    "host": "100.87.80.92",
+    "port": 443,
+    "tls": "TLSv1.2",
+    "response": "HTTP/1.1 401 Unauthorized"
+  },
+  {
+    "host": "100.87.80.92",
+    "port": 16379,
+    "error": "ConnectionRefusedError"
+  },
+  {
+    "host": "2402:4e00:c032:5f00:6cf0:2914:5a6c:0",
+    "port": 443,
+    "error": "timeout"
+  },
+  {
+    "host": "2402:4e00:c032:5f00:6cf0:2914:5a6c:0",
+    "port": 16379,
+    "error": "timeout"
+  }
+]

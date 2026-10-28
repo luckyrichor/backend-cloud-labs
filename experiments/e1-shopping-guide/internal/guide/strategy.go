@@ -3,6 +3,7 @@ package guide
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/catalog"
 )
@@ -86,6 +87,9 @@ func (s Service) readThrough(ctx context.Context, op uint64, id string, gated bo
 		return Result{}, sourceErr
 	}
 	s.event(op, id, "store_read", authoritative.Version)
+	if err := s.delayFill(ctx); err != nil {
+		return Result{}, err
+	}
 	fillErr := s.fill(ctx, authoritative, gated)
 	s.event(op, id, "fill", authoritative.Version)
 	return Result{authoritative, "store", !errors.Is(err, ErrCacheMiss) || fillErr != nil}, nil
@@ -94,7 +98,7 @@ func (s Service) readThrough(ctx context.Context, op uint64, id string, gated bo
 func (s Service) getStrategy(ctx context.Context, op uint64, id string) (Result, error) {
 	switch s.Mode {
 	case CacheAside:
-		return s.readThrough(ctx, op, id, false)
+		return s.readThrough(ctx, op, id, s.GatedAside)
 	default: // Versioned
 		return s.readThrough(ctx, op, id, !s.UngatedFills)
 	}
@@ -138,5 +142,53 @@ func (s Service) begin(id, kind string) uint64 {
 func (s Service) event(op uint64, id, name string, version int64) {
 	if op != 0 {
 		s.Trace.Event(op, id, name, version)
+	}
+}
+
+// VersionStore is optional so the memory source retains the normal contract.
+type VersionStore interface {
+	GetVersion(context.Context, string) (int64, error)
+}
+
+func (s Service) getStrictVersion(ctx context.Context, op uint64, id string) (Result, error) {
+	cached, cacheErr := s.Cache.Get(ctx, id)
+	if cacheErr == nil {
+		vs, ok := s.Store.(VersionStore)
+		if !ok {
+			return Result{}, errors.New("strict-version requires GetVersion")
+		}
+		version, err := vs.GetVersion(ctx, id)
+		if err != nil {
+			return Result{}, err
+		}
+		s.event(op, id, "source_version", version)
+		if cached.Version == version {
+			s.event(op, id, "cache_validated", cached.Version)
+			return Result{cached, "cache_validated", false}, nil
+		}
+	}
+	authoritative, err := s.Store.Get(ctx, id)
+	if err != nil {
+		return Result{}, err
+	}
+	s.event(op, id, "store_read", authoritative.Version)
+	if err := s.delayFill(ctx); err != nil {
+		return Result{}, err
+	}
+	_, fillErr := s.Cache.PutIfNewer(ctx, authoritative)
+	s.event(op, id, "fill", authoritative.Version)
+	return Result{authoritative, "store", (cacheErr != nil && !errors.Is(cacheErr, ErrCacheMiss)) || fillErr != nil}, nil
+}
+func (s Service) delayFill(ctx context.Context) error {
+	if s.FillDelay <= 0 {
+		return nil
+	}
+	timer := time.NewTimer(s.FillDelay)
+	defer timer.Stop()
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case <-timer.C:
+		return nil
 	}
 }

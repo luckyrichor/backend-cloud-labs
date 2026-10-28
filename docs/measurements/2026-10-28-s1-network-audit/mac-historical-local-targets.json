@@ -1,0 +1,17 @@
+{
+  "note": "Mac loopback ephemeral target ports, NOT tx published ports. Connections are forwarded to tx 18096; admin to19096, MySQL to13306. These historical local listeners are not a public tx service.",
+  "targets": [
+    "http://127.0.0.1:61138",
+    "http://127.0.0.1:61139",
+    "http://127.0.0.1:61140",
+    "http://127.0.0.1:61141",
+    "http://127.0.0.1:62230",
+    "http://127.0.0.1:62231",
+    "http://127.0.0.1:62232",
+    "http://127.0.0.1:62233",
+    "http://127.0.0.1:63802",
+    "http://127.0.0.1:63803",
+    "http://127.0.0.1:63804",
+    "http://127.0.0.1:63805"
+  ]
+}

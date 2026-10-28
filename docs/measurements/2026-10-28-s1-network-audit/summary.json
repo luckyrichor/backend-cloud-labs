@@ -1,0 +1,78 @@
+{
+  "time_utc": "2026-10-28T00:58:56.105472+00:00",
+  "direct_business_reachable": false,
+  "rtt": [
+    {
+      "name": "direct-http80-43.142.37.199",
+      "host": "43.142.37.199",
+      "port": 80,
+      "path": "/healthz",
+      "reuse": true,
+      "success": 1000,
+      "errors": 0,
+      "ms": {
+        "p50": 29.880209,
+        "p99": 158.401125,
+        "max": 462.320292
+      }
+    },
+    {
+      "name": "direct-http80-100.87.80.92",
+      "host": "100.87.80.92",
+      "port": 80,
+      "path": "/healthz",
+      "reuse": true,
+      "success": 1000,
+      "errors": 0,
+      "ms": {
+        "p50": 29.361667,
+        "p99": 108.893917,
+        "max": 259.549041
+      }
+    },
+    {
+      "name": "ssh-http80-reuse",
+      "host": "127.0.0.1",
+      "port": 55278,
+      "path": "/healthz",
+      "reuse": true,
+      "success": 1000,
+      "errors": 0,
+      "ms": {
+        "p50": 32.498458,
+        "p99": 109.150167,
+        "max": 268.925792
+      }
+    },
+    {
+      "name": "ssh-e1-health-reuse",
+      "host": "127.0.0.1",
+      "port": 55277,
+      "path": "/healthz",
+      "reuse": true,
+      "success": 1000,
+      "errors": 0,
+      "ms": {
+        "p50": 32.188292,
+        "p99": 101.984834,
+        "max": 222.065625
+      }
+    },
+    {
+      "name": "ssh-e1-health-fresh",
+      "host": "127.0.0.1",
+      "port": 55277,
+      "path": "/healthz",
+      "reuse": false,
+      "success": 1000,
+      "errors": 0,
+      "ms": {
+        "p50": 72.511042,
+        "p99": 161.454958,
+        "max": 208.656875
+      }
+    }
+  ],
+  "tunnel_cleaned": true,
+  "scope": "single concurrency read-only 404 HTTP application RTT, no formal benchmark; direct public route uses utun5; tailscale uses utun4"
+}

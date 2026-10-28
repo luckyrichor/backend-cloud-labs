@@ -8,3 +8,7 @@ require (
 )
 
 require filippo.io/edwards25519 v1.2.0 // indirect
+
+require github.com/luckyrichor/backend-cloud-labs/support/telemetry v0.0.0
+
+replace github.com/luckyrichor/backend-cloud-labs/support/telemetry => ../support/telemetry

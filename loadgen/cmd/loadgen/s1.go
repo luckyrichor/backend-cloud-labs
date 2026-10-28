@@ -18,6 +18,7 @@ import (
 
 	"github.com/go-sql-driver/mysql"
 	lg "github.com/luckyrichor/backend-cloud-labs/loadgen"
+	"github.com/luckyrichor/backend-cloud-labs/support/telemetry/audit"
 )
 
 // sourceCommit is stamped at build time (-ldflags "-X main.sourceCommit=<sha>") so a copied
@@ -26,6 +27,8 @@ var sourceCommit = ""
 
 func s1Main(args []string) {
 	fs := flag.NewFlagSet("s1", flag.ExitOnError)
+	auditRun := fs.String("audit-run", "", "run label joining all-key events with raw records")
+	bypassAudit := fs.String("bypass-audit", "", "exclusive Linux commit-return audit file for bypass writes")
 	target := fs.String("target", "http://127.0.0.1:18086", "E1 business base URL")
 	targets := fs.String("targets", "", "equivalent business base URLs separated by commas; round-robin arrivals")
 	perTarget := fs.Int("connections-per-target", 0, "HTTP connection cap per target (zero uses max-inflight)")
@@ -66,6 +69,13 @@ func s1Main(args []string) {
 	auth := os.Getenv("LOADGEN_AUTHORIZATION")
 	cfg := lg.S1Config{Target: strings.TrimRight(*target, "/"), Admin: strings.TrimRight(*admin, "/"), Popularity: pop, ZipfS: *zipfS,
 		ReadRatio: *readRatio, PrimeConnections: *prime, Rate: *rate, Warmup: *warmup, Window: *window, Seed: *seed, MaxInflight: *limit, Timeout: *timeout, Authorization: auth}
+	cfg.AuditRun = *auditRun
+	if *bypassAudit != "" {
+		w, err := audit.Open(*bypassAudit, "bypass-writer")
+		fatal(err)
+		cfg.BypassAudit = w
+		defer func() { fatal(w.Close()) }()
+	}
 	if *targets != "" {
 		for _, target := range strings.Split(*targets, ",") {
 			cfg.Targets = append(cfg.Targets, strings.TrimRight(strings.TrimSpace(target), "/"))
@@ -106,7 +116,7 @@ func s1Main(args []string) {
 	doc := map[string]any{
 		"story": *story, "arm": *arm, "repeat": *repeat, "git_commit": commit, "data_version": *dataVersion,
 		"generated_at": time.Now().UTC(),
-		"config": map[string]any{"zipf_s": *zipfS, "read_ratio": *readRatio, "rate": *rate, "warmup": warmup.String(),
+		"config": map[string]any{"zipf_s": *zipfS, "audit_run": cfg.AuditRun, "read_ratio": *readRatio, "rate": *rate, "warmup": warmup.String(),
 			"window": window.String(), "seed": *seed, "max_inflight": *limit, "timeout": timeout.String(), "bypass_writes": cfg.Bypass != nil,
 			"popularity_ids": len(pop), "prime_connections": *prime, "targets": cfg.Targets, "connections_per_target": *perTarget, "bypass_pool_limit": min(*limit, 64)},
 		"client": map[string]any{"host": host, "goos": runtime.GOOS, "goarch": runtime.GOARCH, "cpus": runtime.NumCPU(), "nofile_soft": nofile.Cur},

@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/luckyrichor/backend-cloud-labs/support/telemetry/audit"
 	"io"
 	"math"
 	"math/rand/v2"
@@ -32,6 +33,8 @@ import (
 // identical request sequence. Every request is recorded; stale reads are judged against the
 // writes this same process saw acknowledged, so no cross-machine clock is involved.
 type S1Config struct {
+	AuditRun             string
+	BypassAudit          *audit.Writer
 	Target, Admin        string   // business and admin base URLs, e.g. http://127.0.0.1:18086
 	Targets              []string // equivalent business URLs, round-robin by planned request index
 	PerTargetConnections int      // cap each forwarding transport independently (zero uses MaxInflight)
@@ -149,9 +152,15 @@ var writeTitlePad = strings.Repeat("x", 96)
 
 func (c s1Clients) do(ctx context.Context, op s1Op, seq int, rec *S1Record) {
 	id := strconv.FormatUint(uint64(op.id), 10)
+	phase := "warmup"
+	if rec.Window {
+		phase = "window"
+	}
+	ctx = audit.WithLabels(ctx, c.cfg.AuditRun, phase, strconv.Itoa(seq))
 	if op.write && c.cfg.Bypass != nil {
 		price, stock := 100+int64(seq%100000), int64(seq%997)
 		res, err := c.cfg.Bypass.ExecContext(ctx, `UPDATE items SET price_cent = ?, stock = ?, version = LAST_INSERT_ID(version + 1), updated_at = UTC_TIMESTAMP(6) WHERE id = ?`, price, stock, op.id)
+		committedAt := audit.Now()
 		if err == nil {
 			var rows int64
 			rows, err = res.RowsAffected()
@@ -165,6 +174,9 @@ func (c s1Clients) do(ctx context.Context, op s1Op, seq int, rec *S1Record) {
 		if err != nil {
 			rec.Err = "mysql"
 			return
+		}
+		if c.cfg.BypassAudit != nil {
+			c.cfg.BypassAudit.RecordAt(ctx, id, "commit_return", 0, rec.Version, committedAt)
 		}
 		rec.Status = 200
 		return
@@ -190,6 +202,9 @@ func (c s1Clients) do(ctx context.Context, op s1Op, seq int, rec *S1Record) {
 		rec.Err = "request"
 		return
 	}
+	req.Header.Set("X-BCL-Run", c.cfg.AuditRun)
+	req.Header.Set("X-BCL-Phase", phase)
+	req.Header.Set("X-BCL-Request", strconv.Itoa(seq))
 	resp, err := c.http.Do(req)
 	if err != nil {
 		rec.Err = "transport_other"

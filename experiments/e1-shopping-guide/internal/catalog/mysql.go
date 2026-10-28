@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"github.com/luckyrichor/backend-cloud-labs/support/telemetry/audit"
 	"strconv"
 	"time"
 )
@@ -19,8 +20,9 @@ var ErrInvalidID = errors.New("catalog: item id must be a canonical unsigned dec
 // inside it. LAST_INSERT_ID(expr) hands the committed version back in the OK packet,
 // so no second round trip (and no window for another writer) is needed to learn it.
 type MySQLStore struct {
-	DB  *sql.DB
-	now func() time.Time
+	DB    *sql.DB
+	Audit *audit.Writer
+	now   func() time.Time
 }
 
 func NewMySQLStore(db *sql.DB) *MySQLStore { return &MySQLStore{DB: db, now: time.Now} }
@@ -77,6 +79,7 @@ VALUES (?, ?, 0, ?, ?, LAST_INSERT_ID(1), ?) AS incoming
 ON DUPLICATE KEY UPDATE title = incoming.title, price_cent = incoming.price_cent, stock = incoming.stock,
   version = LAST_INSERT_ID(items.version + 1), updated_at = incoming.updated_at`,
 		n, item.Title, item.PriceCent, item.Stock, now)
+	committedAt := audit.Now() // immediately after autocommit ExecContext returns
 	if err != nil {
 		return Item{}, err
 	}
@@ -88,5 +91,25 @@ ON DUPLICATE KEY UPDATE title = incoming.title, price_cent = incoming.price_cent
 		return Item{}, errors.New("catalog: MySQL did not report the committed version")
 	}
 	item.Version, item.UpdatedAt = version, now
+	if s.Audit != nil {
+		s.Audit.RecordAt(ctx, item.ID, "commit_return", 0, version, committedAt)
+	}
 	return item, nil
+}
+
+// GetVersion performs one primary-key lookup, without fetching/decode of the item payload.
+func (s *MySQLStore) GetVersion(ctx context.Context, id string) (int64, error) {
+	n, ok := parseID(id)
+	if !ok {
+		if err := ctx.Err(); err != nil {
+			return 0, err
+		}
+		return 0, ErrNotFound
+	}
+	var version int64
+	err := s.DB.QueryRowContext(ctx, "SELECT version FROM items WHERE id = ?", n).Scan(&version)
+	if errors.Is(err, sql.ErrNoRows) {
+		return 0, ErrNotFound
+	}
+	return version, err
 }

@@ -1,9 +1,14 @@
 package catalog_test
 
 import (
+	"bufio"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/luckyrichor/backend-cloud-labs/support/telemetry/audit"
+	"os"
+	"path/filepath"
 	"sort"
 	"sync"
 	"testing"
@@ -113,5 +118,66 @@ func TestMySQLRejectsNonCanonicalIDs(t *testing.T) {
 		if _, err := store.Get(ctx, id); !errors.Is(err, catalog.ErrNotFound) {
 			t.Errorf("Get(%q) err %v, want ErrNotFound", id, err)
 		}
+	}
+}
+
+func TestMySQLVersionOnlyMatchesCommittedRow(t *testing.T) {
+	s := mysqlStore(t)
+	ctx := context.Background()
+	for _, id := range []string{"41", "42"} {
+		written, err := s.Put(ctx, catalog.Item{ID: id, Title: "payload"})
+		if err != nil {
+			t.Fatal(err)
+		}
+		v, err := s.GetVersion(ctx, id)
+		if err != nil || v != written.Version {
+			t.Fatalf("version=%d want=%d err=%v", v, written.Version, err)
+		}
+	}
+	if _, err := s.GetVersion(ctx, "999"); !errors.Is(err, catalog.ErrNotFound) {
+		t.Fatal(err)
+	}
+}
+
+func TestMySQLCommitReturnAuditCoversAllWrittenKeys(t *testing.T) {
+	s := mysqlStore(t)
+	path := filepath.Join(t.TempDir(), "audit.jsonl")
+	w, err := audit.Open(path, "mysql-test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	s.Audit = w
+	start := audit.Now()
+	for _, id := range []string{"1", "42", "1851455"} {
+		if _, err := s.Put(context.Background(), catalog.Item{ID: id, Title: "row"}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	end := audit.Now()
+	if err := w.Close(); err != nil {
+		t.Fatal(err)
+	}
+	f, err := os.Open(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+	sc := bufio.NewScanner(f)
+	seen := map[string]bool{}
+	for sc.Scan() {
+		var e audit.Event
+		if json.Unmarshal(sc.Bytes(), &e) != nil {
+			t.Fatal("invalid audit")
+		}
+		if e.Event != "commit_return" {
+			continue
+		}
+		if e.TNS < start || e.TNS > end || e.Version != 1 {
+			t.Fatalf("bad commit event %+v", e)
+		}
+		seen[e.ID] = true
+	}
+	if len(seen) != 3 || sc.Err() != nil {
+		t.Fatal("missing all-key commit events", sc.Err())
 	}
 }
