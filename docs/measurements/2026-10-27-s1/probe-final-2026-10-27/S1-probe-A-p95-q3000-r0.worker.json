@@ -1,0 +1,7 @@
+{
+  "exit_code": 0,
+  "stdout": "S1-probe A r0 rate=3000 valid=true reads=28502 stale=8 (0.0003) read_p99=98559us dropped=0\n",
+  "stderr": "",
+  "tunnel_alive": true,
+  "tunnel_log_tail": "channel 3: open failed: connect failed: Connection refused\n"
+}

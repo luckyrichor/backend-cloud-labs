@@ -1,0 +1,19 @@
+{
+  "ready": true,
+  "host": "luomac.local",
+  "platform": "macOS-27.0.1-arm64-arm-64bit",
+  "cpus": 10,
+  "nofile": [
+    8192,
+    9223372036854775807
+  ],
+  "machine": "arm64",
+  "worker_pid": 20397,
+  "idle_sleep_inhibited": true,
+  "business_streams": 4,
+  "control_stream_separate": true,
+  "max_inflight": 1536,
+  "http_connections_per_stream": 256,
+  "bypass_pool_limit": 64,
+  "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801"
+}

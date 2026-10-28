@@ -1,0 +1,7 @@
+{
+  "exit_code": 0,
+  "stdout": "S1-bypass A r3 rate=400 valid=true reads=12179 stale=3506 (0.2879) read_p99=787455us dropped=0\n",
+  "stderr": "",
+  "tunnel_alive": true,
+  "tunnel_log_tail": "control:\nchannel 2: open failed: connect failed: Connection refused\n\nbusiness-0:\nchannel 1: open failed: connect failed: Connection refused\n\nbusiness-1:\nchannel 1: open failed: connect failed: Connection refused\n\nbusiness-2:\nchannel 1: open failed: connect failed: Connection refused\n\nbusiness-3:\nchannel 1: open failed: connect failed: Connection refused\n"
+}

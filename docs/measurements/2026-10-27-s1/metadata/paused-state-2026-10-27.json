@@ -1,0 +1,26 @@
+{
+  "paused_at": "2026-10-27T08:59:54.640777+00:00",
+  "reason": "User requested pause",
+  "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+  "completed_attempts": 161,
+  "valid_attempts": 153,
+  "invalid_completed_attempts": 8,
+  "interrupted_round": "S1-A-p95-q100-r6",
+  "interrupted_evidence": ".local/s1-suite/matrix-idle-2026-10-27/interrupted-user-pause-20261027T085954Z",
+  "baseline_restored": true,
+  "source_fingerprint": [
+    2000000,
+    2000000,
+    11670244223,
+    476822047,
+    1,
+    1
+  ],
+  "controller_session_closed": true,
+  "resume_command": "python3 .local/s1-suite/supplement.py",
+  "next_steps": [
+    "Finish pending whole-cell supplementary repeats from supplement-rounds.json.",
+    "Run separate tx calibration only after Mac measurements finish.",
+    "Archive evidence, derive S1 report, complete final regression and sync documentation."
+  ]
+}

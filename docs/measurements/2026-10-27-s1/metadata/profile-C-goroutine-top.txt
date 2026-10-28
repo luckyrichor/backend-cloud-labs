@@ -1,0 +1,19 @@
+File: e1
+Build ID: 4f04360071cd5d54458457078c663fb823e2d3e8
+Type: goroutine
+Time: 2026-10-27 04:46:23 EDT
+Showing nodes accounting for 103, 99.04% of 104 total
+Showing top 12 nodes out of 43
+      flat  flat%   sum%        cum   cum%
+       101 97.12% 97.12%        101 97.12%  runtime.gopark
+         1  0.96% 98.08%          1  0.96%  runtime.goroutineProfileWithLabels
+         1  0.96% 99.04%          1  0.96%  runtime.notetsleepg
+         0     0% 99.04%         31 29.81%  bufio.(*Reader).Peek
+         0     0% 99.04%         31 29.81%  bufio.(*Reader).fill
+         0     0% 99.04%          1  0.96%  database/sql.(*DB).connectionCleaner
+         0     0% 99.04%          1  0.96%  database/sql.(*DB).connectionOpener
+         0     0% 99.04%         64 61.54%  github.com/go-sql-driver/mysql.(*mysqlConn).startWatcher.func1
+         0     0% 99.04%          1  0.96%  github.com/luckyrichor/backend-cloud-labs/support/telemetry.Start.func1
+         0     0% 99.04%          2  1.92%  internal/poll.(*FD).Accept
+         0     0% 99.04%         31 29.81%  internal/poll.(*FD).Read
+         0     0% 99.04%         33 31.73%  internal/poll.(*pollDesc).wait

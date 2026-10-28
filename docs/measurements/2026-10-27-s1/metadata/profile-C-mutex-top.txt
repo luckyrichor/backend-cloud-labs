@@ -1,0 +1,19 @@
+File: e1
+Build ID: 4f04360071cd5d54458457078c663fb823e2d3e8
+Type: delay
+Time: 2026-10-27 04:46:23 EDT
+Showing nodes accounting for 171.99us, 100% of 171.99us total
+Showing top 12 nodes out of 45
+      flat  flat%   sum%        cum   cum%
+  171.99us   100%   100%   171.99us   100%  runtime.unlock (inline)
+         0     0%   100%     2.04us  1.19%  bufio.(*Reader).Peek
+         0     0%   100%     2.04us  1.19%  bufio.(*Reader).fill
+         0     0%   100%     2.04us  1.19%  github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/cache.(*Redis).Get
+         0     0%   100%     2.04us  1.19%  github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/guide.Service.Get
+         0     0%   100%     2.04us  1.19%  github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/guide.cacheView.Get
+         0     0%   100%     2.04us  1.19%  github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/httpapi.HandlerWithOptions.func1
+         0     0%   100%     2.04us  1.19%  github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/observe.(*Cache).Get
+         0     0%   100%     2.04us  1.19%  github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/observe.(*Latency).Wrap.func1
+         0     0%   100%     2.04us  1.19%  github.com/luckyrichor/backend-cloud-labs/support/telemetry.(*Metrics).HTTP.func1
+         0     0%   100%     2.04us  1.19%  github.com/redis/go-redis/v9.(*Client).Process
+         0     0%   100%     2.04us  1.19%  github.com/redis/go-redis/v9.(*baseClient)._process

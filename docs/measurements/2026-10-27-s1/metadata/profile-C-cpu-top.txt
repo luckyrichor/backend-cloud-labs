@@ -1,0 +1,20 @@
+File: e1
+Build ID: 4f04360071cd5d54458457078c663fb823e2d3e8
+Type: cpu
+Time: 2026-10-27 04:46:18 EDT
+Duration: 5s, Total samples = 620ms (12.40%)
+Showing nodes accounting for 440ms, 70.97% of 620ms total
+Showing top 12 nodes out of 248
+      flat  flat%   sum%        cum   cum%
+     330ms 53.23% 53.23%      330ms 53.23%  internal/runtime/syscall/linux.Syscall6
+      10ms  1.61% 54.84%       10ms  1.61%  context.parentCancelCtx
+      10ms  1.61% 56.45%       10ms  1.61%  database/sql.(*closingMutex).Unlock
+      10ms  1.61% 58.06%       10ms  1.61%  database/sql.driverArgsConnLocked
+      10ms  1.61% 59.68%       10ms  1.61%  encoding/json/jsontext.(*decoderState).ReadToken
+      10ms  1.61% 61.29%       10ms  1.61%  encoding/json/v2.MarshalEncode
+      10ms  1.61% 62.90%       10ms  1.61%  github.com/HdrHistogram/hdrhistogram-go.(*Histogram).setCountAtIndex
+      10ms  1.61% 64.52%       50ms  8.06%  github.com/redis/go-redis/v9.cmdable.eval
+      10ms  1.61% 66.13%       10ms  1.61%  github.com/redis/go-redis/v9/internal/pool.(*Conn).HasBufferedData
+      10ms  1.61% 67.74%      230ms 37.10%  internal/poll.(*FD).Write
+      10ms  1.61% 69.35%       10ms  1.61%  internal/poll.runtime_pollSetDeadline
+      10ms  1.61% 70.97%       10ms  1.61%  internal/reflectlite.Value.IsNil

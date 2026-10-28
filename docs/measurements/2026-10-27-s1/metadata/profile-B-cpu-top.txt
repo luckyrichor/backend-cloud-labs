@@ -1,0 +1,20 @@
+File: e1
+Build ID: 4f04360071cd5d54458457078c663fb823e2d3e8
+Type: cpu
+Time: 2026-10-27 04:45:40 EDT
+Duration: 5s, Total samples = 510ms (10.20%)
+Showing nodes accounting for 380ms, 74.51% of 510ms total
+Showing top 12 nodes out of 208
+      flat  flat%   sum%        cum   cum%
+     260ms 50.98% 50.98%      260ms 50.98%  internal/runtime/syscall/linux.Syscall6
+      20ms  3.92% 54.90%       20ms  3.92%  runtime.nanotime
+      10ms  1.96% 56.86%       50ms  9.80%  database/sql.ctxDriverPrepare
+      10ms  1.96% 58.82%       30ms  5.88%  errors.As
+      10ms  1.96% 60.78%       20ms  3.92%  errors.as
+      10ms  1.96% 62.75%       20ms  3.92%  github.com/redis/go-redis/v9/internal/pool.(*ConnPool).getConn
+      10ms  1.96% 64.71%       10ms  1.96%  internal/runtime/atomic.(*UnsafePointer).Load
+      10ms  1.96% 66.67%       10ms  1.96%  internal/runtime/maps.memHashAES
+      10ms  1.96% 68.63%       10ms  1.96%  net/http.(*mapping[go.shape.string,go.shape.*uint8]).find
+      10ms  1.96% 70.59%       10ms  1.96%  reflect.Value.Field
+      10ms  1.96% 72.55%       10ms  1.96%  runtime.(*stkframe).getStackMap
+      10ms  1.96% 74.51%       10ms  1.96%  runtime.(*timer).unlock

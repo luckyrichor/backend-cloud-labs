@@ -1,0 +1,15 @@
+{
+  "recorded_at": "2026-10-27T06:08:10.102939+00:00",
+  "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+  "reason": "First invalid primary round S1-B-p95-q100-r2 had clustered transport_timeout; retain failures and require at least five valid repeats.",
+  "selection": "Use only validity and source audit, never latency, stale ratio, or improvement size, to decide supplementation.",
+  "unit": "Entire story/rate/read-ratio condition: all A/B/C/D arms, or all A/B-off/B in reverse.",
+  "repeat": "Start from repeat 6 and increase; same repeat seed across all arms; alternate order by repeat parity.",
+  "aggregation": "Retain and report every attempted run; include all valid attempts in descriptive statistics and report counts; pairwise conclusions also use common valid repeat identifiers.",
+  "clarifications": [
+    {
+      "at": "2026-10-27T07:23:09.088689+00:00",
+      "rule": "Require at least five common valid repeat identifiers for each reported strategy comparison, as well as at least five valid attempts per arm. Different invalid repeat numbers in A and B may require more than one whole-cell supplementary repeat. Selection still uses only validity, never performance."
+    }
+  ]
+}

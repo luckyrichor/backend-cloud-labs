@@ -1,0 +1,7 @@
+{
+  "exit_code": 0,
+  "stdout": "S1-tx-calibration B r4 rate=400 valid=true reads=12141 stale=0 (0.0000) read_p99=3499us dropped=0\n",
+  "stderr": "",
+  "transport": "tx-loopback",
+  "ssh_in_use": false
+}

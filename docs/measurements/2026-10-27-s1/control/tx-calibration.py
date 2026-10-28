@@ -47,10 +47,18 @@ c.save(STATE/'tx-calibration-environment.json',dict(source_commit=COMMIT,client_
     binary_sha256=hashlib.sha256(binary.read_bytes()).hexdigest(),scope='Separate diagnostic only; client hardware, affinity and transport differ from Mac.'))
 c.start_redis();c.stop_e1();c.restore();client=Local()
 try:
-    for repeat in range(1,6):
+    repeat=1
+    while True:
         order=['A','B','C','D'] if repeat%2 else ['D','C','B','A']
         for arm in order:
             c.one(client,COMMIT,manifest,OUT,arm,.95,design['rates'][-1],repeat,
                   max(20,math.ceil(12000/(design['rates'][-1]*.95))),10,'S1-tx-calibration')
-    c.event('tx-calibration-complete')
+        if repeat>=5:
+            ids={arm:set() for arm in ['A','B','C','D']}
+            for done in OUT.glob('*.done.json'):
+                doc=json.loads(done.with_name(done.name.removesuffix('.done.json')+'.json').read_text())
+                if doc['result']['valid']:ids[doc['arm']].add(doc['repeat'])
+            if all(len(ids['A']&ids[arm])>=5 for arm in ['B','C','D']):break
+        repeat+=1
+    c.event('tx-calibration-complete',repeats_attempted=repeat)
 finally:c.stop_e1()

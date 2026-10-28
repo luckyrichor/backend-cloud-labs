@@ -1,0 +1,19 @@
+File: e1
+Build ID: 4f04360071cd5d54458457078c663fb823e2d3e8
+Type: goroutine
+Time: 2026-10-27 04:45:09 EDT
+Showing nodes accounting for 247, 99.60% of 248 total
+Showing top 12 nodes out of 95
+      flat  flat%   sum%        cum   cum%
+       245 98.79% 98.79%        245 98.79%  runtime.gopark
+         1   0.4% 99.19%          1   0.4%  runtime.goroutineProfileWithLabels
+         1   0.4% 99.60%          1   0.4%  runtime.notetsleepg
+         0     0% 99.60%        171 68.95%  bufio.(*Reader).Peek
+         0     0% 99.60%          1   0.4%  bufio.(*Reader).ReadLine
+         0     0% 99.60%          1   0.4%  bufio.(*Reader).ReadSlice
+         0     0% 99.60%        172 69.35%  bufio.(*Reader).fill
+         0     0% 99.60%          1   0.4%  database/sql.(*DB).QueryContext
+         0     0% 99.60%          1   0.4%  database/sql.(*DB).QueryContext.func1
+         0     0% 99.60%          1   0.4%  database/sql.(*DB).QueryRowContext
+         0     0% 99.60%          1   0.4%  database/sql.(*DB).connectionCleaner
+         0     0% 99.60%          1   0.4%  database/sql.(*DB).connectionOpener

@@ -1,0 +1,7 @@
+{
+  "attempts": 120,
+  "valid": 113,
+  "reads": 1456108,
+  "stale": 0,
+  "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801"
+}

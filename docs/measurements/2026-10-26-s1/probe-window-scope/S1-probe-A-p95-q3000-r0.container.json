@@ -1,0 +1,37 @@
+{
+  "Status": "running",
+  "Running": true,
+  "Paused": false,
+  "Restarting": false,
+  "OOMKilled": false,
+  "Dead": false,
+  "Pid": 663565,
+  "ExitCode": 0,
+  "Error": "",
+  "StartedAt": "2026-10-26T14:09:46.577252673Z",
+  "FinishedAt": "0001-01-01T00:00:00Z",
+  "Health": {
+    "Status": "healthy",
+    "FailingStreak": 0,
+    "Log": [
+      {
+        "Start": "2026-10-26T22:09:51.577520869+08:00",
+        "End": "2026-10-26T22:09:51.643227047+08:00",
+        "ExitCode": 0,
+        "Output": ""
+      },
+      {
+        "Start": "2026-10-26T22:09:56.64424704+08:00",
+        "End": "2026-10-26T22:09:56.715925581+08:00",
+        "ExitCode": 0,
+        "Output": ""
+      },
+      {
+        "Start": "2026-10-26T22:10:01.716448586+08:00",
+        "End": "2026-10-26T22:10:01.779960267+08:00",
+        "ExitCode": 0,
+        "Output": ""
+      }
+    ]
+  }
+}

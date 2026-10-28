@@ -1,0 +1,52 @@
+{
+  "collected_at": "2026-10-27T10:42:22.799094+00:00",
+  "scope": "After Mac measurements, before separate tx calibration",
+  "tx": {
+    "uname": {
+      "system": "Linux",
+      "node": "VM-0-15-ubuntu",
+      "release": "6.8.0-139-generic",
+      "version": "#139-Ubuntu SMP PREEMPT_DYNAMIC Sat Aug  1 03:52:05 UTC 2026",
+      "machine": "x86_64",
+      "processor": "x86_64"
+    },
+    "cpus": 4,
+    "controller_affinity": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  "mysql": {
+    "image": "mysql:8.0@sha256:7dcddc01f13bab2f15cde676d44d01f61fc9f99fe7785e86196dfc07d358ae2b",
+    "image_id": "sha256:7dcddc01f13bab2f15cde676d44d01f61fc9f99fe7785e86196dfc07d358ae2b",
+    "cpuset": "0",
+    "memory_bytes": 1073741824,
+    "settings": [
+      "8.0.46",
+      "268435456",
+      "ROW",
+      "FULL"
+    ]
+  },
+  "redis": {
+    "image": "redis:7-alpine@sha256:520775a41a63e77e06c73e35d2fd9cc15921a609516818796b4ecbb813078bc7",
+    "image_id": "sha256:520775a41a63e77e06c73e35d2fd9cc15921a609516818796b4ecbb813078bc7",
+    "cpuset": "1",
+    "memory_bytes": 201326592
+  },
+  "e1_requested_resources": {
+    "cpuset": "2",
+    "memory_bytes": 201326592,
+    "source": "d2ca677 scripts/s1-suite.py"
+  },
+  "mac": {
+    "host": "luomac.local",
+    "platform": "macOS-27.0.1-arm64-arm-64bit",
+    "cpus": 10,
+    "memory_bytes": 17179869184,
+    "route_interface_to_tx": "utun5",
+    "ssh_version": "OpenSSH_10.3p1, LibreSSL 3.3.6"
+  }
+}

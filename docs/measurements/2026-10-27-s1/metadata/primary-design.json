@@ -1,0 +1,28 @@
+{
+  "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+  "evidence_root": "docs/measurements/2026-10-27-s1",
+  "rates": [
+    100,
+    250,
+    400
+  ],
+  "service_p99_slo_us": 50000,
+  "rate_rule": "25%, 50%, 80% of highest valid probed baseline A rate within p99 SLO; floor to 50 req/s",
+  "calibration_arms": [
+    "A",
+    "C"
+  ],
+  "rate_selection_arm": "A",
+  "business_streams": 4,
+  "max_inflight": 1536,
+  "http_connections_per_stream": 256,
+  "warmup_seconds": 10,
+  "window_rule": "max(20, ceil(12000/(rate*read_ratio))) seconds",
+  "repeats": 5,
+  "read_ratios": [
+    0.95,
+    0.99
+  ],
+  "truth": "client-acknowledged same-id version lower bound",
+  "planned_at": "2026-10-27T05:23:17.681801+00:00"
+}

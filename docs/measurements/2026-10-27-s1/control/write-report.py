@@ -1,0 +1,165 @@
+import json,sys,statistics,collections
+from pathlib import Path
+D=json.loads(Path(sys.argv[1]).read_text());T=json.loads(Path(sys.argv[2]).read_text());out=Path(sys.argv[3]);base='measurements/2026-10-27-s1'
+assert D['completed_attempts']==206 and D['valid_attempts']==198, 'This report builder is specific to the archived 2026-10-27 evidence'
+G={(g['story'],g['ratio'],g['rate'],g['arm']):g for g in D['groups']}
+def stat(g,key,scale=1,dec=3):
+ s=g['metrics'][key];return f"{s['median']*scale:.{dec}f} [{s['min']*scale:.{dec}f}, {s['max']*scale:.{dec}f}]"
+def table(headers,rows):return '| '+' | '.join(headers)+' |\n| '+' | '.join(['---']*len(headers))+' |\n'+''.join('| '+' | '.join(map(str,row))+' |\n' for row in rows)
+counts=[]
+for story,title in [('S1','Mac主对照（含整组补跑）'),('S1-reverse','反向验证'),('S1-bypass','直写MySQL'),('S1-profile','独立剖析'),('S1-tx-calibration','tx校准（单列）')]:
+ q=[r for r in D['quality'] if r['story']==story]
+ counts.append([title,sum(r['attempts'] for r in q),sum(r['valid'] for r in q),sum(r['invalid'] for r in q)])
+rows=D['rows'];failed_r=sum(r['read_failed'] for r in rows);failed_w=sum(r['write_failed'] for r in rows);issued=sum(r['reads']+r['writes'] for r in rows);drops=sum(r['measured_dropped'] for r in rows)
+errors=collections.Counter()
+for q in D['quality']:errors.update(q['error_classes'])
+comparisons=[c for c in D['comparisons'] if c['story'] in ['S1','S1-reverse','S1-bypass']]
+assert min(len(c['common_repeat_ids']) for c in comparisons)>=5
+extra=[c['metrics']['source_qps'] for c in comparisons if c['story']=='S1' and c['arm']=='C']
+low=min(-x['relative_reduction'] for x in extra)*100;high=max(-x['relative_reduction'] for x in extra)*100
+text=f'''# S1：真实MySQL前的缓存策略对照（2026-10-27）
+
+> 由 Codex 生成。测量源码固定为 `backend-cloud-labs@d2ca677db32a17eaed9aff776244262b88d42801`；后续交接、控制和分析文件独立保存。数据版本：`{D['data_versions'][0]}`。
+
+本轮实验、有效重复补足、独立校准和证据分析已完成。**没有实测证据支持 B/D 在本负载下带来显著 GET p99 改善。** 主矩阵与反向组的客户端确认口径陈旧读均为0，陈旧率收益记为不确定；同一次有效运行的服务端热点时序仍捕获了真实旧值回填。绕过服务直写时，A/B/D的确认口径陈旧率中位数约27.9%，C观察为0，代价是更高的MySQL回源。
+
+## 1. 数据与控制条件
+
+- P1合成放大的200万商品，独立 `bcl_s1.items`；只读 `items_base` 从已校验的P1 TSV导入。每轮恢复所有尝试写入的ID并核对字段，专用Redis清空、E1重启。共享 `bcl.items` 没有被本实验更新。
+- Redis TTL为60秒，读写访问均按固定热度排列上的Zipf(0.99)生成；95:5、99:1两档，100/250/400 req/s三档。重复编号r的种子为20261026+r，同编号各策略使用同一计划。
+- 率档由固定源短探测的A基线决定：有效且服务端GET p99≤50ms的最高已探测点为500 req/s，再取25%/50%/80%并按50向下取整、最低100。A1500虽请求成功，服务端p99为122.687ms；A500为28.047ms。50ms是实验阈值，短探测不能充当系统容量认证。C探测保留，未作为定档门槛。
+- 每轮只读预建128个连接请求，预热10秒并排空，然后重置直方图；正式窗口 `max(20,ceil(12000/(rate*ratio)))` 秒，预计至少约1.2万次读。五遍交替，奇数A/B/C/D、偶数反序。补跑只由有效性决定，按整组增加重复编号。
+- tx四核主机上，E1请求CPU2/192MiB、实验Redis CPU1/192MiB，MySQL CPU0、buffer pool 256MiB；商品表约310MiB，超出buffer pool。其他已部署服务仍在，背景负载未完全隔离。实际镜像、内存、内核和客户端快照见[环境记录]({base}/metadata/environment.json)。
+- 主发压器在真实Mac（arm64、10核），四条独立业务SSH流各最多256 HTTP连接，另设管理/旁路SQL控制流；总在途上限1536、旁路SQL池64、超时3秒、客户端空闲连接2秒。旧单隧道、旧版本探测均为诊断数据，不混入正式比较。
+- A普通SET回填、写后DEL；B版本门控回填及写后回填；C每次先完整点查源，再校验缓存版本；D在门控缓存优先基础上保留本地修复队列与代际。C当前实现读取完整商品行，不是单独优化过的 `SELECT version`。
+
+## 2. 有效性、重复与统计规则
+
+{table(['范围','完成尝试','有效','无效'],counts)}
+
+合计{D['completed_attempts']}次已完成尝试、{D['valid_attempts']}次有效；用户暂停造成的1次中断另列，未计有效/完成。所有无效结果保持原始标记。暂停前后复用同一源码、二进制、基底和种子规则，时段差异保留在范围内；不把恢复后的链路变化解释为业务优化。
+
+全部已完成尝试发出正式读/写请求{issued}次，其中读失败{failed_r}次、写失败{failed_w}次，正式丢到达{drops}次；发出请求成功率为{(issued-failed_r-failed_w)/issued*100:.5f}%。这是含无效轮次的质量统计，不是只挑成功轮。CSV错误分类（含预热）为 `{dict(sorted(errors.items()))}`。预热已发请求失败同样判无效。
+
+有效门禁包含：无失败/正式丢到达、正版本、HdrHistogram不溢出、发率偏差≤5%、指标完整、源最终版本/字段审计通过。运行时source=mysql、策略/关门控/TTL另经原始结果复核。共同有效重复最少为5；若A、B失效的编号不同，就继续补整组。
+
+表内是全部有效尝试的“各运行分位数的中位数 [最小,最大]”；结论使用双方共同有效编号重算，具体文件和编号在[analysis.json]({base}/analysis.json)。只有相对变化>10%且最小/最大范围不重叠才按实验规则记为显著；零基线的相对提升不可定义。这个规则不是置信区间或p值检验。
+
+客户端延迟从计划到达计到完成，包含排队/调度/链路；服务端从HTTP业务handler入口计到返回。两者都以HdrHistogram(1μs–600s、3位有效数字)记录。回源QPS分母包含实际采集和排空时间，是近似值。Redis命中率不等于免回源率：C即使命中Redis仍读MySQL。
+
+## 3. 主矩阵
+
+### 服务端GET p99，毫秒
+
+'''
+for metric,title in [('server_p99_us',None),('client_p99_us','### 客户端GET p99，毫秒')]:
+ if title:text+='\n'+title+'\n\n'
+ items=[]
+ for ratio in [.95,.99]:
+  for rate in [100,250,400]:
+   groups=[G[('S1',ratio,rate,a)] for a in ['A','B','C','D']]
+   items.append([f'{ratio:.0%}',rate]+[stat(g,metric,.001)+f" (n={g['repeats']})" for g in groups])
+ text+=table(['读比例','req/s','A','B','C','D'],items)
+text+=f'''
+18个主矩阵策略相对A的服务端p99比较、18个客户端p99比较均未通过上述区分判据；不能仅凭较低中位数写提升百分比。主矩阵全部有效轮的确认口径陈旧读为0，因此18个陈旧率比较均记为不确定。B和D回源量相对A变化未超过预定判据；C的配对中位数回源高出约{low:.1f}%–{high:.1f}%，六个条件均达到区分判据。
+
+完整p50/p95/p99、命中率、成功率及每次运行值见[汇总CSV]({base}/groups.csv)、[质量CSV]({base}/quality.csv)和原始文件。例：95:5、400 req/s各组的回源中位数约A203.7、B193.9、C378.0、D193.4 QPS。B/D的写后回填可以避免部分写后未命中，但此数据不足以支持大幅降低回源或p99的主张。
+
+## 4. 热点竞态与反向验证
+
+有效运行 [S1-A-p95-q400-r1]({base}/matrix-idle-2026-10-27/S1-A-p95-q400-r1.trace.jsonl.gz)，热点1851455，捕获了下列同进程单调时间序列（单位ns）：
+
+| 操作 | 事件 | 版本 | t_ns |
+| --- | --- | --- | --- |
+| 读962 | begin | — | 40871928973 |
+| 读962 | store_read | 59 | 40922999828 |
+| 写975 | write_commit | 60 | 40932488897 |
+| 写975 | delete | 60 | 40947684282 |
+| 读962 | fill | 59 | 40952659755 |
+| 读989 | cache_hit | 59 | 40953018720 |
+
+```mermaid
+sequenceDiagram
+    participant R as 旧读
+    participant DB as MySQL
+    participant W as 写请求
+    participant K as Redis
+    R->>DB: 读取v59
+    DB-->>R: v59
+    W->>DB: 提交v60
+    W->>K: DEL
+    R->>K: 迟到回填v59
+    K-->>R: 后续读命中v59
+```
+
+这证明源提交后缓存确实可能被旧回填污染。客户端同版本v59/v60记录均在正式窗口，但确认口径陈旧数仍为0：该口径只检查“读发出前，已经收到的同ID最大成功写版本”，不覆盖请求在途期间发生的提交。它不能证明缓存从未落后源；也不能用服务端trace事件数替代正式窗口陈旧率。两端的单调时钟未直接拼接。
+
+15轮反向A/B-off/B全有效，五遍确认口径陈旧率均0，缺乏分离度，**未从该比例验证门控收益**。有效主矩阵的门控拒绝计数合计B0、C8、D0；C的拒绝不能当作B的优化证据。已有确定性竞态测试说明门控机制可拒绝旧回填，仍不能据此预写真实负载提升。
+
+## 5. 绕过服务直写MySQL
+
+下表各组同为95:5、400 req/s。SQL写只改价格、库存、版本和更新时间；本组不与经过HTTP写的写延迟直接混算。
+
+'''
+items=[]
+for a in ['A','B','C','D']:
+ g=G[('S1-bypass',.95,400,a)]
+ items.append([a,g['repeats'],stat(g,'stale_ratio',100,3),stat(g,'source_qps',1,2),stat(g,'server_p99_us',.001),stat(g,'client_p99_us',.001)])
+text+=table(['组','有效n','陈旧率 %','回源QPS','服务端p99 ms','客户端p99 ms'],items)
+text+='''
+A/B/D的陈旧率范围重叠，B/D相对A无显著提升；C观察到0，其相对A的下降满足实验区分规则，同时回源QPS显著增加。0是本次确认口径的观察值，不是未来零陈旧保证。版本门控保护回填顺序，不会主动发现服务外写入；外部失效/回填通道仍是S2的必要范围。本次窗口不足以完整观测所有键的TTL到期，不声称已测出全部收敛时间。
+
+## 6. 严格查源的时间区间与独立剖析
+
+现有C热点trace的 `read_start→store_read` 记录source.Get观察区间，包含连接池等待、驱动、MySQL点查及少量trace开销；`read_start→cache_validated/fill` 是核心读路径，尚未包含HTTP JSON输出。它们是同一次调用的嵌套区间。以下用同样的HdrHistogram从原始时序重算：
+
+'''
+tracegroups=collections.defaultdict(list)
+for r in T['rows']:
+ if r['story']=='S1':tracegroups[(r['ratio'],r['rate'])].append(r)
+items=[]
+for (ratio,rate),runs in sorted(tracegroups.items()):
+ assert sum(r['incomplete_reads'] for r in runs)==0
+ items.append([f'{ratio:.0%}',rate,len(runs),sum(r['source_get_observation_us']['count'] for r in runs),
+  statistics.median(r['source_get_observation_us']['p50_us'] for r in runs),statistics.median(r['core_read_path_us']['p50_us'] for r in runs),
+  statistics.median(r['source_get_observation_us']['p99_us'] for r in runs),statistics.median(r['core_read_path_us']['p99_us'] for r in runs)])
+text+=table(['读比例','req/s','运行n','热点完整调用数','source p50 μs','核心路径p50 μs','source p99 μs','核心路径p99 μs'],items)
+text+=f'''
+这些是各运行热点分位数的中位数，**覆盖整个尝试，含预建/预热**，只用于定位，不能替代正式全目录分位数。每次C热点读都先支付source.Get区间，支持回源构成路径下限；没有测量裸mysqld执行时间，不能宣称服务延迟与裸SQL完全相等。数据见[时序直方图]({base}/trace-histograms.json.gz)。
+
+A/B/C各单独采集5秒CPU及mutex/goroutine剖析，E1 Build ID一致。CPU样本分别490/510/620ms，顶层系统调用约占53%/51%/53%；这是独立定位快照，未重复CPU成本实验，不能将样本差写成优化幅度。mutex未采到样本不证明没有锁成本；goroutine快照不能证明不存在泄漏。原始9个pprof及[文本摘要]({base}/metadata/profile-B-cpu-top.txt)均保留，剖析轮不计正式性能对照。
+
+## 7. tx本机校准（单列）
+
+同一业务/发压源码、同一基底和400 req/s、95:5，四组五遍交替。Linux发压器绑CPU3，单个loopback业务目标、连接上限1024；Mac是10核客户端和四条SSH业务流。硬件、CPU绑定和拓扑均不同，不能把两组差值全部等同纯网络延迟。
+
+'''
+items=[]
+for a in ['A','B','C','D']:
+ g=G[('S1-tx-calibration',.95,400,a)]
+ items.append([a,g['repeats'],stat(g,'server_p99_us',.001),stat(g,'client_p99_us',.001),stat(g,'source_qps',1,2),stat(g,'stale_ratio',100,3)])
+text+=table(['组','有效n','服务端p99 ms','客户端p99 ms','回源QPS','陈旧率 %'],items)
+text+=f'''
+本表用于判断外部等待是否掩盖业务差异，不能替换Mac主结果或充当优化后数据。Mac客户端重复范围明显较宽，正式结论已按预设规则保留“无显著提升/不确定”，未剔除较慢的有效轮。
+
+## 8. 边界、复现与下一阶段
+
+- 单实例、共享MySQL实例、虚拟机与现存监控/其他服务环境；数据量和负载不代表生产容量。客户端固定到达不保证经过SSH后的服务端到达均匀。
+- B/D正常路径接近；本次没有注入Redis写失败来专门评估D的修复队列/代际，不能据此证明该功能没有价值。当前修复只协调本进程，跨实例协议尚未完成。
+- 原始确认口径低估所有已提交更新的陈旧窗口；源Get是完整行读取，严格校验代价不能外推为最小化版本查询代价。
+- 前置旧版本/单隧道试跑仅用于诊断，按登记路径归档并与本报告输入隔离；用户暂停中断单独保留。完整最终状态见[completion.json]({base}/completion.json)，17:00暂停快照为历史状态。
+
+在仓库根目录执行：
+
+```bash
+python3 docs/measurements/2026-10-27-s1/recompute.py --out .local/s1-recomputed
+# 输出analysis.json应与归档版本一致；全部文件校验在仓库根目录执行
+sha256sum -c docs/measurements/2026-10-27-s1/SHA256SUMS
+```
+
+[证据说明和控制脚本]({base}/README.md)、[登记索引]({base}/registry.json)列出原始结果、CSV、单实例trace、字段/版本审计、恢复、环境和pprof。二进制固定源、数据版本、配置与每个比较的共同编号均可追溯。原始数据不做事后valid修正。
+
+S1的结果是：真实晚回填已被时序证实；主负载下门控的p99/确认口径陈旧率收益未被证实；外部写入时缓存优先路径出现明显陈旧，严格查源降低本次观察到的陈旧率并增加回源量。下一步进入S2：binlog→Redis Stream、跨实例失效/回填和故障收敛实验；**CP2仍需等整个P2/S2完成后由用户审阅**。
+'''
+out.write_text(text)
+print(out)

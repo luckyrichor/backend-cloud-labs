@@ -1,0 +1,10 @@
+{
+  "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+  "binaries": {
+    ".local/s1-suite/loadgen-mac": "ed0422f9a5efd27daae1aaf3c18b3d43cb88efb3f35df5c57f9c3f823d5e7e26",
+    ".local/bin/e1": "9f010b265cae763dc9ee2b9cf4b11472536ad5286e837f076c384a590194bf9d"
+  },
+  "data_version": "catalog/b0e5aba50106/seed-20261023/8025233af339",
+  "image_id": "sha256:66b92105eb364d88923fcb911902de74d521ec23faeff5ab9c1f169a4bd7ef15",
+  "service_revision": "d2ca677db32a17eaed9aff776244262b88d42801"
+}

@@ -1,0 +1,6 @@
+scripts/check.sh: exit 0
+Go top-level passed: 139
+Expected memory-store MySQL skips: 4 (real MySQL suite executed)
+Go vet: passed
+CTest: 7/7
+{"source_fingerprint": [2000000, 2000000, 11670244223, 476822047, 1, 1], "trace_groups": 41, "minimum_common_valid_repeats": 5}

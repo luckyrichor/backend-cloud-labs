@@ -1,0 +1,14 @@
+{
+  "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+  "client_cpu_affinity": [
+    3
+  ],
+  "ssh_in_use": false,
+  "business_urls": [
+    "http://127.0.0.1:18096"
+  ],
+  "max_inflight": 1536,
+  "connections_per_target": 1024,
+  "binary_sha256": "181e6ec4ac2ae6ca34e7c2f0dc5ec2d309d302e507edc907b95d51bc0b98b6b0",
+  "scope": "Separate diagnostic only; client hardware, affinity and transport differ from Mac."
+}

@@ -1,0 +1,20 @@
+File: e1
+Build ID: 4f04360071cd5d54458457078c663fb823e2d3e8
+Type: cpu
+Time: 2026-10-27 04:45:04 EDT
+Duration: 5s, Total samples = 490ms ( 9.80%)
+Showing nodes accounting for 390ms, 79.59% of 490ms total
+Showing top 12 nodes out of 217
+      flat  flat%   sum%        cum   cum%
+     260ms 53.06% 53.06%      260ms 53.06%  internal/runtime/syscall/linux.Syscall6
+      20ms  4.08% 57.14%       20ms  4.08%  runtime.futex
+      20ms  4.08% 61.22%       20ms  4.08%  time.runtimeNow
+      10ms  2.04% 63.27%       50ms 10.20%  github.com/redis/go-redis/v9/internal/pool.(*Conn).WithWriter
+      10ms  2.04% 65.31%      220ms 44.90%  internal/poll.(*FD).Write
+      10ms  2.04% 67.35%       10ms  2.04%  internal/runtime/atomic.(*Uint32).Add
+      10ms  2.04% 69.39%       10ms  2.04%  internal/runtime/maps.(*Map).getWithoutKeySmallFastStr
+      10ms  2.04% 71.43%       10ms  2.04%  net.(*OpError).Timeout
+      10ms  2.04% 73.47%       10ms  2.04%  net.(*TCPConn).SetReadDeadline
+      10ms  2.04% 75.51%       10ms  2.04%  net/textproto.validHeaderFieldByte
+      10ms  2.04% 77.55%       10ms  2.04%  reflect.(*rtype).AssignableTo
+      10ms  2.04% 79.59%       10ms  2.04%  reflect.Value.Elem

@@ -1,0 +1,19 @@
+File: e1
+Build ID: 4f04360071cd5d54458457078c663fb823e2d3e8
+Type: delay
+Time: 2026-10-27 04:45:09 EDT
+Showing nodes accounting for 4.37us, 100% of 4.37us total
+Showing top 12 nodes out of 51
+      flat  flat%   sum%        cum   cum%
+    4.37us   100%   100%     4.37us   100%  runtime.unlock (inline)
+         0     0%   100%     2.32us 53.22%  bufio.NewWriterSize
+         0     0%   100%     2.04us 46.78%  database/sql.(*DB).QueryContext
+         0     0%   100%     2.04us 46.78%  database/sql.(*DB).QueryContext.func1
+         0     0%   100%     2.04us 46.78%  database/sql.(*DB).QueryRowContext
+         0     0%   100%     2.04us 46.78%  database/sql.(*DB).query
+         0     0%   100%     2.04us 46.78%  database/sql.(*DB).queryDC
+         0     0%   100%     2.04us 46.78%  database/sql.(*DB).queryDC.func2
+         0     0%   100%     2.04us 46.78%  database/sql.(*DB).retry
+         0     0%   100%     2.04us 46.78%  database/sql.ctxDriverPrepare
+         0     0%   100%     2.04us 46.78%  database/sql.withLock
+         0     0%   100%     2.04us 46.78%  github.com/go-sql-driver/mysql.(*buffer).fill

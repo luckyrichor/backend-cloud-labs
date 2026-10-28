@@ -1,0 +1,1682 @@
+[
+  {
+    "file": "docs/measurements/2026-10-26-s1/probe/S1-probe-A-p95-q500-r0.trace.jsonl.gz",
+    "source_commit": "1759f943821c1bbd298434e76adca158ea7b0fe5",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-26-s1/probe/S1-probe-A-p95-q1500-r0.trace.jsonl.gz",
+    "source_commit": "1759f943821c1bbd298434e76adca158ea7b0fe5",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-26-s1/probe/S1-probe-A-p95-q3000-r0.trace.jsonl.gz",
+    "source_commit": "1759f943821c1bbd298434e76adca158ea7b0fe5",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-26-s1/probe-v3/S1-probe-A-p95-q500-r0.trace.jsonl.gz",
+    "source_commit": "713a3ac8ca231b6da1c15da9ddf0cdfe78fbf746",
+    "instance_boundaries": 3,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-26-s1/probe-v3/S1-probe-A-p95-q1500-r0.trace.jsonl.gz",
+    "source_commit": "713a3ac8ca231b6da1c15da9ddf0cdfe78fbf746",
+    "instance_boundaries": 2,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-26-s1/probe-v3/S1-probe-A-p95-q3000-r0.trace.jsonl.gz",
+    "source_commit": "713a3ac8ca231b6da1c15da9ddf0cdfe78fbf746",
+    "instance_boundaries": 2,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-26-s1/probe-final/S1-probe-A-p95-q500-r0.trace.jsonl.gz",
+    "source_commit": "bbb622cdb30f3e555403f033dd35ffe4822054db",
+    "instance_boundaries": 4,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-26-s1/probe-final/S1-probe-A-p95-q1500-r0.trace.jsonl.gz",
+    "source_commit": "bbb622cdb30f3e555403f033dd35ffe4822054db",
+    "instance_boundaries": 3,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-26-s1/probe-selected/S1-probe-A-p95-q500-r0.trace.jsonl.gz",
+    "source_commit": "a9495c87e8bd78f7d16586f372ed1e5c229aba6c",
+    "instance_boundaries": 5,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-26-s1/probe-bounded/S1-probe-A-p95-q500-r0.trace.jsonl.gz",
+    "source_commit": "93254b272fd36d4e7d5269a00511e06306988dc8",
+    "instance_boundaries": 6,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-26-s1/probe-bounded/S1-probe-A-p95-q1500-r0.trace.jsonl.gz",
+    "source_commit": "93254b272fd36d4e7d5269a00511e06306988dc8",
+    "instance_boundaries": 5,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-26-s1/probe-bounded/S1-probe-A-p95-q3000-r0.trace.jsonl.gz",
+    "source_commit": "93254b272fd36d4e7d5269a00511e06306988dc8",
+    "instance_boundaries": 4,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-26-s1/probe-diagnose/S1-probe-A-p95-q500-r0.trace.jsonl.gz",
+    "source_commit": "93254b272fd36d4e7d5269a00511e06306988dc8",
+    "instance_boundaries": 7,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-26-s1/probe-diagnose/S1-probe-A-p95-q1500-r0.trace.jsonl.gz",
+    "source_commit": "93254b272fd36d4e7d5269a00511e06306988dc8",
+    "instance_boundaries": 6,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-26-s1/probe-diagnose/S1-probe-A-p95-q3000-r0.trace.jsonl.gz",
+    "source_commit": "93254b272fd36d4e7d5269a00511e06306988dc8",
+    "instance_boundaries": 5,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-26-s1/probe-primed/S1-probe-A-p95-q500-r0.trace.jsonl.gz",
+    "source_commit": "a9ed948803e3a45dbb3d75f4a924d19f502e6231",
+    "instance_boundaries": 8,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-26-s1/probe-primed/S1-probe-A-p95-q1500-r0.trace.jsonl.gz",
+    "source_commit": "a9ed948803e3a45dbb3d75f4a924d19f502e6231",
+    "instance_boundaries": 7,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-26-s1/probe-primed/S1-probe-A-p95-q3000-r0.trace.jsonl.gz",
+    "source_commit": "a9ed948803e3a45dbb3d75f4a924d19f502e6231",
+    "instance_boundaries": 6,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-26-s1/probe-primed-source/S1-probe-A-p95-q500-r0.trace.jsonl.gz",
+    "source_commit": "b0edac1bf376a45d9c2d0e0800ae8a2ab072704e",
+    "instance_boundaries": 9,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-26-s1/probe-primed-source/S1-probe-A-p95-q1500-r0.trace.jsonl.gz",
+    "source_commit": "b0edac1bf376a45d9c2d0e0800ae8a2ab072704e",
+    "instance_boundaries": 8,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-26-s1/probe-primed-source/S1-probe-A-p95-q3000-r0.trace.jsonl.gz",
+    "source_commit": "b0edac1bf376a45d9c2d0e0800ae8a2ab072704e",
+    "instance_boundaries": 7,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-26-s1/matrix/S1-A-p95-q350-r1.trace.jsonl.gz",
+    "source_commit": "b0edac1bf376a45d9c2d0e0800ae8a2ab072704e",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-26-s1/matrix/S1-B-p95-q350-r1.trace.jsonl.gz",
+    "source_commit": "b0edac1bf376a45d9c2d0e0800ae8a2ab072704e",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-26-s1/matrix/S1-C-p95-q350-r1.trace.jsonl.gz",
+    "source_commit": "b0edac1bf376a45d9c2d0e0800ae8a2ab072704e",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-26-s1/matrix/S1-D-p95-q350-r1.trace.jsonl.gz",
+    "source_commit": "b0edac1bf376a45d9c2d0e0800ae8a2ab072704e",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-26-s1/matrix/S1-A-p95-q750-r1.trace.jsonl.gz",
+    "source_commit": "b0edac1bf376a45d9c2d0e0800ae8a2ab072704e",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-26-s1/matrix/S1-B-p95-q750-r1.trace.jsonl.gz",
+    "source_commit": "b0edac1bf376a45d9c2d0e0800ae8a2ab072704e",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-26-s1/matrix/S1-C-p95-q750-r1.trace.jsonl.gz",
+    "source_commit": "b0edac1bf376a45d9c2d0e0800ae8a2ab072704e",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-26-s1/probe-window-scope/S1-probe-A-p95-q500-r0.trace.jsonl.gz",
+    "source_commit": "1c3ca2acf47186cc19328aab9d18fcfc667fa315",
+    "instance_boundaries": 10,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-26-s1/probe-window-scope/S1-probe-A-p95-q1500-r0.trace.jsonl.gz",
+    "source_commit": "1c3ca2acf47186cc19328aab9d18fcfc667fa315",
+    "instance_boundaries": 9,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-26-s1/probe-window-scope/S1-probe-A-p95-q3000-r0.trace.jsonl.gz",
+    "source_commit": "1c3ca2acf47186cc19328aab9d18fcfc667fa315",
+    "instance_boundaries": 8,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-26-s1/matrix-v2/S1-A-p95-q350-r1.trace.jsonl.gz",
+    "source_commit": "1c3ca2acf47186cc19328aab9d18fcfc667fa315",
+    "instance_boundaries": 2,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-26-s1/matrix-v2/interrupted-2026-10-27/S1-B-p95-q350-r1.trace.jsonl.gz",
+    "source_commit": "1c3ca2acf47186cc19328aab9d18fcfc667fa315",
+    "instance_boundaries": 2,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/probe-2026-10-27/S1-probe-A-p95-q500-r0.trace.jsonl.gz",
+    "source_commit": "8029adaad8bd4dc914d97d6ea7fda5260add4211",
+    "instance_boundaries": 11,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/probe-2026-10-27/S1-probe-A-p95-q1500-r0.trace.jsonl.gz",
+    "source_commit": "8029adaad8bd4dc914d97d6ea7fda5260add4211",
+    "instance_boundaries": 10,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/probe-2026-10-27/S1-probe-A-p95-q3000-r0.trace.jsonl.gz",
+    "source_commit": "8029adaad8bd4dc914d97d6ea7fda5260add4211",
+    "instance_boundaries": 9,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/probe-final-2026-10-27/S1-probe-A-p95-q500-r0.trace.jsonl.gz",
+    "source_commit": "11120a1e7bef865cf80e1e701972f600d5fa26d7",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/probe-final-2026-10-27/S1-probe-A-p95-q1500-r0.trace.jsonl.gz",
+    "source_commit": "11120a1e7bef865cf80e1e701972f600d5fa26d7",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/probe-final-2026-10-27/S1-probe-A-p95-q3000-r0.trace.jsonl.gz",
+    "source_commit": "11120a1e7bef865cf80e1e701972f600d5fa26d7",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-2026-10-27/S1-A-p95-q750-r1.trace.jsonl.gz",
+    "source_commit": "11120a1e7bef865cf80e1e701972f600d5fa26d7",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-2026-10-27/S1-B-p95-q750-r1.trace.jsonl.gz",
+    "source_commit": "11120a1e7bef865cf80e1e701972f600d5fa26d7",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-2026-10-27/S1-C-p95-q750-r1.trace.jsonl.gz",
+    "source_commit": "11120a1e7bef865cf80e1e701972f600d5fa26d7",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-2026-10-27/S1-D-p95-q750-r1.trace.jsonl.gz",
+    "source_commit": "11120a1e7bef865cf80e1e701972f600d5fa26d7",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-2026-10-27/S1-A-p95-q1500-r1.trace.jsonl.gz",
+    "source_commit": "11120a1e7bef865cf80e1e701972f600d5fa26d7",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-2026-10-27/S1-B-p95-q1500-r1.trace.jsonl.gz",
+    "source_commit": "11120a1e7bef865cf80e1e701972f600d5fa26d7",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-2026-10-27/S1-C-p95-q1500-r1.trace.jsonl.gz",
+    "source_commit": "11120a1e7bef865cf80e1e701972f600d5fa26d7",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-2026-10-27/S1-D-p95-q1500-r1.trace.jsonl.gz",
+    "source_commit": "11120a1e7bef865cf80e1e701972f600d5fa26d7",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-2026-10-27/S1-A-p95-q2400-r1.trace.jsonl.gz",
+    "source_commit": "11120a1e7bef865cf80e1e701972f600d5fa26d7",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-2026-10-27/S1-B-p95-q2400-r1.trace.jsonl.gz",
+    "source_commit": "11120a1e7bef865cf80e1e701972f600d5fa26d7",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-2026-10-27/S1-C-p95-q2400-r1.trace.jsonl.gz",
+    "source_commit": "11120a1e7bef865cf80e1e701972f600d5fa26d7",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-2026-10-27/S1-D-p95-q2400-r1.trace.jsonl.gz",
+    "source_commit": "11120a1e7bef865cf80e1e701972f600d5fa26d7",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-2026-10-27/S1-A-p99-q750-r1.trace.jsonl.gz",
+    "source_commit": "11120a1e7bef865cf80e1e701972f600d5fa26d7",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-2026-10-27/S1-B-p99-q750-r1.trace.jsonl.gz",
+    "source_commit": "11120a1e7bef865cf80e1e701972f600d5fa26d7",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-2026-10-27/S1-C-p99-q750-r1.trace.jsonl.gz",
+    "source_commit": "11120a1e7bef865cf80e1e701972f600d5fa26d7",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/probe-multistream-2026-10-27/S1-probe-A-p95-q500-r0.trace.jsonl.gz",
+    "source_commit": "139ac9fd57baf933412722c2b8a9b889ef8429b7",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/probe-multistream-2026-10-27/S1-probe-C-p95-q500-r0.trace.jsonl.gz",
+    "source_commit": "139ac9fd57baf933412722c2b8a9b889ef8429b7",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/probe-multistream-2026-10-27/S1-probe-A-p95-q1500-r0.trace.jsonl.gz",
+    "source_commit": "139ac9fd57baf933412722c2b8a9b889ef8429b7",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/probe-multistream-2026-10-27/S1-probe-C-p95-q1500-r0.trace.jsonl.gz",
+    "source_commit": "139ac9fd57baf933412722c2b8a9b889ef8429b7",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/probe-multistream-2026-10-27/S1-probe-A-p95-q3000-r0.trace.jsonl.gz",
+    "source_commit": "139ac9fd57baf933412722c2b8a9b889ef8429b7",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/probe-multistream-2026-10-27/S1-probe-C-p95-q3000-r0.trace.jsonl.gz",
+    "source_commit": "139ac9fd57baf933412722c2b8a9b889ef8429b7",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/probe-baseline-multistream-2026-10-27/S1-probe-A-p95-q500-r0.trace.jsonl.gz",
+    "source_commit": "2e8a460d06f52efa3173b0d0afe458fe029b30f8",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/probe-baseline-multistream-2026-10-27/S1-probe-C-p95-q500-r0.trace.jsonl.gz",
+    "source_commit": "2e8a460d06f52efa3173b0d0afe458fe029b30f8",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/probe-baseline-multistream-2026-10-27/S1-probe-A-p95-q1500-r0.trace.jsonl.gz",
+    "source_commit": "2e8a460d06f52efa3173b0d0afe458fe029b30f8",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/probe-baseline-multistream-2026-10-27/S1-probe-C-p95-q1500-r0.trace.jsonl.gz",
+    "source_commit": "2e8a460d06f52efa3173b0d0afe458fe029b30f8",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/probe-baseline-multistream-2026-10-27/S1-probe-A-p95-q3000-r0.trace.jsonl.gz",
+    "source_commit": "2e8a460d06f52efa3173b0d0afe458fe029b30f8",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/probe-baseline-multistream-2026-10-27/S1-probe-C-p95-q3000-r0.trace.jsonl.gz",
+    "source_commit": "2e8a460d06f52efa3173b0d0afe458fe029b30f8",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-multistream-2026-10-27/S1-A-p95-q350-r1.trace.jsonl.gz",
+    "source_commit": "2e8a460d06f52efa3173b0d0afe458fe029b30f8",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-multistream-2026-10-27/S1-B-p95-q350-r1.trace.jsonl.gz",
+    "source_commit": "2e8a460d06f52efa3173b0d0afe458fe029b30f8",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/probe-idle-2026-10-27/S1-probe-A-p95-q500-r0.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/probe-idle-2026-10-27/S1-probe-C-p95-q500-r0.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/probe-idle-2026-10-27/S1-probe-A-p95-q1500-r0.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/probe-idle-2026-10-27/S1-probe-C-p95-q1500-r0.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/probe-idle-2026-10-27/S1-probe-A-p95-q3000-r0.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/probe-idle-2026-10-27/S1-probe-C-p95-q3000-r0.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p95-q100-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p95-q100-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p95-q100-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p95-q100-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p95-q250-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p95-q250-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p95-q250-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p95-q250-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p95-q400-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p95-q400-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p95-q400-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p95-q400-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p99-q100-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p99-q100-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p99-q100-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p99-q100-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p99-q250-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p99-q250-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p99-q250-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p99-q250-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p99-q400-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p99-q400-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p99-q400-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p99-q400-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p95-q100-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p95-q100-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p95-q100-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p95-q100-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p95-q250-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p95-q250-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p95-q250-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p95-q250-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p95-q400-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p95-q400-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p95-q400-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p95-q400-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p99-q100-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p99-q100-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p99-q100-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p99-q100-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p99-q250-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p99-q250-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p99-q250-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p99-q250-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p99-q400-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p99-q400-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p99-q400-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p99-q400-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p95-q100-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p95-q100-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p95-q100-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p95-q100-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p95-q250-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p95-q250-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p95-q250-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p95-q250-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p95-q400-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p95-q400-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p95-q400-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p95-q400-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p99-q100-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p99-q100-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p99-q100-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p99-q100-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p99-q250-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p99-q250-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p99-q250-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p99-q250-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p99-q400-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p99-q400-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p99-q400-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p99-q400-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p95-q100-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p95-q100-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p95-q100-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p95-q100-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p95-q250-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p95-q250-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p95-q250-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p95-q250-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p95-q400-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p95-q400-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p95-q400-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p95-q400-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p99-q100-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p99-q100-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p99-q100-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p99-q100-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p99-q250-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p99-q250-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p99-q250-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p99-q250-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p99-q400-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p99-q400-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p99-q400-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p99-q400-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p95-q100-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p95-q100-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p95-q100-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p95-q100-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p95-q250-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p95-q250-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p95-q250-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p95-q250-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p95-q400-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p95-q400-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p95-q400-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p95-q400-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p99-q100-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p99-q100-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p99-q100-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p99-q100-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p99-q250-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p99-q250-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p99-q250-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p99-q250-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p99-q400-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p99-q400-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p99-q400-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p99-q400-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-reverse-A-p95-q400-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-reverse-B-off-p95-q400-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-reverse-B-p95-q400-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-bypass-A-p95-q400-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-bypass-B-p95-q400-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-bypass-C-p95-q400-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-bypass-D-p95-q400-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-reverse-B-p95-q400-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-reverse-B-off-p95-q400-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-reverse-A-p95-q400-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-bypass-D-p95-q400-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-bypass-C-p95-q400-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-bypass-B-p95-q400-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-bypass-A-p95-q400-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-reverse-A-p95-q400-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-reverse-B-off-p95-q400-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-reverse-B-p95-q400-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-bypass-A-p95-q400-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-bypass-B-p95-q400-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-bypass-C-p95-q400-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-bypass-D-p95-q400-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-reverse-B-p95-q400-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-reverse-B-off-p95-q400-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-reverse-A-p95-q400-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-bypass-D-p95-q400-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-bypass-C-p95-q400-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-bypass-B-p95-q400-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-bypass-A-p95-q400-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-reverse-A-p95-q400-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-reverse-B-off-p95-q400-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-reverse-B-p95-q400-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-bypass-A-p95-q400-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-bypass-B-p95-q400-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": false
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-bypass-C-p95-q400-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-bypass-D-p95-q400-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-profile-A-p95-q400-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-profile-B-p95-q400-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-profile-C-p95-q400-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p95-q100-r6.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p95-q100-r6.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p95-q100-r6.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p95-q100-r6.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p95-q100-r7.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p95-q100-r7.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p95-q100-r7.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p95-q100-r7.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p95-q400-r6.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p95-q400-r6.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p95-q400-r6.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p95-q400-r6.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p99-q100-r6.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p99-q100-r6.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p99-q100-r6.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p99-q100-r6.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p99-q400-r6.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p99-q400-r6.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p99-q400-r6.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p99-q400-r6.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-A-p99-q400-r7.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-B-p99-q400-r7.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-C-p99-q400-r7.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-D-p99-q400-r7.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-bypass-D-p95-q400-r6.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-bypass-C-p95-q400-r6.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-bypass-B-p95-q400-r6.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/matrix-idle-2026-10-27/S1-bypass-A-p95-q400-r6.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/tx-calibration-2026-10-27/S1-tx-calibration-A-p95-q400-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/tx-calibration-2026-10-27/S1-tx-calibration-B-p95-q400-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/tx-calibration-2026-10-27/S1-tx-calibration-C-p95-q400-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/tx-calibration-2026-10-27/S1-tx-calibration-D-p95-q400-r1.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/tx-calibration-2026-10-27/S1-tx-calibration-D-p95-q400-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/tx-calibration-2026-10-27/S1-tx-calibration-C-p95-q400-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/tx-calibration-2026-10-27/S1-tx-calibration-B-p95-q400-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/tx-calibration-2026-10-27/S1-tx-calibration-A-p95-q400-r2.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/tx-calibration-2026-10-27/S1-tx-calibration-A-p95-q400-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/tx-calibration-2026-10-27/S1-tx-calibration-B-p95-q400-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/tx-calibration-2026-10-27/S1-tx-calibration-C-p95-q400-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/tx-calibration-2026-10-27/S1-tx-calibration-D-p95-q400-r3.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/tx-calibration-2026-10-27/S1-tx-calibration-D-p95-q400-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/tx-calibration-2026-10-27/S1-tx-calibration-C-p95-q400-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/tx-calibration-2026-10-27/S1-tx-calibration-B-p95-q400-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/tx-calibration-2026-10-27/S1-tx-calibration-A-p95-q400-r4.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/tx-calibration-2026-10-27/S1-tx-calibration-A-p95-q400-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/tx-calibration-2026-10-27/S1-tx-calibration-B-p95-q400-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/tx-calibration-2026-10-27/S1-tx-calibration-C-p95-q400-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  },
+  {
+    "file": "docs/measurements/2026-10-27-s1/tx-calibration-2026-10-27/S1-tx-calibration-D-p95-q400-r5.trace.jsonl.gz",
+    "source_commit": "d2ca677db32a17eaed9aff776244262b88d42801",
+    "instance_boundaries": 1,
+    "timeline_eligible": true
+  }
+]
