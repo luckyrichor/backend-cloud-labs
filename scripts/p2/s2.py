@@ -95,7 +95,7 @@ async def main(a):
  out=Path(a.out).resolve();out.mkdir(exist_ok=True,parents=True)
  import importlib.util
  spec=importlib.util.spec_from_file_location('restore',ROOT/'scripts/s1-suite.py');restore=importlib.util.module_from_spec(spec);spec.loader.exec_module(restore);restore.restore()
- design={'rates':[5,10,20],'repeats':5,'seconds':a.seconds,'poll_ms':a.poll_ms,'local_ttl':'500ms','observer_horizon_ms':600,'observer':'concurrent write plus fixed probe count','delay':a.delay,'rate_rule':'sustained observer tiers 5/10/20 per second; prior 50/s exceeded fixed-count observer capacity; retain prior failures, do not infer cache failure or saturation','source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()}
+ design={'rates':[2,5,10],'repeats':5,'seconds':a.seconds,'poll_ms':a.poll_ms,'local_ttl':'500ms','observer_horizon_ms':600,'observer':'concurrent write plus fixed probe count','delay':a.delay,'rate_rule':'conservative observer tiers 2/5/10 per second; sustained 20/s and 50/s had observer overload; fixed 120 probes unchanged; preserve prior attempts','source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()}
  if not(out/'design.json').exists():save(out/'design.json',design)
  else:assert json.loads((out/'design.json').read_text())==design,'immutable design mismatch'
  if a.phase=='smoke':
@@ -109,8 +109,8 @@ async def main(a):
      if(path/'result.json.gz').exists():continue
      await matrix_trial(path,arm,rate,repeat,a.seconds,a.poll_ms,a.delay)
   for repeat in range(1,6):
-   path=out/f'S2-reverse-C-q20-r{repeat}'
-   if not(path/'result.json.gz').exists():await matrix_trial(path,'C',20,repeat,a.seconds,a.poll_ms,a.delay,True)
+   path=out/f'S2-reverse-C-q10-r{repeat}'
+   if not(path/'result.json.gz').exists():await matrix_trial(path,'C',10,repeat,a.seconds,a.poll_ms,a.delay,True)
 if __name__=='__main__':
  def interrupt(signum,frame):raise KeyboardInterrupt
  signal.signal(signal.SIGTERM,interrupt)
