@@ -86,6 +86,9 @@ func main() {
 			}
 		}()
 		metrics.Route("GET /debug/audit", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Query().Get("flush") == "1" {
+				_ = allKeys.Flush()
+			}
 			count, failed := allKeys.Status()
 			json.NewEncoder(w).Encode(map[string]any{"events": count, "failed": failed, "clock": "linux-CLOCK_MONOTONIC", "all_keys": true})
 		}))
@@ -124,7 +127,11 @@ func main() {
 			ReadTimeout: 200 * time.Millisecond, WriteTimeout: 200 * time.Millisecond, MaxRetries: -1, PoolSize: 64})
 		defer client.Close()
 		redisClient = client
-		cached = &cache.Redis{Client: client, Prefix: "guide:", TTL: ttl}
+		prefix := os.Getenv("GUIDE_CACHE_PREFIX")
+		if prefix == "" {
+			prefix = "guide:"
+		}
+		cached = &cache.Redis{Client: client, Prefix: prefix, TTL: ttl}
 	}
 
 	var tier *coherence.Cache
@@ -145,6 +152,17 @@ func main() {
 		cached = tier
 	}
 	service := guide.NewService(observe.NewStore(store, metrics.Counter), observe.NewCache(cached, metrics.Counter), mode)
+	// S2 uses an explicitly shared namespace; the single-process repair queue's
+	// random prefix would otherwise isolate L2 and hide stream updates from reads.
+	if tier != nil {
+		if mode != guide.CacheAside {
+			log.Fatal("S2 local tier requires cache-aside")
+		}
+		if os.Getenv("GUIDE_CACHE_PREFIX") == "" {
+			log.Fatal("S2 requires an explicit run-scoped cache prefix")
+		}
+		service.SharedNamespace = true
+	}
 	service.Audit = allKeys
 	if stream := os.Getenv("GUIDE_STREAM"); stream != "" {
 		instance := os.Getenv("GUIDE_INSTANCE")

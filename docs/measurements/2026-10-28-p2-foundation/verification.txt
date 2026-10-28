@@ -1,0 +1,3 @@
+scripts/check.sh exit0
+Counter({'pass': 154, 'skip': 6})
+Go race/vet passed; real MySQL and Redis integration suites executed; CTest7/7

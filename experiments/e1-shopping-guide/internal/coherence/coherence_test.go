@@ -2,7 +2,11 @@ package coherence
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/guide"
+	"github.com/luckyrichor/backend-cloud-labs/experiments/e1-shopping-guide/internal/httpapi"
+	"net/http/httptest"
 	"os"
 	"testing"
 	"time"
@@ -86,4 +90,43 @@ func TestConsumerRestartRecoversPendingAndReorderedEvents(t *testing.T) {
 	}
 	cancel()
 	<-done
+}
+
+// Exercise the HTTP adapter too: it creates a repair queue when absent, which
+// must not silently reintroduce private prefixes into an explicitly shared L2.
+func TestSharedNamespaceSurvivesHTTPAdapterAndEventApply(t *testing.T) {
+	ctx := context.Background()
+	source := catalog.NewMemoryStore()
+	source.Put(ctx, catalog.Item{ID: "7"})
+	shared := cache.NewMemory(time.Minute)
+	a := &Cache{Local: cache.NewMemory(time.Minute), Shared: shared}
+	defer a.Close()
+	b := &Cache{Local: cache.NewMemory(time.Minute), Shared: shared}
+	defer b.Close()
+	service := guide.NewService(source, b, guide.CacheAside)
+	service.SharedNamespace = true
+	service.GatedAside = true
+	handler := httpapi.Handler(service)
+	read := func() int64 {
+		w := httptest.NewRecorder()
+		handler.ServeHTTP(w, httptest.NewRequest("GET", "/items/7", nil))
+		var result guide.Result
+		if w.Code != 200 || json.Unmarshal(w.Body.Bytes(), &result) != nil {
+			t.Fatal(w.Body.String())
+		}
+		return result.Item.Version
+	}
+	if read() != 1 {
+		t.Fatal("prime failed")
+	}
+	source.Put(ctx, catalog.Item{ID: "7"})
+	a.Delete(ctx, "7")
+	if read() != 1 {
+		t.Fatal("baseline peer should remain stale")
+	}
+	authoritative, _ := source.Get(ctx, "7")
+	b.PutIfNewer(ctx, authoritative)
+	if read() != 2 {
+		t.Fatal("HTTP reader cannot see event-applied shared namespace")
+	}
 }

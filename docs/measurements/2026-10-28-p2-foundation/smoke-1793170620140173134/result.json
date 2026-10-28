@@ -1,0 +1,104 @@
+{
+  "source_commit": "7ae656d+uncommitted-namespace-fix",
+  "baseline": 1,
+  "target": 2,
+  "observations": [
+    {
+      "begin_ns": 2072606525264816,
+      "done_ns": 2072606525736312,
+      "version": 1
+    },
+    {
+      "begin_ns": 2072606527815952,
+      "done_ns": 2072606528251951,
+      "version": 1
+    },
+    {
+      "begin_ns": 2072606530320329,
+      "done_ns": 2072606530719108,
+      "version": 1
+    },
+    {
+      "begin_ns": 2072606532796242,
+      "done_ns": 2072606533190865,
+      "version": 1
+    },
+    {
+      "begin_ns": 2072606535287105,
+      "done_ns": 2072606535670556,
+      "version": 1
+    },
+    {
+      "begin_ns": 2072606537737591,
+      "done_ns": 2072606538176766,
+      "version": 1
+    },
+    {
+      "begin_ns": 2072606540250785,
+      "done_ns": 2072606540655095,
+      "version": 1
+    },
+    {
+      "begin_ns": 2072606542724495,
+      "done_ns": 2072606543148251,
+      "version": 1
+    },
+    {
+      "begin_ns": 2072606545215557,
+      "done_ns": 2072606545594619,
+      "version": 1
+    },
+    {
+      "begin_ns": 2072606547662977,
+      "done_ns": 2072606548148720,
+      "version": 1
+    },
+    {
+      "begin_ns": 2072606550213632,
+      "done_ns": 2072606550535307,
+      "version": 1
+    },
+    {
+      "begin_ns": 2072606552612501,
+      "done_ns": 2072606553034434,
+      "version": 1
+    },
+    {
+      "begin_ns": 2072606555119012,
+      "done_ns": 2072606555765287,
+      "version": 1
+    },
+    {
+      "begin_ns": 2072606557837522,
+      "done_ns": 2072606558364282,
+      "version": 1
+    },
+    {
+      "begin_ns": 2072606560433021,
+      "done_ns": 2072606560923533,
+      "version": 1
+    },
+    {
+      "begin_ns": 2072606562991971,
+      "done_ns": 2072606563396652,
+      "version": 1
+    },
+    {
+      "begin_ns": 2072606565475549,
+      "done_ns": 2072606565936386,
+      "version": 1
+    },
+    {
+      "begin_ns": 2072606568020714,
+      "done_ns": 2072606568791362,
+      "version": 2
+    }
+  ],
+  "consumer": {
+    "applied": 1,
+    "errors": 0,
+    "paused": false,
+    "replayed": 0
+  },
+  "scope": "integration only, not formal benchmark"
+}

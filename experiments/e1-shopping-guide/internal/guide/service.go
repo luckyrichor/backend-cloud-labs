@@ -43,10 +43,12 @@ type Service struct {
 	FillDelay time.Duration
 	// GatedAside is used only by S2 event-driven invalidation, including all refill paths.
 	GatedAside bool
-	Mode       ReadMode
-	Store      catalog.Store
-	Cache      Cache
-	Repairs    *RepairQueue
+	// SharedNamespace is an explicit S2 topology choice; the Redis prefix is run-scoped.
+	SharedNamespace bool
+	Mode            ReadMode
+	Store           catalog.Store
+	Cache           Cache
+	Repairs         *RepairQueue
 	// UngatedFills replaces Versioned's gated fills with plain SETs (S1 reverse validation).
 	UngatedFills bool
 	// Trace, when set, records the timeline of traced keys.

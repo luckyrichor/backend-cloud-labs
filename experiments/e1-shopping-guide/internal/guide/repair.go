@@ -132,7 +132,7 @@ func (c cacheView) PutIfNewer(ctx context.Context, item catalog.Item) (bool, err
 	return c.Cache.PutIfNewer(ctx, item)
 }
 func (s Service) snapshotCache() Service {
-	if s.Repairs != nil {
+	if s.Repairs != nil && !s.SharedNamespace {
 		scope := s.Repairs.scope.Load()
 		s.generation = scope.generation
 		s.Cache = cacheView{s.Cache, scope.prefix}
