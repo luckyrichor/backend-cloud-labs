@@ -27,13 +27,24 @@ async def matrix_trial(out,arm,rate,repeat,seconds,poll_ms,delay,reverse=False):
    try:
     row['prime']=await r.get(1,id,f'prime-{i}','prime')
     if row['prime']['version']!=1:raise RuntimeError('baseline version not one')
-    row['write']=await r.put(id,f'write-{i}')
-    deadline=time.perf_counter_ns()+5_000_000_000
-    while time.perf_counter_ns()<deadline:
-     read=await r.get(1,id,f'poll-{i}-{len(row["reads"])}');row['reads'].append(read)
-     if read['version']>=row['write']['version']:return
-     await asyncio.sleep(poll_ms/1000)
-    raise RuntimeError('convergence timeout')
+    target=row['prime']['version']+1;poll_origin=time.perf_counter_ns();deadline=poll_origin+5_000_000_000
+    async def write():
+     row['write']=await r.put(id,f'write-{i}')
+     if row['write']['version']!=target:raise RuntimeError('unexpected competing writer')
+    writer=asyncio.create_task(write());row['target']=target;first_fresh=None
+    polls=max(1,math.ceil(600/poll_ms));index=0
+    try:
+     while index<polls or first_fresh is None:
+      if writer.done() and writer.exception() is not None:await writer
+      if time.perf_counter_ns()>deadline:raise RuntimeError('convergence timeout')
+      planned=poll_origin+int(index*poll_ms*1e6);await asyncio.sleep(max(0,(planned-time.perf_counter_ns())/1e9))
+      read=await r.get(1,id,f'poll-{i}-{index}');read['planned_ns']=planned;row['reads'].append(read)
+      if read['version']>=target and first_fresh is None:first_fresh=index
+      index+=1
+     await writer;row['first_fresh_index']=first_fresh
+    finally:
+     if not writer.done():writer.cancel()
+     await asyncio.gather(writer,return_exceptions=True)
    except Exception as e:row['error']=type(e).__name__+': '+str(e);failures.append(row['error'])
   tasks=[]
   for i in range(n):
@@ -47,21 +58,28 @@ async def matrix_trial(out,arm,rate,repeat,seconds,poll_ms,delay,reverse=False):
  finally:r.close()
  audit=read_audit(out);commits={(e['id'],e.get('request')):e for e in audit if e['event']=='commit_return'};observations=[]
  reads={(e['instance'],e.get('request')):e for e in audit if e['event']=='read_return' and e.get('phase')=='window'}
+ begins={(e['instance'],e.get('request')):e for e in audit if e['event']=='read_begin' and e.get('phase')=='window'}
+ sql_begins={(e['id'],e.get('request')):e for e in audit if e['event']=='commit_call_begin'}
  for row in flows:
   if 'error' in row:continue
   commit=commits.get((row['id'],row['write']['request']))
   if commit is None:failures.append('missing commit log');continue
-  if not(row['write']['call_begin_ns']<=commit['t_ns']<=row['write']['call_done_ns']):failures.append('commit outside coordinator bracket')
+  sql_begin=sql_begins.get((row['id'],row['write']['request']))
+  if sql_begin is None or not(row['write']['call_begin_ns']<=sql_begin['t_ns']<=commit['t_ns']<=row['write']['call_done_ns']):failures.append('missing SQL begin or invalid commit bracket')
   if any(('instance-1',read['request']) not in reads or reads[('instance-1',read['request'])].get('version')!=read['version'] for read in row['reads']):failures.append('missing or mismatched full-key read log')
-  fresh=row['reads'][-1];stale=[x for x in row['reads'] if x['version']<row['write']['version']]
+  fresh_index=row['first_fresh_index'];fresh=row['reads'][fresh_index];stale=[x for x in row['reads'][:fresh_index] if x['version']<row['write']['version']]
+  for read in row['reads']:
+   key=('instance-1',read['request']);begin=begins.get(key);end=reads.get(key)
+   if begin is None or end is None or not(read['begin_ns']<=begin['t_ns']<=end['t_ns']<=read['done_ns']):failures.append('read clock bracket or full-key begin missing')
+  regression=sum(read['version']<row['write']['version'] for read in row['reads'][fresh_index+1:])
   lower=max(0,(stale[-1]['begin_ns']-commit['t_ns'])/1e6) if stale else 0
   upper=max(0,(fresh['done_ns']-commit['t_ns'])/1e6)
-  observations.append({'id':row['id'],'commit_return_ns':commit['t_ns'],'last_stale_begin_ns':stale[-1]['begin_ns'] if stale else None,'first_fresh_done_ns':fresh['done_ns'],'lower_ms':lower,'upper_ms':upper,'write_call_ms':(row['write']['call_done_ns']-row['write']['call_begin_ns'])/1e6})
+  observations.append({'id':row['id'],'commit_call_begin_ns':sql_begin['t_ns'] if sql_begin else None,'commit_return_ns':commit['t_ns'],'polls':len(row['reads']),'regressions_after_first_fresh':regression,'fresh_before_commit_return':fresh['done_ns']<commit['t_ns'],'last_stale_begin_ns':stale[-1]['begin_ns'] if stale else None,'first_fresh_done_ns':fresh['done_ns'],'lower_ms':lower,'upper_ms':upper,'write_call_ms':(row['write']['call_done_ns']-row['write']['call_begin_ns'])/1e6})
  if len(observations)!=math.ceil(rate*seconds):failures.append('observation coverage incomplete')
  actual_in_window=sum(1 for row in flows if 'write' in row and start<=row['write']['call_begin_ns']<start+int(seconds*1e9))
  if actual_in_window < .98*math.ceil(rate*seconds):failures.append('fewer than 98% scheduled writes started in arrival window')
  # Retain failures verbatim as typed, credential-free classifications; no performance-based rejection.
- doc={'source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'data_version':json.loads((ROOT/'datasets/stats/catalog.json').read_text())['data_version'],'run':r.run,'arm':arm,'rate':rate,'repeat':repeat,'seconds':seconds,'poll_ms':poll_ms,'reverse':reverse,'valid':not failures,'invalid_reasons':failures,'observations':observations,'flows':flows,'actual_writes_in_window':actual_in_window,'audit_events':len(audit),'states':states,'telemetry':telemetry,'clock':'same Linux CLOCK_MONOTONIC boot for server+coordinator','coordinator_pid':os.getpid(),'coordinator_cpu_affinity':sorted(os.sched_getaffinity(0))}
+ doc={'source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'data_version':json.loads((ROOT/'datasets/stats/catalog.json').read_text())['data_version'],'run':r.run,'arm':arm,'rate':rate,'repeat':repeat,'seconds':seconds,'poll_ms':poll_ms,'reverse':reverse,'valid':not failures,'invalid_reasons':failures,'observations':observations,'flows':flows,'actual_writes_in_window':actual_in_window,'audit_events':len(audit),'states':states,'telemetry':telemetry,'observer':'concurrent write and fixed 600ms-worth of planned probes for every arm','clock':'same Linux CLOCK_MONOTONIC boot for server+coordinator','coordinator_pid':os.getpid(),'coordinator_cpu_affinity':sorted(os.sched_getaffinity(0))}
  save(Path(out)/'result.json.gz',doc)
  print(json.dumps({'event':'trial-complete','path':str(out),'arm':arm,'rate':rate,'repeat':repeat,'valid':doc['valid'],'observations':len(observations)}),flush=True)
  return doc
@@ -77,7 +95,7 @@ async def main(a):
  out=Path(a.out).resolve();out.mkdir(exist_ok=True,parents=True)
  import importlib.util
  spec=importlib.util.spec_from_file_location('restore',ROOT/'scripts/s1-suite.py');restore=importlib.util.module_from_spec(spec);spec.loader.exec_module(restore);restore.restore()
- design={'rates':[5,20,50],'repeats':5,'seconds':a.seconds,'poll_ms':a.poll_ms,'local_ttl':'500ms','delay':a.delay,'rate_rule':'explicit diagnostic-to-formal write tiers 5/20/50 per second; gate actual delivery/success, do not infer saturation','source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()}
+ design={'rates':[5,20,50],'repeats':5,'seconds':a.seconds,'poll_ms':a.poll_ms,'local_ttl':'500ms','observer_horizon_ms':600,'observer':'concurrent write plus fixed probe count','delay':a.delay,'rate_rule':'explicit diagnostic-to-formal write tiers 5/20/50 per second; gate actual delivery/success, do not infer saturation','source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()}
  if not(out/'design.json').exists():save(out/'design.json',design)
  else:assert json.loads((out/'design.json').read_text())==design,'immutable design mismatch'
  if a.phase=='smoke':

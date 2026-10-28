@@ -159,6 +159,9 @@ func (c s1Clients) do(ctx context.Context, op s1Op, seq int, rec *S1Record) {
 	ctx = audit.WithLabels(ctx, c.cfg.AuditRun, phase, strconv.Itoa(seq))
 	if op.write && c.cfg.Bypass != nil {
 		price, stock := 100+int64(seq%100000), int64(seq%997)
+		if c.cfg.BypassAudit != nil {
+			c.cfg.BypassAudit.RecordAt(ctx, id, "commit_call_begin", 0, 0, audit.Now())
+		}
 		res, err := c.cfg.Bypass.ExecContext(ctx, `UPDATE items SET price_cent = ?, stock = ?, version = LAST_INSERT_ID(version + 1), updated_at = UTC_TIMESTAMP(6) WHERE id = ?`, price, stock, op.id)
 		committedAt := audit.Now()
 		if err == nil {
@@ -172,6 +175,9 @@ func (c s1Clients) do(ctx context.Context, op s1Op, seq int, rec *S1Record) {
 			}
 		}
 		if err != nil {
+			if c.cfg.BypassAudit != nil {
+				c.cfg.BypassAudit.RecordAt(ctx, id, "commit_error", 0, 0, committedAt)
+			}
 			rec.Err = "mysql"
 			return
 		}

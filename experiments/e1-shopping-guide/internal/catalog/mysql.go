@@ -74,6 +74,10 @@ func (s *MySQLStore) Put(ctx context.Context, item Item) (Item, error) {
 	}
 	// updated_at is DATETIME(6): stamp at microsecond precision so the returned copy equals a later read.
 	now := s.now().UTC().Truncate(time.Microsecond)
+	callBegin := audit.Now()
+	if s.Audit != nil {
+		s.Audit.RecordAt(ctx, item.ID, "commit_call_begin", 0, 0, callBegin)
+	}
 	res, err := s.DB.ExecContext(ctx, `INSERT INTO items (id, title, category_id, price_cent, stock, version, updated_at)
 VALUES (?, ?, 0, ?, ?, LAST_INSERT_ID(1), ?) AS incoming
 ON DUPLICATE KEY UPDATE title = incoming.title, price_cent = incoming.price_cent, stock = incoming.stock,
@@ -81,6 +85,9 @@ ON DUPLICATE KEY UPDATE title = incoming.title, price_cent = incoming.price_cent
 		n, item.Title, item.PriceCent, item.Stock, now)
 	committedAt := audit.Now() // immediately after autocommit ExecContext returns
 	if err != nil {
+		if s.Audit != nil {
+			s.Audit.RecordAt(ctx, item.ID, "commit_error", 0, 0, committedAt)
+		}
 		return Item{}, err
 	}
 	version, err := res.LastInsertId()
