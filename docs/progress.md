@@ -344,3 +344,6 @@ Claude已实现的MySQL/四策略基础上，Codex完成发压门禁/窗口/连�
 
 
 2026-10-29 S1补测探针恢复：35960f1的3秒超时探针中C/CV发生transport_timeout，C服务端GET最大约22–38ms；每轮独立control RTT最大可到1.8–2.3秒。不能将网络超时归因源查询，不修改已记录valid或删除任何尝试。保留probes目录后受控SIGINT，统一新补测Mac等待10秒，保持50ms服务端SLO、所有臂同参数及原定100/250/400档位，重跑完整A/C/CV探针。S2报告已建于项目目录HvnawG2UbiDfY1kAJybc4eBznGb，回读/回查通过，35960f1已推送。
+
+
+2026-10-29：cfe45c7下10秒等待的新探针第3重复A/C/CV全部有效，各12359正式读（全key日志匹配）；此前10秒探针也有网络/客户端预算导致的无效尝试，保留全部原valid与中断现场。本次增加只读s1_quality共同有效组验收器，安排持久bcl-s1-v2单元对交接提交重新probe，再自动natural/race/bypass，先前数据不覆盖。S2报告已在项目知识库HvnawG2UbiDfY1kAJybc4eBznGb归档并回读；S1正式测量/报告仍待完成。
