@@ -25,15 +25,17 @@ type Registry func(name string) *atomic.Uint64
 // Store counts source operations; source reads per second is S1's "MySQL read QPS".
 type Store struct {
 	catalog.Store
-	Reads, Writes, Errors *atomic.Uint64
+	Reads, Writes, Errors   *atomic.Uint64
+	FullReads, VersionReads *atomic.Uint64
 }
 
 func NewStore(s catalog.Store, reg Registry) *Store {
-	return &Store{s, reg("bcl_e1_source_reads_total"), reg("bcl_e1_source_writes_total"), reg("bcl_e1_source_errors_total")}
+	return &Store{Store: s, Reads: reg("bcl_e1_source_reads_total"), Writes: reg("bcl_e1_source_writes_total"), Errors: reg("bcl_e1_source_errors_total"), FullReads: reg("bcl_e1_source_full_reads_total"), VersionReads: reg("bcl_e1_source_version_reads_total")}
 }
 
 func (s *Store) Get(ctx context.Context, id string) (catalog.Item, error) {
 	s.Reads.Add(1)
+	s.FullReads.Add(1)
 	item, err := s.Store.Get(ctx, id)
 	if err != nil && !errors.Is(err, catalog.ErrNotFound) {
 		s.Errors.Add(1)
@@ -237,8 +239,10 @@ func (s *Store) GetVersion(ctx context.Context, id string) (int64, error) {
 	var version int64
 	var err error
 	if vs, ok := s.Store.(guide.VersionStore); ok {
+		s.VersionReads.Add(1)
 		version, err = vs.GetVersion(ctx, id)
 	} else {
+		s.FullReads.Add(1)
 		var item catalog.Item
 		item, err = s.Store.Get(ctx, id)
 		version = item.Version

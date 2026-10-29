@@ -122,3 +122,30 @@ func TestFileTracerWritesOrderedLinesForOneKey(t *testing.T) {
 		}
 	}
 }
+
+type projectedStore struct{ catalog.Store }
+
+func (s projectedStore) GetVersion(ctx context.Context, id string) (int64, error) {
+	v, err := s.Store.Get(ctx, id)
+	return v.Version, err
+}
+func TestProjectionCountersMatchStrictVersionQueryDecisions(t *testing.T) {
+	ctx := context.Background()
+	base := catalogtest.NewStore(t)
+	base.Put(ctx, catalog.Item{ID: "1", Title: "one"})
+	reg, c := registry()
+	store := observe.NewStore(projectedStore{base}, reg)
+	s := guide.NewService(store, cache.NewMemory(time.Hour), guide.StrictVersion)
+	for range 2 {
+		if _, err := s.Get(ctx, "1"); err != nil {
+			t.Fatal(err)
+		}
+	}
+	base.Put(ctx, catalog.Item{ID: "1", Title: "two"})
+	if _, err := s.Get(ctx, "1"); err != nil {
+		t.Fatal(err)
+	}
+	if c["bcl_e1_source_reads_total"].Load() != 4 || c["bcl_e1_source_full_reads_total"].Load() != 2 || c["bcl_e1_source_version_reads_total"].Load() != 2 {
+		t.Fatal("projection counts must include mismatch full reread")
+	}
+}

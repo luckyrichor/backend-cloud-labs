@@ -163,6 +163,7 @@ func (s Service) getStrictVersion(ctx context.Context, op uint64, id string) (Re
 		}
 		s.event(op, id, "source_version", version)
 		if cached.Version == version {
+			s.Repairs.clearFor(s.generation, id, cached.Version)
 			s.event(op, id, "cache_validated", cached.Version)
 			return Result{cached, "cache_validated", false}, nil
 		}
@@ -177,6 +178,9 @@ func (s Service) getStrictVersion(ctx context.Context, op uint64, id string) (Re
 	}
 	_, fillErr := s.Cache.PutIfNewer(ctx, authoritative)
 	s.event(op, id, "fill", authoritative.Version)
+	if fillErr == nil {
+		s.Repairs.clearFor(s.generation, id, authoritative.Version)
+	}
 	return Result{authoritative, "store", (cacheErr != nil && !errors.Is(cacheErr, ErrCacheMiss)) || fillErr != nil}, nil
 }
 func (s Service) delayFill(ctx context.Context) error {

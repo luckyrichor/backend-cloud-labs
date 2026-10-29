@@ -1,0 +1,12 @@
+{
+  "scope": "post-S2 source with S1 projection counters and supplemental scripts; tests are not new S2 runs",
+  "check_script": "bash scripts/check.sh",
+  "exit_code": 0,
+  "go": {
+    "top_level_pass": 158,
+    "skip": 6,
+    "fail": 0
+  },
+  "ctest": "7/7",
+  "python": "8/8"
+}

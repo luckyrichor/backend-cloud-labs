@@ -1,0 +1,11 @@
+{
+  "source_commit": "fdccc715f37d30bd9bad0483e687977f9b20aee0",
+  "binaries": {
+    "guide": "54fcadedb73fc5fc6595975a2c61bb73e5b5077225e37c0a763ed1c8bf323b62",
+    "binlog-stream": "2ae6e044bbe6748179885192e40a584b622646c1c20886d4f92a56e4acca505d",
+    "source-probe": "786692a2650b1436782f29cb0bcce70f6ee94d3691c714d04eebfd1f274701c3",
+    "loadgen": "4cce784669834d554629e7237e698141763aafe42da9794e52a15035c7f0ff0e",
+    "summary": "6f50d9ffffb3c4359b6f3c253f415f9d1ba03da47775675453fe79ca7c937a77",
+    "loadgen-mac": "348509ed8aab11cbab39ba87d9eef5fb3eefebc23396c1c77fb8321b09e2c306"
+  }
+}

@@ -45,15 +45,36 @@ func TestStrictVersionNoDoubleQueryOnMissAndRechecksHit(t *testing.T) {
 		t.Fatalf("mismatch not refreshed %+v %v", r, err)
 	}
 }
+
+type cancelAfterRead struct {
+	catalog.Store
+	cancel context.CancelFunc
+	called bool
+}
+
+func (s *cancelAfterRead) Get(ctx context.Context, id string) (catalog.Item, error) {
+	item, err := s.Store.Get(ctx, id)
+	s.called = true
+	s.cancel()
+	return item, err
+}
 func TestFaultFillDelayHonorsCancellation(t *testing.T) {
 	ctx := context.Background()
 	store := catalog.NewMemoryStore()
 	store.Put(ctx, catalog.Item{ID: "1"})
-	s := guide.NewService(store, cache.NewMemory(time.Hour), guide.CacheAside)
-	s.FillDelay = time.Hour
 	cancelled, cancel := context.WithCancel(ctx)
-	cancel()
+	defer cancel()
+	source := &cancelAfterRead{Store: store, cancel: cancel}
+	cached := cache.NewMemory(time.Hour)
+	s := guide.NewService(source, cached, guide.CacheAside)
+	s.FillDelay = time.Hour
 	if _, err := s.Get(cancelled, "1"); !errors.Is(err, context.Canceled) {
 		t.Fatalf("want cancellation, got %v", err)
+	}
+	if !source.called {
+		t.Fatal("cancellation did not reach fill delay")
+	}
+	if _, err := cached.Get(ctx, "1"); !errors.Is(err, guide.ErrCacheMiss) {
+		t.Fatal("cancelled refill modified cache")
 	}
 }
