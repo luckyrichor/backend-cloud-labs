@@ -44,6 +44,10 @@ def archive(trace,target):
  if destination.exists():raise RuntimeError('audit archive already exists')
  destination.write_bytes(gzip.compress(raw,mtime=0))
 legacy.start_e1=start;legacy.archive_trace=archive
+class Mac(legacy.Mac):
+ def ask(self,c):
+  if c.get('op')=='run':c=dict(c,timeout='10s')
+  return super().ask(c)
 class TX:
  def __init__(self,commit):
   self.commit=commit;self.secret=json.loads((ROOT/'.local/deploy/client-env.json').read_text());self.environment={'scope':'separate tx bypass consistency cohort','host':'tx','cpu_affinity':[3],'business_streams':1}
@@ -79,7 +83,7 @@ def one(client,commit,manifest,out,arm,ratio,rate,repeat,story,delay='0s',bypass
  else:
   audits=[out/(stem+'.audit.jsonl.gz')]
   if bypass:audits.append(out/(stem+'.bypass.audit.jsonl.gz'))
-  truth=calculate(audits,out/(stem+'.csv.gz'),stem);truth.update(source_commit=commit,story=story,arm=arm,repeat=repeat,ratio=ratio,rate=rate,fill_delay=delay,fault_injection=delay!='0s',client_topology='tx-loopback' if bypass else 'Mac-four-SSH-business-streams',client_valid=doc['result']['valid'],source_audit_ok=json.loads((out/(stem+'.correctness.json')).read_text())['ok'])
+  truth=calculate(audits,out/(stem+'.csv.gz'),stem);truth.update(source_commit=commit,story=story,arm=arm,repeat=repeat,ratio=ratio,rate=rate,fill_delay=delay,fault_injection=delay!='0s',client_topology='tx-loopback' if bypass else 'Mac-four-SSH-business-streams',client_timeout='3s' if bypass else '10s',client_valid=doc['result']['valid'],source_audit_ok=json.loads((out/(stem+'.correctness.json')).read_text())['ok'])
   save(path,truth)
  good=doc['result']['valid'] and truth['valid'] and truth['source_audit_ok']
  print(json.dumps({'event':'a2-complete','story':story,'arm':arm,'ratio':ratio,'rate':rate,'repeat':repeat,'valid':good,'stale':truth['stale'],'reads':truth['successful_formal_reads']}),flush=True)
@@ -104,7 +108,7 @@ def main(a):
  shutil.copyfile(ROOT/'.local/s1-suite/prepared.json',STATE/'prepared.json')
  if not(STATE/'provenance.json').exists() or json.loads((STATE/'provenance.json').read_text())['source_commit']!=commit:legacy.build(commit,manifest)
  legacy.start_redis();legacy.stop_e1();legacy.restore()
- client=TX(commit) if a.phase=='bypass' else legacy.Mac(commit)
+ client=TX(commit) if a.phase=='bypass' else Mac(commit)
  try:
   if a.phase!='probe':
    qualified=json.loads((STATE/'probe-qualified.json').read_text());assert qualified['source_commit']==commit,'probe source mismatch'
