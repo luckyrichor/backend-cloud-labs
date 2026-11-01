@@ -1,6 +1,6 @@
 # AGENTS.md
 
-最后更新：2026-11-01（北京时间，P2补测/报告收尾）· Codex
+最后更新：2026-11-01（北京时间，CP2交付完成，等待审阅）· Codex
 
 本文件是本仓库唯一的交接正文（Claude Code 经 `CLAUDE.md` 的 `@AGENTS.md` 导入，Codex 直接读）。没参与过的人只读这一份，应能知道项目是什么、做到哪、怎么继续。
 
@@ -110,7 +110,7 @@ python3 scripts/with-p0-env.py go -C tools/datapipe run ./cmd/dbmigrate --dir ..
 
 **收尾状态**
 
-- 仓库报告和证据已整理；飞书待同步：2026-11-01 S1新版报告、S2 Stream丢失补充与P2开发记录。同步并回查后进入CP2，等待用户审阅；不自动开始P3。
+- **已到CP2，等待用户审阅**。仓库报告/证据已提交f9ab281；S1 v2飞书revision4、S2追加revision5、开发记录revision28均已关键词回读，项目父节点回查确认。目录：我的文档库 / WorkPlan / backend-cloud-labs。S1 v2链接见第12节；不自动开始P3。
 
 **未开始**
 
@@ -118,7 +118,7 @@ python3 scripts/with-p0-env.py go -C tools/datapipe run ./cmd/dbmigrate --dir ..
 
 ## 8. 下一步计划（按优先级）
 
-1. 完成当前P2交付的飞书同步与归档位置回查，给出S1 v2、S2两份报告链接。
+1. 当前停在CP2，S1 v2、S2及开发记录均已同步并回查；直接将第12节报告链接交用户审阅。
 2. **CP2等待用户审阅**：请用户查看负结果（反向验证未支持门控独立收益、CV未降低p99）及恢复边界（Stream历史丢失仅TTL被动兜底/人工重建组）。没有新审批前不进入P3。
 3. 如用户批准进入后续阶段，再按方案启动P3的E3 S4/S5；不自行改动既有首轮结果或为挑选有利结论重跑。
 
@@ -172,14 +172,15 @@ python3 scripts/with-p0-env.py go -C tools/datapipe run ./cmd/dbmigrate --dir ..
 
 - 项目概览（节点本身，Codex 2026-10-13，来源 b98f225）：https://kcn0pbn0hwo0.feishu.cn/wiki/PgE6wzqFbiUa6lktbhHcPqP0nDi
 - backend-cloud-labs 方案（用户方案原文同步）：https://kcn0pbn0hwo0.feishu.cn/wiki/BnIcwD3TUiLXNHkEs9qcCxgdng6
-- S2报告（2026-10-29，实测源码fdccc71，归档/报告35960f1）：https://kcn0pbn0hwo0.feishu.cn/wiki/HvnawG2UbiDfY1kAJybc4eBznGb
+- S1新版报告（2026-11-01，测量a00e151，归档f9ab281）：https://kcn0pbn0hwo0.feishu.cn/wiki/TyIMwQ6VoiPtKpkhpPHciSwOn0e
+- S2报告（2026-10-29，实测源码fdccc71，2026-11-01追加a00e151的Stream丢失补充）：https://kcn0pbn0hwo0.feishu.cn/wiki/HvnawG2UbiDfY1kAJybc4eBznGb
 - backend-cloud-labs 开发记录（每个阶段在文末追加一节，只追加不改旧内容）：https://kcn0pbn0hwo0.feishu.cn/wiki/AkEQwOqXTiyhbiklUqPcjUKfnXg
 
 2026-10-27：Codex已将恢复/链路调整、真实竞态、120轮主矩阵及158轮完整计划进展追加至revision 7–12；本次暂停记录已追加至revision 13，回读“161次已完成尝试”并核验文档仍在本项目父节点下。18:04恢复记录已追加revision14并回读/回查通过。S1最终报告与完成状态已在2026-10-28同步至revision15，追加署名日期更正至revision16；回读与项目父节点回查通过，暂停快照保留作历史。
 
 ## 13. 更新日志
 
-- 2026-11-01 · Codex：S1新版205选中轮完成并公开重算，新增v2报告/无损归档；Stream丢失5/5补测和独立核对通过，S2追加边界说明。停止正式压测，准备CP2；飞书同步状态见上文。
+- 2026-11-01 · Codex：S1新版205选中轮完成并公开重算，新增v2报告/无损归档；Stream丢失5/5补测和独立核对通过，S2追加边界说明。停止正式压测，CP2交付完成；S1 v2 revision4/S2 revision5/开发记录revision28均同步并回读、父节点回查通过。
 
 - 2026-10-29 · Codex：S2报告和175MB无损归档完成，公开重算6100目标/732000轮询逐字节一致；A/B窗口p99约503ms，C约12–13ms，停桥恢复TTL量级，写p99无稳定收益。S1补测脚本/全key真值与投影计数已通过检查，准备同源探针；CP2未到达。
 
