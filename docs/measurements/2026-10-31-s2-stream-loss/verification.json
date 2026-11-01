@@ -1,0 +1,46 @@
+{
+  "valid": true,
+  "runs": [
+    {
+      "repeat": 1,
+      "valid": true,
+      "ttl_fallback_us": 498759.042,
+      "source_commit": "a00e15101716f21cd674662e74210130719a0bcc",
+      "server_commit_to_fresh_return_us": 499771.334
+    },
+    {
+      "repeat": 2,
+      "valid": true,
+      "ttl_fallback_us": 498324.685,
+      "source_commit": "a00e15101716f21cd674662e74210130719a0bcc",
+      "server_commit_to_fresh_return_us": 499373.125
+    },
+    {
+      "repeat": 3,
+      "valid": true,
+      "ttl_fallback_us": 499712.945,
+      "source_commit": "a00e15101716f21cd674662e74210130719a0bcc",
+      "server_commit_to_fresh_return_us": 500802.052
+    },
+    {
+      "repeat": 4,
+      "valid": true,
+      "ttl_fallback_us": 507269.359,
+      "source_commit": "a00e15101716f21cd674662e74210130719a0bcc",
+      "server_commit_to_fresh_return_us": 508311.678
+    },
+    {
+      "repeat": 5,
+      "valid": true,
+      "ttl_fallback_us": 506121.111,
+      "source_commit": "a00e15101716f21cd674662e74210130719a0bcc",
+      "server_commit_to_fresh_return_us": 507099.921
+    }
+  ],
+  "ttl_fallback_us": {
+    "median": 499712.945,
+    "min": 498324.685,
+    "max": 507269.359
+  },
+  "boundary": "Small fault sample; operator recreated empty consumer groups. This does not restore lost historical events or validate full-catalog proactive rebuild."
+}

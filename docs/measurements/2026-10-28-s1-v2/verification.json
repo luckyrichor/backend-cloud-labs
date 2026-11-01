@@ -1,0 +1,23 @@
+{
+  "verified_at": "2026-11-01T08:49:27.275472+00:00",
+  "formal_attempts_recomputed": 250,
+  "selected_runs": 205,
+  "comparison_cells": 41,
+  "public_rebuilds": 2,
+  "second_rebuild_uses_freshly_built_summary": true,
+  "recomputed_gzip_byte_identical": true,
+  "groups_csv_byte_identical": true,
+  "python_tests": {
+    "passed": 8,
+    "command": "python3 -m unittest discover -s scripts/p2 -p 'test_*.py' -v"
+  },
+  "first_round_report_sha256": "84d1d79ac660f665f7e7db2e0dfcb0bd47c5a29d45348f32cad8bc6260021803",
+  "restored_fingerprint_verified_again": [
+    2000000,
+    2000000,
+    11670244223,
+    476822047,
+    1,
+    1
+  ]
+}

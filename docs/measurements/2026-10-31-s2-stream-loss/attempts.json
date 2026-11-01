@@ -1,0 +1,62 @@
+[
+  {
+    "path": "raw/s2-stream-loss-extra/S2-stream-loss-r1/fault.json.gz",
+    "original_valid": true,
+    "final_eligible": true,
+    "source_commit": "a00e15101716f21cd674662e74210130719a0bcc",
+    "arm": null,
+    "rate": null,
+    "repeat": 1,
+    "kind": "owned-stream-loss",
+    "reverse": false,
+    "classification": "supplemental separate cohort"
+  },
+  {
+    "path": "raw/s2-stream-loss-extra/S2-stream-loss-r2/fault.json.gz",
+    "original_valid": true,
+    "final_eligible": true,
+    "source_commit": "a00e15101716f21cd674662e74210130719a0bcc",
+    "arm": null,
+    "rate": null,
+    "repeat": 2,
+    "kind": "owned-stream-loss",
+    "reverse": false,
+    "classification": "supplemental separate cohort"
+  },
+  {
+    "path": "raw/s2-stream-loss-extra/S2-stream-loss-r3/fault.json.gz",
+    "original_valid": true,
+    "final_eligible": true,
+    "source_commit": "a00e15101716f21cd674662e74210130719a0bcc",
+    "arm": null,
+    "rate": null,
+    "repeat": 3,
+    "kind": "owned-stream-loss",
+    "reverse": false,
+    "classification": "supplemental separate cohort"
+  },
+  {
+    "path": "raw/s2-stream-loss-extra/S2-stream-loss-r4/fault.json.gz",
+    "original_valid": true,
+    "final_eligible": true,
+    "source_commit": "a00e15101716f21cd674662e74210130719a0bcc",
+    "arm": null,
+    "rate": null,
+    "repeat": 4,
+    "kind": "owned-stream-loss",
+    "reverse": false,
+    "classification": "supplemental separate cohort"
+  },
+  {
+    "path": "raw/s2-stream-loss-extra/S2-stream-loss-r5/fault.json.gz",
+    "original_valid": true,
+    "final_eligible": true,
+    "source_commit": "a00e15101716f21cd674662e74210130719a0bcc",
+    "arm": null,
+    "rate": null,
+    "repeat": 5,
+    "kind": "owned-stream-loss",
+    "reverse": false,
+    "classification": "supplemental separate cohort"
+  }
+]
