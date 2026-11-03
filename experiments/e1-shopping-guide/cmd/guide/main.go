@@ -35,6 +35,7 @@ import (
 //	CACHE_READ_MODE                   strict (default) | cache-first | cache-aside | versioned
 //	GUIDE_CACHE_TTL                   cache entry lifetime (default 1m)
 //	GUIDE_UNGATED_FILLS=1             versioned arm fills with plain SET (S1 reverse validation)
+//	GUIDE_GATED_ASIDE=1               cache-aside refills through the version gate (S1 branch arm)
 //	GUIDE_TRACE_ID, GUIDE_TRACE_FILE  append the event timeline of one key as JSON lines
 func main() {
 	// Enabled only in dedicated profiling runs, excluded from performance comparisons.
@@ -152,6 +153,14 @@ func main() {
 		cached = tier
 	}
 	service := guide.NewService(observe.NewStore(store, metrics.Counter), observe.NewCache(cached, metrics.Counter), mode)
+	// S1 uses cache-aside's delete-on-write with gated refills, without the S2
+	// stream consumer or local tier. The default cache-aside arm stays ungated.
+	if os.Getenv("GUIDE_GATED_ASIDE") == "1" {
+		if mode != guide.CacheAside {
+			log.Fatal("GUIDE_GATED_ASIDE requires CACHE_READ_MODE=cache-aside")
+		}
+		service.GatedAside = true
+	}
 	// S2 uses an explicitly shared namespace; the single-process repair queue's
 	// random prefix would otherwise isolate L2 and hide stream updates from reads.
 	if tier != nil {
@@ -219,7 +228,20 @@ func main() {
 	}
 	latency := observe.NewLatency()
 	metrics.Route("GET /debug/latency", latency.Handler())
-	strategy := []byte(`{"source":"` + sourceName + `","mode":"` + string(service.Mode) + `","ungated_fills":` + map[bool]string{true: "true", false: "false"}[service.UngatedFills] + `,"ttl":"` + ttl.String() + `","fill_delay":"` + service.FillDelay.String() + `"}`)
+	strategy, err := json.Marshal(struct {
+		Source        string `json:"source"`
+		Mode          string `json:"mode"`
+		UngatedFills  bool   `json:"ungated_fills"`
+		GatedAside    bool   `json:"gated_aside"`
+		ReadFillGated bool   `json:"read_fill_gated"`
+		WritePath     string `json:"write_path"`
+		TTL           string `json:"ttl"`
+		FillDelay     string `json:"fill_delay"`
+	}{sourceName, string(service.Mode), service.UngatedFills, service.GatedAside,
+		service.ReadFillGated(), service.WritePath(), ttl.String(), service.FillDelay.String()})
+	if err != nil {
+		log.Fatal("strategy metadata failed")
+	}
 	metrics.Route("GET /debug/strategy", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(strategy)

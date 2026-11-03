@@ -127,6 +127,103 @@ func TestUngatedStrategiesNeedSetAndDelete(t *testing.T) {
 	}
 }
 
+// recordingCache distinguishes the two cache primitives so the S1 branch arms
+// prove which path a request actually took rather than only inspecting config.
+type recordingCache struct {
+	inner                *cache.Memory
+	gated, sets, deletes int
+}
+
+func (c *recordingCache) Get(ctx context.Context, id string) (catalog.Item, error) {
+	return c.inner.Get(ctx, id)
+}
+
+func (c *recordingCache) PutIfNewer(ctx context.Context, item catalog.Item) (bool, error) {
+	c.gated++
+	return c.inner.PutIfNewer(ctx, item)
+}
+
+func (c *recordingCache) Set(ctx context.Context, item catalog.Item) error {
+	c.sets++
+	return c.inner.Set(ctx, item)
+}
+
+func (c *recordingCache) Delete(ctx context.Context, id string) error {
+	c.deletes++
+	return c.inner.Delete(ctx, id)
+}
+
+func TestGateOnlyBranchGatesReadsAndDeletesOnWrite(t *testing.T) {
+	ctx := context.Background()
+	c := &recordingCache{inner: cache.NewMemory(time.Hour)}
+	s := guide.NewService(catalogtest.NewStore(t), c, guide.CacheAside)
+	s.SharedNamespace = true
+	s.GatedAside = true
+	if _, err := s.Put(ctx, catalog.Item{ID: "1", Title: "t", PriceCent: 1, Stock: 1}); err != nil {
+		t.Fatal(err)
+	}
+	if c.gated != 0 || c.sets != 0 || c.deletes != 1 {
+		t.Fatalf("gate-only write must delete, not fill: gated=%d sets=%d deletes=%d", c.gated, c.sets, c.deletes)
+	}
+	first, err := s.Get(ctx, "1")
+	if err != nil || first.Source != "store" {
+		t.Fatalf("cache miss should read the source: %+v %v", first, err)
+	}
+	if c.gated != 1 || c.sets != 0 {
+		t.Fatalf("gate-only read fill must use PutIfNewer: gated=%d sets=%d", c.gated, c.sets)
+	}
+	second, err := s.Get(ctx, "1")
+	if err != nil || second.Source != "cache_unvalidated" {
+		t.Fatalf("second read should hit the gated entry: %+v %v", second, err)
+	}
+}
+
+func TestWriteOnlyBranchFillsUngatedOnReadAndWrite(t *testing.T) {
+	ctx := context.Background()
+	c := &recordingCache{inner: cache.NewMemory(time.Hour)}
+	s := guide.NewService(catalogtest.NewStore(t), c, guide.Versioned)
+	s.SharedNamespace = true
+	s.UngatedFills = true
+	if _, err := s.Put(ctx, catalog.Item{ID: "1", Title: "t", PriceCent: 1, Stock: 1}); err != nil {
+		t.Fatal(err)
+	}
+	if c.gated != 0 || c.sets != 1 || c.deletes != 0 {
+		t.Fatalf("write-only put must use plain SET: gated=%d sets=%d deletes=%d", c.gated, c.sets, c.deletes)
+	}
+	if err := c.inner.Delete(ctx, "1"); err != nil {
+		t.Fatal(err)
+	}
+	read, err := s.Get(ctx, "1")
+	if err != nil || read.Source != "store" {
+		t.Fatalf("cache miss should read the source: %+v %v", read, err)
+	}
+	if c.gated != 0 || c.sets != 2 {
+		t.Fatalf("write-only read fill must use plain SET: gated=%d sets=%d", c.gated, c.sets)
+	}
+}
+
+func TestStrategyDescriptorsReportBranchPaths(t *testing.T) {
+	for _, tc := range []struct {
+		name    string
+		mode    guide.ReadMode
+		gated   bool
+		ungated bool
+		read    bool
+		write   string
+	}{
+		{"A", guide.CacheAside, false, false, false, "delete"},
+		{"B", guide.Versioned, false, false, true, "gated-fill"},
+		{"B-off", guide.Versioned, false, true, false, "plain-fill"},
+		{"B-gate-only", guide.CacheAside, true, false, true, "delete"},
+		{"B-write-only", guide.Versioned, false, true, false, "plain-fill"},
+	} {
+		s := guide.Service{Mode: tc.mode, GatedAside: tc.gated, UngatedFills: tc.ungated}
+		if got := s.ReadFillGated(); got != tc.read || s.WritePath() != tc.write {
+			t.Fatalf("%s: read_fill_gated=%t write_path=%s", tc.name, got, s.WritePath())
+		}
+	}
+}
+
 func TestZeroModeIsStrict(t *testing.T) {
 	ctx := context.Background()
 	store := &countingStore{Store: catalogtest.NewStore(t)}

@@ -75,6 +75,35 @@ func (s Service) fill(ctx context.Context, item catalog.Item, gated bool) error 
 	return u.Set(ctx, item)
 }
 
+// ReadFillGated reports whether a source refill uses the version gate. It makes the
+// S1 single-branch configuration observable from /debug/strategy.
+func (s Service) ReadFillGated() bool {
+	switch s.Mode {
+	case CacheAside:
+		return s.GatedAside
+	case Versioned:
+		return !s.UngatedFills
+	default:
+		return true
+	}
+}
+
+// WritePath names the cache action after a committed source write: "delete" for
+// cache-aside, "gated-fill" or "plain-fill" for versioned fills.
+func (s Service) WritePath() string {
+	switch s.Mode {
+	case CacheAside:
+		return "delete"
+	case Versioned:
+		if s.UngatedFills {
+			return "plain-fill"
+		}
+		return "gated-fill"
+	default:
+		return "gated-fill"
+	}
+}
+
 // readThrough serves a hit unvalidated, otherwise reads the source and fills.
 func (s Service) readThrough(ctx context.Context, op uint64, id string, gated bool) (Result, error) {
 	cached, err := s.Cache.Get(ctx, id)

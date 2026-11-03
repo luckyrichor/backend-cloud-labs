@@ -357,3 +357,12 @@ S2 Stream丢失5/5有效，独立核对提交/旧读/TTL新读/重建后新事�
 
 
 2026-11-01 CP2同步完成：归档/报告提交f9ab281；S1 v2知识库TyIMwQ6VoiPtKpkhpPHciSwOn0e（revision4）、S2 HvnawG2UbiDfY1kAJybc4eBznGb（追加revision5）、开发记录AkEQwOqXTiyhbiklUqPcjUKfnXg（revision28）均已关键词回读及项目父节点回查通过。AGENTS记录最终链接与CP2等待状态。没有进入P3。
+
+
+## 2026-11-03 · CP2通过、S1单分支实现与阶段2a环境准备
+
+用户通过CP2后，按授权先做S1单分支小补做而非直接进入P3。新增`B-gate-only`与`B-write-only`两个命名臂；E1只增加`GUIDE_GATED_ASIDE`实验开关及`/debug/strategy`的`read_fill_gated`/`write_path`，A/B/B-off/C/CV/D默认语义未改。新增单分支控制器、严格离线汇总门禁和对应测试；确定性测试覆盖gate-only读门控/写删除、write-only读写信普通SET、trace目录契约，以及无效轮次、参数漂移、错误路径计数、混合源版本和旧参考源前缀拒绝。
+
+实际检查：E1 `gofmt -l`无输出、`go vet ./...`通过、`go test -race -count=1 ./...`的7个有测试包全部通过；相关Python测试25/25通过；`git diff --check`无错误。未提交、未推送、未发飞书。
+
+阶段2a只恢复原环境：`bcl-p0`八个容器和`bcl-s1-redis`按原镜像、CPU pin、内存、网络、端口启动，健康检查通过；`bcl-p2-redis`保持停止。只读核对`bcl_s1.items`与`items_base`指纹均为`[2000000,2000000,11670244223,476822047,1,1]`，prepared/catalog数据版本一致；未调用prepare、未重建或清空表、未清理共享Redis。只读快照和30秒CPU观测保存在`.local/s1-single/preflight/`。观测到其他项目仍有较高CPU占用，未启动业务发压；正式两个新臂各5轮待Codex确认负载条件后再执行。
