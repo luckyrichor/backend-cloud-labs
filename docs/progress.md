@@ -379,4 +379,4 @@ Codex按用户授权亲自完成清理收尾；来源 backend-cloud-labs@5a9440e
 
 ## 2026-11-08 用户授权空间清理完成
 
-.local/bin及GitHub已有docs文件按白名单本地移除，保留progress。246受保护文件hash一致，7,998份移除文档的Git blob保持不变；两项目独立验收合计释放约8.44GiB，代码/脚本/独有结果/备份/Git/全部容器卷保留。报告文件以本机skip-worktree移除，不向远端提交删除；恢复说明见AGENTS.md。无业务代码变更，不运行会重装依赖的应用测试；服务仍停，bench-pg保留。飞书待同步：2026-11-08 清理完成与恢复条件。
+.local/bin及GitHub已有docs文件按白名单本地移除，保留progress。246受保护文件hash一致，7,998份移除文档的Git blob保持不变；两项目独立验收合计释放约8.44GiB，代码/脚本/独有结果/备份/Git/全部容器卷保留。报告文件以本机skip-worktree移除，不向远端提交删除；恢复说明见AGENTS.md。无业务代码变更，不运行会重装依赖的应用测试；服务仍停，bench-pg保留。飞书已同步：本项目开发记录revision32（来源b801c21），正文/归档位置回查通过，链接见AGENTS.md。

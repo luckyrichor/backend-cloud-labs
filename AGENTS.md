@@ -228,4 +228,4 @@ python3 scripts/with-p0-env.py go -C tools/datapipe run ./cmd/dbmigrate --dir ..
 - 删除验收时占用1,165,598,720→553,263,104 B（约1.09→0.52GiB），释放612,335,616 B；之后审计/交接文件有少量增长。
 - 容器保持停止；以后运行需按仓库构建入口重编译.local/bin，再按计划恢复实验环境。本次没有实施S1剩余正式轮次或推进P3。
 
-飞书待同步：2026-11-08 本轮用户授权清理完成与恢复说明，沿用本项目开发记录。
+飞书已同步：2026-11-08 清理完成与恢复说明已追加本项目开发记录revision32，来源b801c21，codex profile / --as user；正文与我的文档库/WorkPlan/backend-cloud-labs父节点回查通过。链接：https://kcn0pbn0hwo0.feishu.cn/wiki/AkEQwOqXTiyhbiklUqPcjUKfnXg 。
