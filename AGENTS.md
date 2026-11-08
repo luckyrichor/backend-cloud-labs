@@ -214,3 +214,18 @@ python3 scripts/with-p0-env.py go -C tools/datapipe run ./cmd/dbmigrate --dir ..
 - 2026-10-20 · Codex：P0 完成，停在 CP1。
 - 2026-10-13 · Codex：E5 CMDB 完成。
 - 2026-10-09 · Codex：E1–E4 第五轮评审（缓存代际、E2 移动合并、E3 十进制语法、E4 未服务需求量）；证据 docs/measurements/2026-10-09-fifth-review.json。
+
+
+## 2026-11-08 授权清理完成：恢复与当前本机状态
+
+用户明确确认原始数据可重新取得，并授权执行上轮约8.45GiB清理。CodeBuddy实施、Codex亲自核验；最终结果而非执行自报为依据。两个项目删除验收时合计释放约8.44GiB（后续少量审计/交接文件占用另计），没有删除代码、脚本、本地独有实验记录、数据库dump、.git、任何容器或数据卷，服务保持停止；bench-pg仍按用户仅调查要求保留运行。
+
+本地已移除GitHub已有的docs文件，但保留docs/progress.md，使用仅本机的skip-worktree标记防止误提交报告删除。Git index的原blob、HEAD在删除验收时均未变、工作区无删除待提交；随后仅提交交接记录更新。旧相对docs链接在本机可能不存在，请用GitHub已发布版本或从Git对象恢复；不要把本地不存在误判为GitHub报告丢失。
+
+恢复单份报告（在对应项目根目录执行）：先`git update-index --no-skip-worktree -- docs/具体文件`，再`git restore --source=<清理前HEAD> --worktree -- docs/具体文件`。只针对已确认文件，不使用全仓库restore覆盖新工作。完整路径/原blob清单在本机`.agent-tasks/2026-11-08-cleanup-targets.json.gz`，受保护文件SHA256在`2026-11-08-cleanup-protected.json.gz`，独立验收在`2026-11-08-cleanup-codex-verification.json`；两项目执行主结果在agent-ops-platform的`.agent-tasks/2026-11-08-cleanup-result.json`。skip-worktree是本机index标记，不同步到GitHub。
+
+- 清理前HEAD：e12c7033edbaa7a8a78eb038f9d47a88a0b9e063。删除`.local/bin`7个可重编译实验程序及7,998份Git已有docs文件（保留progress）。本地独有测量/Redis持久化、.git及所有卷未动。独立验收246个受保护文件SHA256一致，7,999个白名单目标均不存在。
+- 删除验收时占用1,165,598,720→553,263,104 B（约1.09→0.52GiB），释放612,335,616 B；之后审计/交接文件有少量增长。
+- 容器保持停止；以后运行需按仓库构建入口重编译.local/bin，再按计划恢复实验环境。本次没有实施S1剩余正式轮次或推进P3。
+
+飞书待同步：2026-11-08 本轮用户授权清理完成与恢复说明，沿用本项目开发记录。
